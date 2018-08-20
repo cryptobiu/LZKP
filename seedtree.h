@@ -20,14 +20,19 @@ typedef union {
 class SeedTree {
 public:
     SeedTree(osuCrypto::u32 size = 0);
-    void Resize(osuCrypto::u32 size);
-    void Generate(block master_seed);
+    SeedTree(osuCrypto::u32 size, const block &master_seed);
+    void resize(osuCrypto::u32 size);
+    void generate(const block &master_seed);
+    block getBlock(int idx);
+    block getSeed(int idx); // not using operator []
 
     const block& operator[](int idx) const;
 
 private:
+public: // Makes tests easier
     osuCrypto::u32 size_;
     std::vector<block> seeds_;
+    std::vector<osuCrypto::PRNG> prngs_;
 
     osuCrypto::PRNG prng_;
 

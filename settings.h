@@ -8,13 +8,14 @@
 
 class Settings {
 public:
-  Settings(int M, int N, int q, int m, int t) : M(M), N(N), q(q), m(m), t(t) {}
+  Settings(int M, int N, int q, int m, int n, int tau) : M(M), N(N), q(q), m(m), n(n), tau(tau) {}
 
   const int M;
   const int N;
   const int q;
   const int m;
-  const int t;
+  const int n; // n < m
+  const int tau;
 //  const int M = 5;
 //  const int N = 8;
 //  const int q = 31;
