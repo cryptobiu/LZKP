@@ -8,11 +8,11 @@
 
 class Settings {
 public:
-  Settings(int M, int N, int q, int m, int n, int tau) : M(M), N(N), q(q), m(m), n(n), tau(tau) {}
+  Settings(int M, int N, uint64_t q, int m, int n, int tau) : M(M), N(N), q(q), m(m), n(n), tau(tau) {}
 
   const int M;
   const int N;
-  const int q;
+  const uint64_t q;
   const int m;
   const int n; // n < m
   const int tau;

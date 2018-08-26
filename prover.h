@@ -18,25 +18,25 @@ public:
   block r1();
   void r3(std::vector<bool> E, std::vector<block> &seed, std::vector<block> &omega, block &h_pi);
   block r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients);
-  void r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<block> &seed_tree,
-          std::vector<block> &gamma_i_bar, std::vector<std::vector> &alpha_i_bar, std::vector<NTL::ZZ_p> &o,
+  void r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
+          std::vector<block> &gamma_i_bar, std::vector<std::vector<NTL::ZZ_p>> &alpha_i_bar, std::vector<NTL::ZZ_p> &o_i_bar,
           std::vector<std::vector<NTL::ZZ_p>> &b_square, std::vector<std::vector<NTL::ZZ_p>> &s);
 
 private:
 public:
   const int M;
   const int N;
-  const int q;
+  const uint64_t q;
   const int m;
   const int n;
   const int tau;
 
-  // Private values of the prover
+  // Public known values
   NTL::Mat<NTL::ZZ_p> a_;
   NTL::Vec<NTL::ZZ_p> t_;
+
+  // Prover's secret
   std::vector<NTL::ZZ_p> secret_;
-
-
 
   std::vector<block> master_seed_;
   std::vector<SeedTree> seed_tree_;

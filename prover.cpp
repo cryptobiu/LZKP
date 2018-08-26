@@ -2,6 +2,7 @@
 #include "seedtree.h"
 
 #include <cryptoTools/Crypto/sha1.h>
+#include <stack>
 
 using namespace lzkp;
 
@@ -227,7 +228,7 @@ block Prover::r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients) {
         NTL::ZZ_p tmp(0);
 
         for (auto k = 0; k < m; ++k) {
-          tmp += a_[k][l] * s_[e][k][i];
+          tmp += a_[l][k] * s_[e][k][i];
         }
 
         o_[e_it][i] += coefficients[e_it][l] * (t_[l] - tmp);
@@ -255,8 +256,72 @@ block Prover::r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients) {
   return h_psi_;
 }
 
-void Prover::r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<block> &seed_tree,
-                std::vector<block> &gamma_i_bar, std::vector<std::vector> &alpha_i_bar, std::vector<NTL::ZZ_p> &o,
+void Prover::r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
+                std::vector<block> &gamma_i_bar, std::vector<std::vector<NTL::ZZ_p>> &alpha_i_bar, std::vector<NTL::ZZ_p> &o_i_bar,
                 std::vector<std::vector<NTL::ZZ_p>> &b_square, std::vector<std::vector<NTL::ZZ_p>> &s) {
+  seed_e_bar = seed_e_bar_;
+  seed_tree.resize(M - tau);
+  gamma_i_bar.resize(M - tau);
+  alpha_i_bar.resize(M - tau);
+  o_i_bar.resize(M - tau);
+  b_square.resize(M - tau);
+  s.resize(M - tau);
 
+  int e_it = 0;
+
+  for (auto e = 0; e < M; ++e) {
+    if (E_[e]) {
+      continue;
+    }
+
+    const auto cur_i_bar = i_bar[e_it];
+
+    seed_tree[e_it].clear();
+
+    std::stack<std::pair<int, std::pair<int, int>>> seed_stack;
+
+    seed_stack.push(std::make_pair(0, std::make_pair(0, N)));
+
+    while (!seed_stack.empty()) {
+      auto item = seed_stack.top();
+      seed_stack.pop();
+
+      // Check for leaf
+      if (item.second.second - item.second.first == 1) {
+        if (item.second.first != cur_i_bar) {
+          seed_tree[e_it].push_back(seed_tree_[e].getSeed(item.second.first));
+        }
+        continue;
+      }
+
+      if (cur_i_bar >= item.second.first && cur_i_bar < item.second.second) { // seed_e_i_bar[e] is a descendant of the current nocde
+        seed_stack.push(std::make_pair(item.first * 2 + 2, std::make_pair((item.second.first + item.second.second) / 2, item.second.second))); // Add right child
+        seed_stack.push(std::make_pair(item.first * 2 + 1, std::make_pair(item.second.first, (item.second.first + item.second.second) / 2))); // Add left child
+      }
+      else {
+        seed_tree[e_it].push_back(seed_tree_[e][item.first]);
+      }
+    }
+
+    gamma_i_bar[e_it] = gamma_[e][cur_i_bar];
+
+    alpha_i_bar[e_it].resize(m);
+    for (auto k = 0; k < m; ++k) {
+      alpha_i_bar[e_it][k] = alpha_[e][k][cur_i_bar];
+    }
+
+    o_i_bar[e_it] = o_[e_it][cur_i_bar];
+
+    if (cur_i_bar != N - 1) {
+      b_square[e_it].resize(m);
+      s[e_it].resize(m);
+
+      for (auto k = 0; k < m; ++k) {
+        b_square[e_it][k] = b_square_[e][k][N - 1];
+        s[e_it][k] = s_[e][k][N - 1];
+      }
+    }
+
+    e_it++;
+  }
 }

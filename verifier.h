@@ -11,6 +11,7 @@
 #include "settings.h"
 
 #include <NTL/ZZ_p.h>
+#include <NTL/matrix.h>
 
 namespace lzkp {
 
@@ -22,15 +23,22 @@ public:
   const std::vector<bool> &r2(const block &h_gamma);
   void r4(const std::vector<block> &seed, const std::vector<block> &omega, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients);
   void r6(const block &h_psi, std::vector<int> &i_bar);
+  bool r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar,
+          const std::vector<std::vector<NTL::ZZ_p>> &alpha_i_bar, const std::vector<NTL::ZZ_p> &o_i_bar, const std::vector<std::vector<NTL::ZZ_p>> &b_square,
+          const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &partial_seeds);
 
 private:
 public:
   const int M;
   const int N;
-  const int q;
+  const uint64_t q;
   const int m;
   const int n;
   const int tau;
+
+  // Public known values
+  NTL::Mat<NTL::ZZ_p> a_;
+  NTL::Vec<NTL::ZZ_p> t_;
 
   std::vector<bool> E_;
   block h_gamma_;
@@ -46,8 +54,19 @@ public:
 
   std::vector<std::vector<block>> gamma_;
   std::vector<block> h_;
+  std::vector<std::vector<NTL::ZZ_p>> coefficients_;
 
   block h_psi_;
+  std::vector<int> i_bar_;
+
+  std::vector<std::vector<block>> partial_seeds_;
+  block seed_e_bar_;
+  osuCrypto::PRNG prng_e_bar_;
+  std::vector<block> g_;
+  std::vector<std::vector<NTL::ZZ_p>> o_;
+  std::vector<block> w_;
+  std::vector<block> psi_;
+
 };
 
 
