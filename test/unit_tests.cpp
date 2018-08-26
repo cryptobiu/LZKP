@@ -68,9 +68,6 @@ TEST_CASE("verifier_constuctor") {
   Settings s(M, 8, 31, 10, 7, 3);
 
   Verifier v(s);
-
-  for (auto i = 0; i < M; ++i)
-    REQUIRE(v.E_[i] == false);
 }
 
 TEST_CASE("prover_r1") {
@@ -78,145 +75,179 @@ TEST_CASE("prover_r1") {
 
   Prover p(s);
 
-  p.r1();
+  block h_gamma;
+
+  p.r1(h_gamma); // Run round 1
 }
 
 TEST_CASE("verifier_r2") {
-  auto M = 50;
-  Settings s(M, 8, 31, 10, 7, 13);
+  auto M = 50, tau = 13;
+  Settings s(M, 8, 31, 10, 7, tau);
 
+  Prover p(s);
   Verifier v(s);
 
-  block dummy;
-  std::vector<bool> e = v.r2(dummy);
+  block h_gamma;
+
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
 
   int sum = 0;
 
+  REQUIRE(E.size() == M);
   for (auto i = 0; i < M; ++i) {
-    if (e[i])
+    if (E[i])
       ++sum;
   }
 
-  REQUIRE(sum == 13);
+  REQUIRE(sum == tau);
 }
 
 TEST_CASE("prover_r3") {
-  auto M = 50, t = 13;
-  Settings s(M, 8, 31, 10, 7, t); // M, N, q, m, n, tau
+  auto M = 50, tau = 13;
+  Settings s(M, 8, 31, 10, 7, tau); // M, N, q, m, n, tau
 
   Prover p(s);
   Verifier v(s);
 
-  block h_gamma = p.r1(); // Run round 1
-  std::vector<bool> E = v.r2(h_gamma); // Run round 2
+  block h_gamma;
 
-  std::vector<block> seed, omega;
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
   block h_pi;
 
-  p.r3(E, seed, omega, h_pi); // Run round 3
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
 
-  REQUIRE(seed.size() == t);
-  REQUIRE(omega.size() == M - t);
+  REQUIRE(seed.size() == tau);
+  REQUIRE(omegaN.size() == M - tau);
 }
 
 TEST_CASE("verifier_r4") {
-  auto M = 50, t = 13, m = 10, n = 10;
-  Settings s(M, 8, 31, m, n, t); // M, N, q, m, n, tau
+  auto M = 50, tau = 13, m = 10, n = 10;
+  Settings s(M, 8, 31, m, n, tau); // M, N, q, m, n, tau
 
   Prover p(s);
   Verifier v(s);
 
-  block h_gamma = p.r1(); // Run round 1
-  std::vector<bool> E = v.r2(h_gamma); // Run round 2
+  block h_gamma;
 
-  std::vector<block> seed, omega;
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
   block h_pi;
 
-  p.r3(E, seed, omega, h_pi); // Run round 3
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
 
   std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omega, h_pi, coefficients); // Run round 4
+  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
 
-  int e_id = 0;
+  int c_id = 0;
   for (auto e = 0; e < M; ++e) {
     if (E[e]) {
       REQUIRE(eq(p.h_[e].b, v.h_[e].b));
-      REQUIRE(coefficients[e_id++].size() == m + n);
+    }
+    else {
+      REQUIRE(coefficients[c_id].size() == m + n);
+      c_id++;
     }
   }
 }
 
 TEST_CASE("prover_r5") {
-  auto M = 50, t = 13, m = 10, n = 10;
-  Settings s(M, 8, 31, m, n, t); // M, N, q, m, n, tau
+  auto M = 50, tau = 13, m = 10, n = 10;
+  Settings s(M, 8, 31, m, n, tau); // M, N, q, m, n, tau
 
   Prover p(s);
   Verifier v(s);
 
-  block h_gamma = p.r1(); // Run round 1
-  std::vector<bool> E = v.r2(h_gamma); // Run round 2
+  block h_gamma;
 
-  std::vector<block> seed, omega;
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
   block h_pi;
 
-  p.r3(E, seed, omega, h_pi); // Run round 3
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
 
   std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omega, h_pi, coefficients); // Run round 4
+  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
 
-  block h_psi = p.r5(coefficients); // Run round 5
+  block h_psi;
+  p.r5(coefficients, h_psi); // Run round 5
 }
 
 TEST_CASE("verifier_r6") {
-  auto M = 50, N = 8, t = 13, m = 64, n = 16;
-  Settings s(M, N, 31, m, n, t); // M, N, q, m, n, tau
+  auto M = 50, N = 8, tau = 13, m = 64, n = 16;
+  Settings s(M, N, 31, m, n, tau); // M, N, q, m, n, tau
 
   Prover p(s);
   Verifier v(s);
 
-  block h_gamma = p.r1(); // Run round 1
-  std::vector<bool> E = v.r2(h_gamma); // Run round 2
+  block h_gamma;
 
-  std::vector<block> seed, omega;
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
   block h_pi;
 
-  p.r3(E, seed, omega, h_pi); // Run round 3
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
 
   std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omega, h_pi, coefficients); // Run round 4
+  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
 
-  block h_psi = p.r5(coefficients); // Run round 5
+  block h_psi;
+  p.r5(coefficients, h_psi); // Run round 5
 
   std::vector<int> i_bar;
 
   v.r6(h_psi, i_bar); // Run round 6
 
-  REQUIRE(i_bar.size() == M - t);
-  for (auto i = 0; i < M - t; ++i) {
+  REQUIRE(i_bar.size() == M - tau);
+  for (auto i = 0; i < M - tau; ++i) {
     REQUIRE(i_bar[i] >= 0);
     REQUIRE(i_bar[i] < N);
   }
 }
 
 TEST_CASE("prover_r7") {
-  auto M = 50, N = 8, t = 13, m = 64, n = 16;
-  Settings set(M, N, 31, m, n, t); // M, N, q, m, n, tau
+  auto M = 50, N = 8, tau = 13, m = 64, n = 16;
+  Settings set(M, N, 31, m, n, tau); // M, N, q, m, n, tau
 
   Prover p(set);
   Verifier v(set);
 
-  block h_gamma = p.r1(); // Run round 1
-  std::vector<bool> E = v.r2(h_gamma); // Run round 2
+  block h_gamma;
 
-  std::vector<block> seed, omega;
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
   block h_pi;
 
-  p.r3(E, seed, omega, h_pi); // Run round 3
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
 
   std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omega, h_pi, coefficients); // Run round 4
+  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
 
-  block h_psi = p.r5(coefficients); // Run round 5
+  block h_psi;
+  p.r5(coefficients, h_psi); // Run round 5
 
   std::vector<int> i_bar;
 
@@ -232,7 +263,7 @@ TEST_CASE("prover_r7") {
 
   REQUIRE(eq(seed_e_bar.b, p.seed_e_bar_.b));
 
-  REQUIRE(seed_tree.size() == M - t);
+  REQUIRE(seed_tree.size() == M - tau);
   int e_it = 0;
   for (auto e = 0; e < M; ++e) {
     if (E[e])
@@ -290,24 +321,29 @@ TEST_CASE("prover_r7") {
 }
 
 TEST_CASE("verifier_r8") {
-  auto M = 50, N = 8, t = 13, m = 64, n = 16;
-  Settings set(M, N, 31, m, n, t); // M, N, q, m, n, tau
+  auto M = 50, N = 8, tau = 13, m = 64, n = 16;
+  Settings set(M, N, 31, m, n, tau); // M, N, q, m, n, tau
 
   Prover p(set);
   Verifier v(set);
 
-  block h_gamma = p.r1(); // Run round 1
-  std::vector<bool> E = v.r2(h_gamma); // Run round 2
+  block h_gamma;
 
-  std::vector<block> seed, omega;
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
   block h_pi;
 
-  p.r3(E, seed, omega, h_pi); // Run round 3
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
 
   std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omega, h_pi, coefficients); // Run round 4
+  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
 
-  block h_psi = p.r5(coefficients); // Run round 5
+  block h_psi;
+  p.r5(coefficients, h_psi); // Run round 5
 
   std::vector<int> i_bar;
 

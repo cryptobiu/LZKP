@@ -15,19 +15,18 @@
 using namespace lzkp;
 
 Verifier::Verifier(const Settings &s) : M(s.M), N(s.N), q(s.q), m(s.m), n(s.n), tau(s.tau) {
-  E_.resize(M);
-
   NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
 
   a_.SetDims(n, m); // Fill with values
   t_.SetLength(m); // Fill with values
 }
 
-const std::vector<bool> &Verifier::r2(const block &h_gamma) {
+void Verifier::r2(const block &h_gamma, std::vector<bool> &E) {
   h_gamma_ = h_gamma;
 
-  osuCrypto::PRNG prng;
+  E_.resize(M);
 
+  osuCrypto::PRNG prng;
   prng.SetSeed(osuCrypto::sysRandomSeed());
 
   for (auto i = M - tau + 1; i <= M; ++i) {
@@ -39,12 +38,12 @@ const std::vector<bool> &Verifier::r2(const block &h_gamma) {
       E_[i - 1] = true;
   }
 
-  return E_;
+  E = E_;
 }
 
-void Verifier::r4(const std::vector<block> &seed, const std::vector<block> &omega, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients) {
+void Verifier::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients) {
   seed_ = seed;
-  omega_ = omega;
+  omegaN_ = omegaN;
   h_pi_ = h_pi;
 
   coefficients_.resize(M - tau);
@@ -87,10 +86,10 @@ void Verifier::r4(const std::vector<block> &seed, const std::vector<block> &omeg
       }
 
       // *1* - 1.c
-      r_[e][N-1] = seed_tree_[e].getBlock(N - 1);
+      r_[e][N - 1] = seed_tree_[e].getBlock(N - 1);
 
       for (auto mm = 0; mm < m; ++mm) {
-        b_[e][mm][N-1]        = NTL::ZZ_p(seed_tree_[e].getBlock(N - 1).halves[0]);
+        b_[e][mm][N - 1] = NTL::ZZ_p(seed_tree_[e].getBlock(N - 1).halves[0]);
       }
 
       // *1* - 1.d
@@ -158,7 +157,6 @@ void Verifier::r6(const block &h_psi, std::vector<int> &i_bar) {
   i_bar_.resize(M - tau);
 
   osuCrypto::PRNG prng;
-
   prng.SetSeed(osuCrypto::sysRandomSeed());
 
   for (auto e = 0; e < M - tau; ++e) {
@@ -306,7 +304,7 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
       sha_omega.Final(blk);
     }
 
-    if (!eq(blk.b, omega_[e_it].b))
+    if (!eq(blk.b, omegaN_[e_it].b))
      return false;
 
     // 1.f + 1.g

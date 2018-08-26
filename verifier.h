@@ -20,8 +20,8 @@ class Verifier {
 public:
   Verifier(const Settings &s);
 
-  const std::vector<bool> &r2(const block &h_gamma);
-  void r4(const std::vector<block> &seed, const std::vector<block> &omega, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients);
+  void r2(const block &h_gamma, std::vector<bool> &E);
+  void r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients);
   void r6(const block &h_psi, std::vector<int> &i_bar);
   bool r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar,
           const std::vector<std::vector<NTL::ZZ_p>> &alpha_i_bar, const std::vector<NTL::ZZ_p> &o_i_bar, const std::vector<std::vector<NTL::ZZ_p>> &b_square,
@@ -40,18 +40,17 @@ public:
   NTL::Mat<NTL::ZZ_p> a_;
   NTL::Vec<NTL::ZZ_p> t_;
 
-  std::vector<bool> E_;
+  // Local values
   block h_gamma_;
+  std::vector<bool> E_;
 
   std::vector<block> seed_;
-  std::vector<block> omega_;
+  std::vector<block> omegaN_;
   block h_pi_;
-
   std::vector<SeedTree> seed_tree_;
   std::vector<std::vector<block>> r_;
   std::vector<std::vector<std::vector<NTL::ZZ_p>>> b_;
   std::vector<std::vector<std::vector<NTL::ZZ_p>>> b_square_;
-
   std::vector<std::vector<block>> gamma_;
   std::vector<block> h_;
   std::vector<std::vector<NTL::ZZ_p>> coefficients_;
