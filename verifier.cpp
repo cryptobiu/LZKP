@@ -14,11 +14,13 @@
 
 using namespace lzkp;
 
-Verifier::Verifier(const Settings &s) : M(s.M), N(s.N), q(s.q), m(s.m), n(s.n), tau(s.tau) {
+Verifier::Verifier(const Settings &s, const NTL::Mat<NTL::ZZ_p> &a, const NTL::Vec<NTL::ZZ_p> &t) : M(s.M), N(s.N), q(s.q), m(s.m), n(s.n), tau(s.tau) {
   NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
 
-  a_.SetDims(n, m); // Fill with values
-  t_.SetLength(m); // Fill with values
+  //a_.SetDims(n, m); // Fill with values
+  //t_.SetLength(n); // Fill with values
+  a_ = a;
+  t_ = t;
 }
 
 void Verifier::r2(const block &h_gamma, std::vector<bool> &E) {
@@ -130,6 +132,7 @@ void Verifier::r4(const std::vector<block> &seed, const std::vector<block> &omeg
         sha_h.Update(gamma_[e][i]);
       }
       sha_h.Final(h_[e]); // mb need to zero it first
+      //std::cout << "Vr4 H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
     }
     else { // 2
       osuCrypto::PRNG prng;
@@ -276,8 +279,9 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
           sha_gamma.Update(buf, NTL::NumBytes(b_square[e_it][k]._ZZ_p__rep));
         }
       }
-      sha_gamma.Update(r_[e][N - 1]);
-      sha_gamma.Final(gamma_[e][N - 1]);
+      sha_gamma.Update(r_[e][i]);
+      sha_gamma.Final(gamma_[e][i]);
+
     }
 
     // 1.d
@@ -289,23 +293,36 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
         sha_h.Update(gamma_i_bar[e_it]);
     }
     sha_h.Final(h_[e]); // mb need to zero it first
+    //std::cout << "Vr8 H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
+
+
+    unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
 
     // 1.e
-    block gN_e, blk;
-    unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
-    if (cur_i_bar != N - 1) {
-      gN_e = prng[N - 1].get<block>();
-      osuCrypto::SHA1 sha_omega(sizeof(block));
-      for (auto i = 0; i < m; ++i) {
-        NTL::BytesFromZZ(buf, s[e_it][i]._ZZ_p__rep, NTL::NumBytes(s[e_it][i]._ZZ_p__rep));
-        sha_omega.Update(buf, NTL::NumBytes(s[e_it][i]._ZZ_p__rep));
+    if (cur_i_bar != N -1) {
+      block gN_e, blk;
+      if (cur_i_bar != N - 1) {
+        gN_e = prng[N - 1].get<block>();
+        osuCrypto::SHA1 sha_omega(sizeof(block));
+        for (auto i = 0; i < m; ++i) {
+          NTL::BytesFromZZ(buf, s[e_it][i]._ZZ_p__rep, NTL::NumBytes(s[e_it][i]._ZZ_p__rep));
+          sha_omega.Update(buf, NTL::NumBytes(s[e_it][i]._ZZ_p__rep));
+        }
+        sha_omega.Update(gN_e);
+        sha_omega.Final(blk);
       }
-      sha_omega.Update(gN_e);
-      sha_omega.Final(blk);
-    }
 
-    if (!eq(blk.b, omegaN_[e_it].b))
-     return false;
+      if (!eq(blk.b, omegaN_[e_it].b)) {
+        std::cout << "1\t" << blk.b << " " << omegaN_[e_it].b << std::endl;
+        return false;
+      }
+      else {
+        std::cout << "1 PASSED" << std::endl;
+      }
+    }
+    else {
+      std::cout << "1 SKIPPED" << std::endl;
+    }
 
     // 1.f + 1.g
     std::vector<std::vector<NTL::ZZ_p>> s_computed;
@@ -326,11 +343,14 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
       for (auto k = 0; k < m; ++k) {
         s_computed[k][i] = NTL::ZZ_p(prng[i].get<block>().halves[0]); // PROBABLY NEED TO CHANGE THAT
         alpha_computed[k][i] = s_computed[k][i] - b_[e][k][i];
+
+        //std::cout << "V alpha " << k << " " << i << " " << alpha_computed[k][i] << std::endl;
       }
     }
     if (cur_i_bar != N - 1) {
       for (auto k = 0; k < m; ++k) {
         alpha_computed[k][N - 1] = s[e_it][k] - b_[e][k][N - 1];
+        //std::cout << "V alpha " << k << " " << N - 1 << " " << alpha_computed[k][N - 1] << std::endl;
       }
     }
 
@@ -354,6 +374,8 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
     sha_pi.Update(g_[e_it]);
     sha_pi.Final(pi);
 
+    //std::cout << "V PI E " << e << " " << pi.halves[0] << pi.halves[1] << std::endl;
+
     sha_h_pi.Update(pi); // For step 3
 
     // 1.i
@@ -363,6 +385,8 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
     for (auto i = 0; i < N; ++i) {
       if (i == cur_i_bar) {
         o_[e_it][cur_i_bar] = o_i_bar[e_it];
+        std::cout << "V O " << e << " " << i << " " << o_[e_it][i] << std::endl;
+
         continue;
       }
 
@@ -387,11 +411,8 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
                          (alpha_computed[k][i] * (s_computed[k][i] + b_[e][k][i]) + b_square[e_it][k] -
                           s_computed[k][i]);
         }
-
-        NTL::BytesFromZZ(buf, o_[e_it][i]._ZZ_p__rep, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
-        sha_psi.Update(buf, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
       }
-
+      std::cout << "V O " << e << " " << i << " " << o_[e_it][i] << std::endl;
     }
 
     // 1.j
@@ -407,41 +428,54 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
     sha_psi.Update(w_[e_it]);
     sha_psi.Final(psi_[e_it]);
 
+    std::cout << "V WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
+    std::cout << "V PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
+
     sha_h_psi.Update(psi_[e_it]);
 
     // 1.k
-    if (sigma_o != 0)
-      return false;
+    if (sigma_o != 0) {
+      std::cout << "2\t" << sigma_o << std::endl;
+      //return false;
+    }
+    else {
+      std::cout << "2 PASSED" << std::endl;
+    }
 
     e_it++;
   }
-
-  return true;
 
   partial_seeds = partial_seeds_;
 
   // 2
   osuCrypto::SHA1 sha_h_gamma(sizeof(block));
   for (auto e = 0; e < M; ++e) {
+    //std::cout << "V H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
     sha_h_gamma.Update(h_[e]);
   }
   block h_gamma_computed;
   sha_h_gamma.Final(h_gamma_computed);
 
-  if (!eq(h_gamma_.b, h_gamma_computed.b))
-    return false;
+  //std::cout << "V h_gammaC " << h_gamma_computed.halves[0] << " " << h_gamma_computed.halves[1] << std::endl;
+  //std::cout << "V h_gamma " << h_gamma_.halves[0] << " " << h_gamma_.halves[1] << std::endl;
+  //if (!eq(h_gamma_.b, h_gamma_computed.b))
+   // return false;
 
   // 3
   block pi;
   sha_h_pi.Final(pi);
-  if (!eq(pi.b, h_pi_.b))
-    return false;
+  //std::cout << "V pi " << pi.halves[0] << " " << pi.halves[1] << std::endl;
+  //std::cout << "V h_pi " << h_pi_.halves[0] << " " << h_pi_.halves[1] << std::endl;
+  //if (!eq(pi.b, h_pi_.b))
+//    return false;
 
   // 4
   block psi;
   sha_h_psi.Final(psi);
-  if (!eq(psi.b, h_psi_.b))
-    return false;
+  std::cout << "V psi " << psi.halves[0] << " " << psi.halves[1] << std::endl;
+  std::cout << "V h_psi_ " << h_psi_.halves[0] << " " << h_psi_.halves[1] << std::endl;
+//  if (!eq(psi.b, h_psi_.b))
+//    return false;
 
   return true;
 }

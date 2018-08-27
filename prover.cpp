@@ -6,14 +6,19 @@
 
 using namespace lzkp;
 
-Prover::Prover(const Settings &s) : M(s.M), N(s.N), q(s.q), m(s.m), n(s.n), tau(s.tau) {
+Prover::Prover(const Settings &s, const NTL::Mat<NTL::ZZ_p> &a, const NTL::Vec<NTL::ZZ_p> &t, const NTL::Vec<NTL::ZZ_p> &secret)
+  : M(s.M), N(s.N), q(s.q), m(s.m), n(s.n), tau(s.tau) {
   // MOVE THIS LINE TO THE DRIVER...
   NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
 
-  a_.SetDims(n, m); // Fill with values
-  t_.SetLength(m); // Fill with values
-  secret_.resize(m); // Need to set private vector
+  //a_.SetDims(n, m); // Fill with values
+  //t_.SetLength(n); // Fill with values
+  a_ = a;
+  t_ = t;
+  secret_ = secret; // Need to set private vector
+}
 
+Prover::~Prover() {
 }
 
 void Prover::r1(block &h_gamma) {
@@ -50,7 +55,7 @@ void Prover::r1(block &h_gamma) {
       r_[e][i] = seed_tree_[e].getBlock(i);
 
       for (auto mm = 0; mm < m; ++mm) {
-        b_[e][mm][i]        = NTL::ZZ_p(seed_tree_[e].getBlock(i).halves[0]); // NEED TO FIND A WAY TO USE ALL 128 BITS
+        b_[e][mm][i]        = NTL::ZZ_p(seed_tree_[e].getBlock(i).halves[0]); // NEED TO FIND A WAY TO USE ALL 128 BITS, now working only up to 64bit
         b_square_[e][mm][i] = NTL::ZZ_p(seed_tree_[e].getBlock(i).halves[0]);
       }
     }
@@ -76,23 +81,21 @@ void Prover::r1(block &h_gamma) {
 
     // 1.e
     osuCrypto::SHA1 sha_gamma(sizeof(block));
-    for (auto i = 0; i < N - 1; ++i) {
+    for (auto i = 0; i < N; ++i) {
       block blk = seed_tree_[e].getSeed(i);
       sha_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
       sha_gamma.Update(blk); // Hash seed_e,i
+      if (i == N - 1) {
+        unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
+        for (auto k = 0; k < m; ++k) {
+          NTL::BytesFromZZ(buf, b_square_[e][k][N - 1]._ZZ_p__rep, NTL::NumBytes(b_square_[e][k][N - 1]._ZZ_p__rep));
+          sha_gamma.Update(buf, NTL::NumBytes(b_square_[e][k][N - 1]._ZZ_p__rep));
+        }
+      }
       sha_gamma.Update(r_[e][i]); // Hash r_e,i
       sha_gamma.Final(gamma_[e][i]);
+      //std::cout << "GAmma " << e << " " << i << " " << gamma_[e][i].halves[0] << " " << gamma_[e][i].halves[1] << std::endl;
     }
-    block blk = seed_tree_[e].getSeed(N - 1); // Calculate com(state_e,N-1 , r_e,N-1) = com(seed_e,N-1 || b^2_e,1,N-1 || ... || b^2_e,m,N , r_e,N-1)
-    sha_gamma.Reset();
-    sha_gamma.Update(blk); // Hash seed_e,N-1
-    unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
-    for (auto i = 0; i < m; ++i) {
-      NTL::BytesFromZZ(buf, b_square_[e][i][N - 1]._ZZ_p__rep, NTL::NumBytes(b_square_[e][i][N - 1]._ZZ_p__rep));
-      sha_gamma.Update(buf, NTL::NumBytes(b_square_[e][i][N - 1]._ZZ_p__rep)); // Hash b^2_e,i,N-1
-    }
-    sha_gamma.Update(r_[e][N - 1]); // Hash r_e,i
-    sha_gamma.Final(gamma_[e][N - 1]);
 
     // 1.f
     osuCrypto::SHA1 sha_h(sizeof(block));
@@ -100,16 +103,14 @@ void Prover::r1(block &h_gamma) {
       sha_h.Update(gamma_[e][i]);
     }
     sha_h.Final(h_[e]); // mb need to zero it first
+    //std::cout << "H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
 
-    sha_h_gamma.Update(blk);
+    sha_h_gamma.Update(h_[e]);
   }
 
   sha_h_gamma.Final(h_gamma_.bytes);
 
   h_gamma = h_gamma_;
-}
-
-Prover::~Prover() {
 }
 
 void Prover::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi) {
@@ -166,6 +167,7 @@ void Prover::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vecto
     for (auto k = 0; k < m; ++k) {
       for (auto i = 0; i < N; ++i) {
         alpha_[e][k][i] = s_[e][k][i] - b_[e][k][i];
+        //std::cout << "alpha " << k << " " << i << " " << alpha_[e][k][i] << std::endl;
       }
     }
 
@@ -194,6 +196,8 @@ void Prover::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vecto
     }
     sha_pi.Update(g_[e]);
     sha_pi.Final(pi);
+
+    //std::cout << "PI E " << e << " " << pi.halves[0] << pi.halves[1] << std::endl;
 
     sha_h_pi.Update(pi);
   }
@@ -238,10 +242,12 @@ void Prover::r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients, block &
       for (auto k = 0; k < m; ++k) {
         o_[e_it][i] += coefficients[e_it][n + k] *
                        (alpha_[e][k][i] * (s_[e][k][i] + b_[e][k][i]) + b_square_[e][k][i] - s_[e][k][i]);
-
-        NTL::BytesFromZZ(buf, o_[e_it][i]._ZZ_p__rep, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
-        sha_psi.Update(buf, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
       }
+
+      NTL::BytesFromZZ(buf, o_[e_it][i]._ZZ_p__rep, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
+      sha_psi.Update(buf, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
+
+      std::cout << "O " << e << " " << i << " " << o_[e_it][i] << std::endl;
     }
 
     w_[e_it] = prng_e_bar_.get<block>();
@@ -249,6 +255,10 @@ void Prover::r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients, block &
     sha_psi.Final(psi_[e_it]);
 
     sha_h_psi.Update(psi_[e_it]);
+
+    std::cout << "WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
+    std::cout << "PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
+
     e_it++;
   }
 

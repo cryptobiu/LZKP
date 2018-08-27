@@ -3,7 +3,7 @@ project(LZKP)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -march=native")
 
 include_directories(.)
 

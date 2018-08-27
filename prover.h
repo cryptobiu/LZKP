@@ -12,7 +12,7 @@ namespace lzkp {
 
 class Prover {
 public:
-  Prover(const Settings &s);
+  Prover(const Settings &s, const NTL::Mat<NTL::ZZ_p> &a, const NTL::Vec<NTL::ZZ_p> &t, const NTL::Vec<NTL::ZZ_p> &secret);
   ~Prover();
 
   void r1(block &h_gamma);
@@ -36,7 +36,7 @@ public:
   NTL::Vec<NTL::ZZ_p> t_;
 
   // Prover's secret
-  std::vector<NTL::ZZ_p> secret_;
+  NTL::Vec<NTL::ZZ_p> secret_;
 
   // Local values
   std::vector<block> master_seed_;

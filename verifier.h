@@ -18,7 +18,7 @@ namespace lzkp {
 
 class Verifier {
 public:
-  Verifier(const Settings &s);
+  Verifier(const Settings &s, const NTL::Mat<NTL::ZZ_p> &a, const NTL::Vec<NTL::ZZ_p> &t);
 
   void r2(const block &h_gamma, std::vector<bool> &E);
   void r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients);
