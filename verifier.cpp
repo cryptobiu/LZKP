@@ -43,10 +43,13 @@ void Verifier::r2(const block &h_gamma, std::vector<bool> &E) {
   E = E_;
 }
 
-void Verifier::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients) {
+void Verifier::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell) {
   seed_ = seed;
   omegaN_ = omegaN;
   h_pi_ = h_pi;
+
+  seed_ell_.b = osuCrypto::sysRandomSeed();
+  prng_seed_ell_.SetSeed(seed_ell_.b);
 
   coefficients_.resize(M - tau);
 
@@ -135,23 +138,20 @@ void Verifier::r4(const std::vector<block> &seed, const std::vector<block> &omeg
       //std::cout << "Vr4 H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
     }
     else { // 2
-      osuCrypto::PRNG prng;
-      prng.SetSeed(osuCrypto::sysRandomSeed());
-
       coefficients_[coef_id].resize(n + m);
 
       for (auto i = 0; i < n; ++i) {
-        coefficients_[coef_id][i] = NTL::ZZ_p(prng.get<block>().halves[0]);
+        coefficients_[coef_id][i] = NTL::ZZ_p(prng_seed_ell_.get<block>().halves[0]);
       }
       for (auto i = 0; i < m; ++i) {
-        coefficients_[coef_id][n + i] = NTL::ZZ_p(prng.get<block>().halves[0]);
+        coefficients_[coef_id][n + i] = NTL::ZZ_p(prng_seed_ell_.get<block>().halves[0]);
       }
 
       coef_id++;
     }
   }
 
-  coefficients = coefficients_;
+  seed_ell = seed_ell_;
 }
 
 void Verifier::r6(const block &h_psi, std::vector<int> &i_bar) {
@@ -175,8 +175,6 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
   seed_e_bar_ = seed_e_bar;
   prng_e_bar_.SetSeed(seed_e_bar_.b);
 
-  int e_it = 0;
-
   partial_seeds_.resize(M);
   g_.resize(M - tau);
   w_.resize(M - tau);
@@ -186,6 +184,25 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
   osuCrypto::SHA1 sha_h_pi(sizeof(block));
   osuCrypto::SHA1 sha_h_psi(sizeof(block));
 
+  // Generate g_[e] = for step 1.h
+  int e_it = 0;
+  for (auto e = 0; e < M; ++e) {
+    if (E_[e])
+      continue;
+
+    g_[e_it++] = prng_e_bar_.get<block>();
+  }
+
+  // Generate w_[e] = for step 1.k
+  e_it = 0;
+  for (auto e = 0; e < M; ++e) {
+    if (E_[e])
+      continue;
+
+    w_[e_it++] = prng_e_bar_.get<block>();
+  }
+
+  e_it = 0;
   for (auto e = 0; e < M; ++e) {
     if (E_[e])
       continue;
@@ -324,38 +341,80 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
       std::cout << "1 SKIPPED" << std::endl;
     }
 
-    // 1.f + 1.g
+    // 1.f + 1.g + 1.i
     std::vector<std::vector<NTL::ZZ_p>> s_computed;
     std::vector<std::vector<NTL::ZZ_p>> alpha_computed;
+    std::vector<NTL::ZZ_p> alpha_sum_computed;
     s_computed.resize(m);
     alpha_computed.resize(m);
+    alpha_sum_computed.resize(m);
 
     for (auto mm = 0; mm < m; ++mm) {
       s_computed[mm].resize(N);
       alpha_computed[mm].resize(N);
+      alpha_sum_computed[mm] = NTL::ZZ_p(0);
     }
 
+    // 1.f
     for (auto i = 0; i < N - 1; ++i) {
-      if (i == cur_i_bar) {
+      if (i == cur_i_bar)
         continue;
-      }
 
-      for (auto k = 0; k < m; ++k) {
+      for (auto k = 0; k < m; ++k)
         s_computed[k][i] = NTL::ZZ_p(prng[i].get<block>().halves[0]); // PROBABLY NEED TO CHANGE THAT
-        alpha_computed[k][i] = s_computed[k][i] - b_[e][k][i];
+    }
 
-        //std::cout << "V alpha " << k << " " << i << " " << alpha_computed[k][i] << std::endl;
-      }
-    }
-    if (cur_i_bar != N - 1) {
+    // 1.g + 1.i
+    for (auto i = 0; i < N; ++i) {
       for (auto k = 0; k < m; ++k) {
-        alpha_computed[k][N - 1] = s[e_it][k] - b_[e][k][N - 1];
-        //std::cout << "V alpha " << k << " " << N - 1 << " " << alpha_computed[k][N - 1] << std::endl;
+        if (i != cur_i_bar) {
+          if (i != N - 1)
+            alpha_computed[k][i] = s_computed[k][i] - b_[e][k][i];
+          else
+            alpha_computed[k][i] = s[e_it][k] - b_[e][k][i];
+
+          alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
+        }
+        else {
+          alpha_sum_computed[k] += alpha_i_bar[e_it][k];
+        }
       }
     }
+
+    for (auto k = 0; k < m; ++k) {
+      //std::cout << "V alpha_sum " << k << " " << alpha_sum_computed[k] << std::endl;
+    }
+
+    /*for (auto k = 0; k < m; ++k) {
+      s_computed[k].resize(N);
+      alpha_computed[k].resize(N);
+      alpha_sum_computed[k] = NTL::ZZ_p(0); // For step 1.i
+
+      for (auto i = 0; i < N; ++i) {
+        if (i == cur_i_bar) {
+          alpha_sum_computed[k] += alpha_i_bar[e_it][k];
+
+          continue;
+        }
+
+        if (i != N - 1) {
+          s_computed[k][i] = NTL::ZZ_p(prng[i].get<block>().halves[0]); // PROBABLY NEED TO CHANGE THAT
+          alpha_computed[k][i] = s_computed[k][i] - b_[e][k][i];
+        }
+        else {
+          alpha_computed[k][i] = s[e_it][k] - b_[e][k][i];
+        }
+
+        alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
+
+        std::cout << "V alpha " << k << " " << i << " " << alpha_computed[k][i] << std::endl;
+      }
+
+      std::cout << "V alpha_sum " << k << " " << alpha_sum_computed[k] << std::endl;
+    }*/
 
     // 1.h
-    g_[e_it] = prng_e_bar_.get<block>();
+    //g_[e_it] = prng_e_bar_.get<block>();
     block pi;
     osuCrypto::SHA1 sha_pi(sizeof(block));
 
@@ -378,14 +437,16 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
 
     sha_h_pi.Update(pi); // For step 3
 
-    // 1.i
+    // 1.j
     osuCrypto::SHA1 sha_psi(sizeof(block));
 
     o_[e_it].resize(N);
     for (auto i = 0; i < N; ++i) {
+      o_[e_it][i] = NTL::ZZ_p(0);
+
       if (i == cur_i_bar) {
-        o_[e_it][cur_i_bar] = o_i_bar[e_it];
-        std::cout << "V O " << e << " " << i << " " << o_[e_it][i] << std::endl;
+        o_[e_it][i] = o_i_bar[e_it];
+        //std::cout << "V O " << e << " " << i << " " << o_[e_it][i] << std::endl;
 
         continue;
       }
@@ -394,29 +455,32 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
         NTL::ZZ_p tmp(0);
 
         for (auto k = 0; k < m; ++k) {
-          tmp += a_[l][k] * s_computed[k][i];
+          if (i != N - 1)
+            tmp += a_[l][k] * s_computed[k][i];
+          else
+            tmp += a_[l][k] * s[e_it][k];
         }
 
-        o_[e_it][i] += coefficients_[e_it][l] * (t_[l] - tmp);
+        o_[e_it][i] += coefficients_[e_it][l] * ((t_[l] / N) - tmp);
       }
 
       for (auto k = 0; k < m; ++k) {
         if (i != N - 1) {
           o_[e_it][i] += coefficients_[e_it][n + k] *
-                         (alpha_computed[k][i] * (s_computed[k][i] + b_[e][k][i]) + b_square_[e][k][i] -
+                         (alpha_sum_computed[k] * (s_computed[k][i] + b_[e][k][i]) + b_square_[e][k][i] -
                           s_computed[k][i]);
         }
         else {
           o_[e_it][i] += coefficients_[e_it][n + k] *
-                         (alpha_computed[k][i] * (s_computed[k][i] + b_[e][k][i]) + b_square[e_it][k] -
-                          s_computed[k][i]);
+                         (alpha_sum_computed[k] * (s[e_it][k] + b_[e][k][i]) + b_square[e_it][k] -
+                          s[e_it][k]);
         }
       }
-      std::cout << "V O " << e << " " << i << " " << o_[e_it][i] << std::endl;
+      //std::cout << "V O " << e << " " << i << " " << o_[e_it][i] << std::endl;
     }
 
-    // 1.j
-    w_[e_it] = prng_e_bar_.get<block>();
+    // 1.k
+    //w_[e_it] = prng_e_bar_.get<block>();
     NTL::ZZ_p sigma_o(0);
 
     for (auto i = 0; i < N; ++i) {
@@ -428,15 +492,15 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
     sha_psi.Update(w_[e_it]);
     sha_psi.Final(psi_[e_it]);
 
-    std::cout << "V WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
-    std::cout << "V PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
+    //std::cout << "V WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
+    //std::cout << "V PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
 
     sha_h_psi.Update(psi_[e_it]);
 
-    // 1.k
+    // 1.l
     if (sigma_o != 0) {
-      std::cout << "2\t" << sigma_o << std::endl;
-      //return false;
+      //std::cout << "BAR: " << cur_i_bar << " 2\t" << sigma_o << std::endl;
+      return false;
     }
     else {
       std::cout << "2 PASSED" << std::endl;
@@ -458,24 +522,24 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
 
   //std::cout << "V h_gammaC " << h_gamma_computed.halves[0] << " " << h_gamma_computed.halves[1] << std::endl;
   //std::cout << "V h_gamma " << h_gamma_.halves[0] << " " << h_gamma_.halves[1] << std::endl;
-  //if (!eq(h_gamma_.b, h_gamma_computed.b))
-   // return false;
+  if (!eq(h_gamma_.b, h_gamma_computed.b))
+    return false;
 
   // 3
   block pi;
   sha_h_pi.Final(pi);
   //std::cout << "V pi " << pi.halves[0] << " " << pi.halves[1] << std::endl;
   //std::cout << "V h_pi " << h_pi_.halves[0] << " " << h_pi_.halves[1] << std::endl;
-  //if (!eq(pi.b, h_pi_.b))
-//    return false;
+  if (!eq(pi.b, h_pi_.b))
+    return false;
 
   // 4
   block psi;
   sha_h_psi.Final(psi);
-  std::cout << "V psi " << psi.halves[0] << " " << psi.halves[1] << std::endl;
-  std::cout << "V h_psi_ " << h_psi_.halves[0] << " " << h_psi_.halves[1] << std::endl;
-//  if (!eq(psi.b, h_psi_.b))
-//    return false;
+  //std::cout << "V psi " << psi.halves[0] << " " << psi.halves[1] << std::endl;
+  //std::cout << "V h_psi_ " << h_psi_.halves[0] << " " << h_psi_.halves[1] << std::endl;
+  if (!eq(psi.b, h_psi_.b))
+    return false;
 
   return true;
 }

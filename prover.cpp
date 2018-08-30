@@ -125,6 +125,7 @@ void Prover::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vecto
   s_.resize(M); // We only need e_bar elements, but...
   gN_.resize(M);
   alpha_.resize(M);
+  alpha_sum_.resize(M);
 
   osuCrypto::SHA1 sha_h_pi(sizeof(block)); // For step 3
 
@@ -140,6 +141,7 @@ void Prover::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vecto
     // 2.b
     s_[e].resize(m);
     alpha_[e].resize(m);
+    alpha_sum_[e].resize(m);
     for (auto mm = 0; mm < m; ++mm) {
       s_[e][mm].resize(N);
       alpha_[e][mm].resize(N);
@@ -163,12 +165,16 @@ void Prover::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vecto
       }
     }
 
-    // 2.e
+    // 2.e + 2.h
     for (auto k = 0; k < m; ++k) {
+      alpha_sum_[e][k] = NTL::ZZ_p(0);
+
       for (auto i = 0; i < N; ++i) {
         alpha_[e][k][i] = s_[e][k][i] - b_[e][k][i];
+        alpha_sum_[e][k] += alpha_[e][k][i];
         //std::cout << "alpha " << k << " " << i << " " << alpha_[e][k][i] << std::endl;
       }
+      //std::cout << "alpha_sum " << e << " " << k << " " << alpha_sum_[e][k] << std::endl;
     }
 
     // 2.f
@@ -209,8 +215,11 @@ void Prover::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vecto
   h_pi = h_pi_;
 }
 
-void Prover::r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients, block &h_psi) {
-  coefficients_ = coefficients;
+void Prover::r5(const block &seed_ell, block &h_psi) {
+  seed_ell_ = seed_ell;
+
+  prng_seed_ell_.SetSeed(seed_ell_.b);
+  coefficients_.resize(M - tau);
 
   o_.resize(M - tau);
   psi_.resize(M - tau);
@@ -227,8 +236,21 @@ void Prover::r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients, block &
     osuCrypto::SHA1 sha_psi(sizeof(block));
     unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
 
+    // 1
+    coefficients_[e_it].resize(n + m);
+
+    for (auto i = 0; i < n; ++i) {
+      coefficients_[e_it][i] = NTL::ZZ_p(prng_seed_ell_.get<block>().halves[0]);
+    }
+    for (auto i = 0; i < m; ++i) {
+      coefficients_[e_it][n + i] = NTL::ZZ_p(prng_seed_ell_.get<block>().halves[0]);
+    }
+
+    // 2.a
     o_[e_it].resize(N);
     for (auto i = 0; i < N; ++i) {
+      o_[e_it][i] = NTL::ZZ_p(0);
+
       for (auto l = 0; l < n; ++l) {
         NTL::ZZ_p tmp(0);
 
@@ -236,28 +258,31 @@ void Prover::r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients, block &
           tmp += a_[l][k] * s_[e][k][i];
         }
 
-        o_[e_it][i] += coefficients[e_it][l] * (t_[l] - tmp);
+        o_[e_it][i] += coefficients_[e_it][l] * ((t_[l] / N) - tmp);
       }
 
       for (auto k = 0; k < m; ++k) {
-        o_[e_it][i] += coefficients[e_it][n + k] *
-                       (alpha_[e][k][i] * (s_[e][k][i] + b_[e][k][i]) + b_square_[e][k][i] - s_[e][k][i]);
+        //o_[e_it][i] += coefficients_[e_it][n + k] *
+//                       (alpha_sum_[e][k] * (s_[e][k][i] + b_[e][k][i]) + b_square_[e][k][i] - s_[e][k][i]);
+        o_[e_it][i] += coefficients_[e_it][n + k] *
+                       (alpha_sum_[e][k] * (s_[e][k][i] + b_[e][k][i]) + b_square_[e][k][i] - s_[e][k][i]);
       }
 
       NTL::BytesFromZZ(buf, o_[e_it][i]._ZZ_p__rep, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
-      sha_psi.Update(buf, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep));
+      sha_psi.Update(buf, NTL::NumBytes(o_[e_it][i]._ZZ_p__rep)); // For step 2.b
 
-      std::cout << "O " << e << " " << i << " " << o_[e_it][i] << std::endl;
+      //std::cout << "O " << e << " " << i << " " << o_[e_it][i] << std::endl;
     }
 
+    // 2.b
     w_[e_it] = prng_e_bar_.get<block>();
     sha_psi.Update(w_[e_it]);
     sha_psi.Final(psi_[e_it]);
 
     sha_h_psi.Update(psi_[e_it]);
 
-    std::cout << "WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
-    std::cout << "PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
+    //std::cout << "WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
+    //std::cout << "PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
 
     e_it++;
   }

@@ -21,7 +21,7 @@ public:
   Verifier(const Settings &s, const NTL::Mat<NTL::ZZ_p> &a, const NTL::Vec<NTL::ZZ_p> &t);
 
   void r2(const block &h_gamma, std::vector<bool> &E);
-  void r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, std::vector<std::vector<NTL::ZZ_p>> &coefficients);
+  void r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell);
   void r6(const block &h_psi, std::vector<int> &i_bar);
   bool r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar,
           const std::vector<std::vector<NTL::ZZ_p>> &alpha_i_bar, const std::vector<NTL::ZZ_p> &o_i_bar, const std::vector<std::vector<NTL::ZZ_p>> &b_square,
@@ -53,6 +53,8 @@ public:
   std::vector<std::vector<std::vector<NTL::ZZ_p>>> b_square_;
   std::vector<std::vector<block>> gamma_;
   std::vector<block> h_;
+  block seed_ell_;
+  osuCrypto::PRNG prng_seed_ell_;
   std::vector<std::vector<NTL::ZZ_p>> coefficients_;
 
   block h_psi_;
@@ -65,7 +67,6 @@ public:
   std::vector<std::vector<NTL::ZZ_p>> o_;
   std::vector<block> w_;
   std::vector<block> psi_;
-
 };
 
 

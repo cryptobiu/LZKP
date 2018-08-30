@@ -17,7 +17,7 @@ public:
 
   void r1(block &h_gamma);
   void r3(const std::vector<bool> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi);
-  void r5(const std::vector<std::vector<NTL::ZZ_p>> &coefficients, block &h_psi);
+  void r5(const block &seed_ell, block &h_psi);
   void r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
           std::vector<block> &gamma_i_bar, std::vector<std::vector<NTL::ZZ_p>> &alpha_i_bar, std::vector<NTL::ZZ_p> &o_i_bar,
           std::vector<std::vector<NTL::ZZ_p>> &b_square, std::vector<std::vector<NTL::ZZ_p>> &s);
@@ -56,10 +56,13 @@ public:
   std::vector<std::vector<std::vector<NTL::ZZ_p>>> s_;
   std::vector<block> gN_; // g_{e,N}
   std::vector<std::vector<std::vector<NTL::ZZ_p>>> alpha_;
+  std::vector<std::vector<NTL::ZZ_p>> alpha_sum_;
   std::vector<block> seed_;
   std::vector<block> omegaN_;
   block h_pi_;
 
+  block seed_ell_;
+  osuCrypto::PRNG prng_seed_ell_;
   std::vector<std::vector<NTL::ZZ_p>> coefficients_;
   std::vector<std::vector<NTL::ZZ_p>> o_;
   std::vector<block> w_;

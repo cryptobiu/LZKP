@@ -349,16 +349,18 @@ TEST_CASE("verifier_r4") {
 
   p.r3(E, seed, omegaN, h_pi); // Run round 3
 
-  std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
+  //std::vector<std::vector<NTL::ZZ_p>> coefficients;
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
 
+  REQUIRE(v.coefficients_.size() == M - tau);
   int c_id = 0;
   for (auto e = 0; e < M; ++e) {
     if (E[e]) {
       REQUIRE(eq(p.h_[e].b, v.h_[e].b));
     }
     else {
-      REQUIRE(coefficients[c_id].size() == m + n);
+      REQUIRE(v.coefficients_[c_id].size() == n + m);
       c_id++;
     }
   }
@@ -417,11 +419,20 @@ TEST_CASE("prover_r5") {
 
   p.r3(E, seed, omegaN, h_pi); // Run round 3
 
-  std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
 
   block h_psi;
-  p.r5(coefficients, h_psi); // Run round 5
+  p.r5(seed_ell, h_psi); // Run round 5
+
+  REQUIRE(p.coefficients_.size() == M - tau);
+  for (auto e = 0; e < M - tau; ++e) {
+    REQUIRE(p.coefficients_[e].size() == n + m);
+
+    for (auto i = 0; i < n + m; ++i) {
+      REQUIRE(p.coefficients_[e][i] == v.coefficients_[e][i]);
+    }
+  }
 }
 
 TEST_CASE("verifier_r6") {
@@ -477,11 +488,11 @@ TEST_CASE("verifier_r6") {
 
   p.r3(E, seed, omegaN, h_pi); // Run round 3
 
-  std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
 
   block h_psi;
-  p.r5(coefficients, h_psi); // Run round 5
+  p.r5(seed_ell, h_psi); // Run round 5
 
   std::vector<int> i_bar;
 
@@ -547,11 +558,11 @@ TEST_CASE("prover_r7") {
 
   p.r3(E, seed, omegaN, h_pi); // Run round 3
 
-  std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
 
   block h_psi;
-  p.r5(coefficients, h_psi); // Run round 5
+  p.r5(seed_ell, h_psi); // Run round 5
 
   std::vector<int> i_bar;
 
@@ -677,11 +688,11 @@ TEST_CASE("verifier_r8") {
 
   p.r3(E, seed, omegaN, h_pi); // Run round 3
 
-  std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
 
   block h_psi;
-  p.r5(coefficients, h_psi); // Run round 5
+  p.r5(seed_ell, h_psi); // Run round 5
 
   std::vector<int> i_bar;
 
@@ -721,7 +732,7 @@ TEST_CASE("verifier_r8") {
 }
 
 TEST_CASE("full_protocol_small_numbers") {
-  auto M = 4, N = 4, tau = 1, m = 8, n = 4;
+  auto M = 50, N = 8, tau = 13, m = 512, n = 32;
   uint64_t q = 31;
 
   // MOVE THIS LINE TO THE DRIVER...
@@ -782,11 +793,11 @@ TEST_CASE("full_protocol_small_numbers") {
 
   p.r3(E, seed, omegaN, h_pi); // Run round 3
 
-  std::vector<std::vector<NTL::ZZ_p>> coefficients;
-  v.r4(seed, omegaN, h_pi, coefficients); // Run round 4
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
 
   block h_psi;
-  p.r5(coefficients, h_psi); // Run round 5
+  p.r5(seed_ell, h_psi); // Run round 5
 
   std::vector<int> i_bar;
 
