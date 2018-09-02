@@ -334,11 +334,11 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
         return false;
       }
       else {
-        std::cout << "1 PASSED" << std::endl;
+//        std::cout << "1 PASSED" << std::endl;
       }
     }
     else {
-      std::cout << "1 SKIPPED" << std::endl;
+//      std::cout << "1 SKIPPED" << std::endl;
     }
 
     // 1.f + 1.g + 1.i
@@ -381,37 +381,9 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
       }
     }
 
-    for (auto k = 0; k < m; ++k) {
+//    for (auto k = 0; k < m; ++k) {
       //std::cout << "V alpha_sum " << k << " " << alpha_sum_computed[k] << std::endl;
-    }
-
-    /*for (auto k = 0; k < m; ++k) {
-      s_computed[k].resize(N);
-      alpha_computed[k].resize(N);
-      alpha_sum_computed[k] = NTL::ZZ_p(0); // For step 1.i
-
-      for (auto i = 0; i < N; ++i) {
-        if (i == cur_i_bar) {
-          alpha_sum_computed[k] += alpha_i_bar[e_it][k];
-
-          continue;
-        }
-
-        if (i != N - 1) {
-          s_computed[k][i] = NTL::ZZ_p(prng[i].get<block>().halves[0]); // PROBABLY NEED TO CHANGE THAT
-          alpha_computed[k][i] = s_computed[k][i] - b_[e][k][i];
-        }
-        else {
-          alpha_computed[k][i] = s[e_it][k] - b_[e][k][i];
-        }
-
-        alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
-
-        std::cout << "V alpha " << k << " " << i << " " << alpha_computed[k][i] << std::endl;
-      }
-
-      std::cout << "V alpha_sum " << k << " " << alpha_sum_computed[k] << std::endl;
-    }*/
+//    }
 
     // 1.h
     //g_[e_it] = prng_e_bar_.get<block>();
@@ -503,7 +475,7 @@ const std::vector<std::vector<NTL::ZZ_p>> &s, std::vector<std::vector<block>> &p
       return false;
     }
     else {
-      std::cout << "2 PASSED" << std::endl;
+//      std::cout << "2 PASSED" << std::endl;
     }
 
     e_it++;

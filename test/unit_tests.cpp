@@ -733,7 +733,7 @@ TEST_CASE("verifier_r8") {
 
 TEST_CASE("full_protocol_small_numbers") {
   auto M = 50, N = 8, tau = 13, m = 512, n = 32;
-  uint64_t q = 31;
+  uint64_t q = 32719;
 
   // MOVE THIS LINE TO THE DRIVER...
   NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
@@ -747,34 +747,34 @@ TEST_CASE("full_protocol_small_numbers") {
   secret.SetLength(m);
 
   // Random matrix A
-  std::cout << "A" << std::endl;
+//  std::cout << "A" << std::endl;
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
       a[nn][mm] = NTL::ZZ_p(prng.get<block>().halves[0]);
-      std::cout << a[nn][mm] << "   ";
+//      std::cout << a[nn][mm] << "   ";
     }
-    std::cout << std::endl;
+//    std::cout << std::endl;
   }
 
   // Random vector secret
-  std::cout << "Secret" << std::endl;
+//  std::cout << "Secret" << std::endl;
   for (auto mm = 0; mm < m; ++mm) {
     secret[mm] = prng.get<block>().bytes[0] % 2;
-    std::cout << secret[mm] << "   ";
+//    std::cout << secret[mm] << "   ";
   }
-  std::cout << std::endl;
+//  std::cout << std::endl;
 
   // Calculate t
-  std::cout << "t" << std::endl;
+//  std::cout << "t" << std::endl;
   for (auto nn = 0; nn < n; ++nn) {
     t[nn] = 0;
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
     }
-    std::cout << t[nn] << "   ";
+//    std::cout << t[nn] << "   ";
   }
-  std::cout << std::endl;
+//  std::cout << std::endl;
 
   Settings set(M, N, q, m, n, tau);
 
@@ -816,7 +816,321 @@ TEST_CASE("full_protocol_small_numbers") {
   bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s, partial_seeds); // Run round 8
 
   // Check seed reconstruction
-  if (flag) {
-    REQUIRE(partial_seeds.size() == M);
+  REQUIRE(flag == true);
+}
+
+TEST_CASE("full_protocol_small_numbers1") {
+  auto M = 50, N = 8, tau = 13, m = 512, n = 32;
+  uint64_t q = 1048517;
+
+  // MOVE THIS LINE TO THE DRIVER...
+  NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
+
+  NTL::Mat<NTL::ZZ_p> a;
+  NTL::Vec<NTL::ZZ_p> t, secret;
+  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
+
+  a.SetDims(n, m); // Fill with values
+  t.SetLength(n); // Fill with values
+  secret.SetLength(m);
+
+  // Random matrix A
+  for (auto nn = 0; nn < n; ++nn) {
+    for (auto mm = 0; mm < m; ++mm) {
+      a[nn][mm] = NTL::ZZ_p(prng.get<block>().halves[0]);
+    }
   }
+
+  // Random vector secret
+  for (auto mm = 0; mm < m; ++mm) {
+    secret[mm] = prng.get<block>().bytes[0] % 2;
+  }
+
+  // Calculate t
+  for (auto nn = 0; nn < n; ++nn) {
+    t[nn] = 0;
+
+    for (auto mm = 0; mm < m; ++mm) {
+      t[nn] += a[nn][mm] * secret[mm];
+    }
+  }
+
+  Settings set(M, N, q, m, n, tau);
+
+  Prover p(set, a, t, secret);
+  Verifier v(set, a, t);
+
+  block h_gamma;
+
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
+  block h_pi;
+
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
+
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+
+  block h_psi;
+  p.r5(seed_ell, h_psi); // Run round 5
+
+  std::vector<int> i_bar;
+
+  v.r6(h_psi, i_bar); // Run round 6
+
+  block seed_e_bar;
+  std::vector<std::vector<block>> seed_tree;
+  std::vector<block> gamma_i_bar;
+  std::vector<std::vector<NTL::ZZ_p>> alpha_i_bar, b_square, s;
+  std::vector<NTL::ZZ_p> o_i_bar;
+
+  p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
+
+  std::vector<std::vector<block>> partial_seeds;
+
+  bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s, partial_seeds); // Run round 8
+
+  // Check seed reconstruction
+  REQUIRE(flag == true);
+}
+
+TEST_CASE("full_protocol_small_numbers2") {
+  auto M = 50, N = 8, tau = 13, m = 512, n = 32;
+  uint64_t q = 2305843009213693951L;
+
+  // MOVE THIS LINE TO THE DRIVER...
+  NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
+
+  NTL::Mat<NTL::ZZ_p> a;
+  NTL::Vec<NTL::ZZ_p> t, secret;
+  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
+
+  a.SetDims(n, m); // Fill with values
+  t.SetLength(n); // Fill with values
+  secret.SetLength(m);
+
+  // Random matrix A
+  for (auto nn = 0; nn < n; ++nn) {
+    for (auto mm = 0; mm < m; ++mm) {
+      a[nn][mm] = NTL::ZZ_p(prng.get<block>().halves[0]);
+    }
+  }
+
+  // Random vector secret
+  for (auto mm = 0; mm < m; ++mm) {
+    secret[mm] = prng.get<block>().bytes[0] % 2;
+  }
+
+  // Calculate t
+  for (auto nn = 0; nn < n; ++nn) {
+    t[nn] = 0;
+
+    for (auto mm = 0; mm < m; ++mm) {
+      t[nn] += a[nn][mm] * secret[mm];
+    }
+  }
+
+  Settings set(M, N, q, m, n, tau);
+
+  Prover p(set, a, t, secret);
+  Verifier v(set, a, t);
+
+  block h_gamma;
+
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
+  block h_pi;
+
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
+
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+
+  block h_psi;
+  p.r5(seed_ell, h_psi); // Run round 5
+
+  std::vector<int> i_bar;
+
+  v.r6(h_psi, i_bar); // Run round 6
+
+  block seed_e_bar;
+  std::vector<std::vector<block>> seed_tree;
+  std::vector<block> gamma_i_bar;
+  std::vector<std::vector<NTL::ZZ_p>> alpha_i_bar, b_square, s;
+  std::vector<NTL::ZZ_p> o_i_bar;
+
+  p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
+
+  std::vector<std::vector<block>> partial_seeds;
+
+  bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s, partial_seeds); // Run round 8
+
+  // Check seed reconstruction
+  REQUIRE(flag == true);
+}
+
+TEST_CASE("full_protocol_big_numbers") {
+  auto M = 220, N = 4, tau = 170, m = 4096, n = 1024;
+  uint64_t q = 2305843009213693951L;
+
+  // MOVE THIS LINE TO THE DRIVER...
+  NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
+
+  NTL::Mat<NTL::ZZ_p> a;
+  NTL::Vec<NTL::ZZ_p> t, secret;
+  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
+
+  a.SetDims(n, m); // Fill with values
+  t.SetLength(n); // Fill with values
+  secret.SetLength(m);
+
+  // Random matrix A
+  for (auto nn = 0; nn < n; ++nn) {
+    for (auto mm = 0; mm < m; ++mm) {
+      a[nn][mm] = NTL::ZZ_p(prng.get<block>().halves[0]);
+    }
+  }
+
+  // Random vector secret
+  for (auto mm = 0; mm < m; ++mm) {
+    secret[mm] = prng.get<block>().bytes[0] % 2;
+  }
+
+  // Calculate t
+  for (auto nn = 0; nn < n; ++nn) {
+    t[nn] = 0;
+
+    for (auto mm = 0; mm < m; ++mm) {
+      t[nn] += a[nn][mm] * secret[mm];
+    }
+  }
+
+  Settings set(M, N, q, m, n, tau);
+
+  Prover p(set, a, t, secret);
+  Verifier v(set, a, t);
+
+  block h_gamma;
+
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
+  block h_pi;
+
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
+
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+
+  block h_psi;
+  p.r5(seed_ell, h_psi); // Run round 5
+
+  std::vector<int> i_bar;
+
+  v.r6(h_psi, i_bar); // Run round 6
+
+  block seed_e_bar;
+  std::vector<std::vector<block>> seed_tree;
+  std::vector<block> gamma_i_bar;
+  std::vector<std::vector<NTL::ZZ_p>> alpha_i_bar, b_square, s;
+  std::vector<NTL::ZZ_p> o_i_bar;
+
+  p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
+
+  std::vector<std::vector<block>> partial_seeds;
+
+  bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s, partial_seeds); // Run round 8
+
+  // Check seed reconstruction
+  REQUIRE(flag == true);
+}
+
+TEST_CASE("full_protocol_big_numbers1") {
+  auto M = 630, N = 64, tau = 615, m = 4096, n = 1024;
+  uint64_t q = 2305843009213693951L;
+
+  // MOVE THIS LINE TO THE DRIVER...
+  NTL::ZZ_p::init(NTL::ZZ(q)); // *** CHECK HOW TO INIT 128 BIT ***
+
+  NTL::Mat<NTL::ZZ_p> a;
+  NTL::Vec<NTL::ZZ_p> t, secret;
+  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
+
+  a.SetDims(n, m); // Fill with values
+  t.SetLength(n); // Fill with values
+  secret.SetLength(m);
+
+  // Random matrix A
+  for (auto nn = 0; nn < n; ++nn) {
+    for (auto mm = 0; mm < m; ++mm) {
+      a[nn][mm] = NTL::ZZ_p(prng.get<block>().halves[0]);
+    }
+  }
+
+  // Random vector secret
+  for (auto mm = 0; mm < m; ++mm) {
+    secret[mm] = prng.get<block>().bytes[0] % 2;
+  }
+
+  // Calculate t
+  for (auto nn = 0; nn < n; ++nn) {
+    t[nn] = 0;
+
+    for (auto mm = 0; mm < m; ++mm) {
+      t[nn] += a[nn][mm] * secret[mm];
+    }
+  }
+
+  Settings set(M, N, q, m, n, tau);
+
+  Prover p(set, a, t, secret);
+  Verifier v(set, a, t);
+
+  block h_gamma;
+
+  p.r1(h_gamma); // Run round 1
+
+  std::vector<bool> E;
+  v.r2(h_gamma, E); // Run round 2
+
+  std::vector<block> seed, omegaN;
+  block h_pi;
+
+  p.r3(E, seed, omegaN, h_pi); // Run round 3
+
+  block seed_ell;
+  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+
+  block h_psi;
+  p.r5(seed_ell, h_psi); // Run round 5
+
+  std::vector<int> i_bar;
+
+  v.r6(h_psi, i_bar); // Run round 6
+
+  block seed_e_bar;
+  std::vector<std::vector<block>> seed_tree;
+  std::vector<block> gamma_i_bar;
+  std::vector<std::vector<NTL::ZZ_p>> alpha_i_bar, b_square, s;
+  std::vector<NTL::ZZ_p> o_i_bar;
+
+  p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
+
+  std::vector<std::vector<block>> partial_seeds;
+
+  bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s, partial_seeds); // Run round 8
+
+  // Check seed reconstruction
+  REQUIRE(flag == true);
 }
