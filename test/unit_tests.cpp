@@ -7,8 +7,6 @@
 #include <cryptoTools/Crypto/PRNG.h>
 #include <seedtree.h>
 #include "seedtree.h"
-//#include "prover.h"
-//#include "verifier.h"
 #include "prover_wrapper.h"
 #include "verifier_wrapper.h"
 

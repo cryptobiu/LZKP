@@ -42,26 +42,26 @@ void ProverWrapper::r1(block &h_gamma) {
   }
 
   // 2 - ** can be parallelized **
-  const size_t nthreads = std::thread::hardware_concurrency();
-  std::vector<std::thread> threads(nthreads);
-
-  for(auto t = 0u; t < nthreads; t++) {
-    threads[t] = std::thread(std::bind(
-        [&](const int bi, const int ei, const int t) {
-          for (auto e = bi; e < ei; ++e) {
-            provers_[e] = new Prover(set_, a_, t_, secret_);
-
-            provers_[e]->r1(master_seed_[e]);
-          }
-        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
-  }
-  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-
-//  for (auto e = 0; e < M; ++e) {
-//    provers_[e] = new Prover(set_, a_, t_, secret_);
+//  const size_t nthreads = std::thread::hardware_concurrency();
+//  std::vector<std::thread> threads(nthreads);
 //
-//    provers_[e]->r1(master_seed_[e]);
+//  for(auto t = 0u; t < nthreads; t++) {
+//    threads[t] = std::thread(std::bind(
+//        [&](const int bi, const int ei, const int t) {
+//          for (auto e = bi; e < ei; ++e) {
+//            provers_[e] = new Prover(set_, a_, t_, secret_);
+//
+//            provers_[e]->r1(master_seed_[e]);
+//          }
+//        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
 //  }
+//  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+
+  for (auto e = 0; e < M; ++e) {
+    provers_[e] = new Prover(set_, a_, t_, secret_);
+
+    provers_[e]->r1(master_seed_[e]);
+  }
 
   osuCrypto::SHA1 sha_h_gamma(sizeof(block));
   for (auto e = 0; e < M; ++e) {

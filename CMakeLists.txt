@@ -20,7 +20,7 @@ IF(Boost_FOUND)
     LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 ENDIF(Boost_FOUND)
 
-add_executable(LZKP
+add_executable(LZKP_TESTS
         test/unit_tests.cpp
         settings.h
         prover_wrapper.cpp
@@ -33,6 +33,23 @@ add_executable(LZKP
         verifier.h
         seedtree.cpp
         seedtree.h
-         )
+        )
+
+target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
+
+add_executable(LZKP
+        protocol.cpp
+        settings.h
+        prover_wrapper.cpp
+        prover_wrapper.h
+        prover.cpp
+        prover.h
+        verifier_wrapper.cpp
+        verifier_wrapper.h
+        verifier.cpp
+        verifier.h
+        seedtree.cpp
+        seedtree.h
+        protocol.cpp)
 
 target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
