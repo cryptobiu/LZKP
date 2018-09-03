@@ -23,7 +23,7 @@ void SeedTree::generate(const block &master_seed) {
 
   seeds_[0].b = prng_.getSeed();
 
-  for (auto i = 0; i < size_ - 1; ++i) {
+  for (auto i = 0u; i < size_ - 1; ++i) {
     prng_.SetSeed(seeds_[i].b);
 
     seeds_[2 * i + 1] = prng_.get<block>();
@@ -31,7 +31,7 @@ void SeedTree::generate(const block &master_seed) {
   }
 
   prngs_.resize(size_);
-  for (auto i = 0; i < size_; ++i) {
+  for (auto i = 0u; i < size_; ++i) {
     prngs_[i].SetSeed(seeds_[size_ - 1 + i].b);
   }
 
@@ -39,14 +39,14 @@ void SeedTree::generate(const block &master_seed) {
 }
 
 block SeedTree::getBlock(int idx) {
-  if (idx < 0 || idx >= size_)
+  if (idx < 0 || (unsigned )idx >= size_)
     exit(1);
 
   return prngs_[idx].get<block>();
 }
 
 block SeedTree::getSeed(int idx) {
-  if (idx < 0 || idx >= size_)
+  if (idx < 0 || (unsigned )idx >= size_)
     exit(1);
 
   return seeds_[size_ - 1 + idx];

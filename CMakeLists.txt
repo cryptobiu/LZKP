@@ -3,7 +3,7 @@ project(LZKP)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -pedantic -g -O3 -march=native")
 
 include_directories(.)
 
@@ -22,12 +22,17 @@ ENDIF(Boost_FOUND)
 
 add_executable(LZKP
         test/unit_tests.cpp
+        settings.h
+        prover_wrapper.cpp
+        prover_wrapper.h
         prover.cpp
         prover.h
-        settings.h
-        seedtree.cpp
+        verifier_wrapper.cpp
+        verifier_wrapper.h
         verifier.cpp
         verifier.h
-        seedtree.h settings.h)
+        seedtree.cpp
+        seedtree.h
+         )
 
 target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
