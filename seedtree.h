@@ -1,7 +1,3 @@
-//
-// Created by roee on 7/26/18.
-//
-
 #ifndef LZKP_SEEDTREE_H
 #define LZKP_SEEDTREE_H
 
@@ -9,7 +5,9 @@
 
 #include <cryptoTools/Crypto/PRNG.h>
 
+
 namespace lzkp {
+
 
 typedef union {
     osuCrypto::u64 halves[2];
@@ -38,6 +36,8 @@ public: // Makes tests easier
 
     bool state;
 };
+
+
 }
 
 #endif //LZKP_SEEDTREE_H

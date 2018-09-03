@@ -1,17 +1,12 @@
-//
-// Created by roee on 7/26/18.
-//
-
 #ifndef LZKP_VERIFIER_H
 #define LZKP_VERIFIER_H
 
-#include <vector>
+#include <NTL/ZZ_p.h>
+#include <NTL/matrix.h>
 
 #include "seedtree.h"
 #include "settings.h"
 
-#include <NTL/ZZ_p.h>
-#include <NTL/matrix.h>
 
 namespace lzkp {
 
@@ -71,5 +66,4 @@ public:
 
 
 }
-
 #endif //LZKP_VERIFIER_H

@@ -1,8 +1,10 @@
 #include "prover.h"
+
+#include <stack>
+#include <cryptoTools/Crypto/sha1.h>
+
 #include "seedtree.h"
 
-#include <cryptoTools/Crypto/sha1.h>
-#include <stack>
 
 using namespace lzkp;
 
@@ -31,7 +33,6 @@ void Prover::r1(block &h_gamma) {
   h_.resize(M);
 
   osuCrypto::PRNG prng;
-  osuCrypto::SHA1 sha_h_gamma(sizeof(block));
 
   for (auto e = 0; e < M; ++e) {
     gamma_[e].resize(N);
@@ -103,11 +104,13 @@ void Prover::r1(block &h_gamma) {
       sha_h.Update(gamma_[e][i]);
     }
     sha_h.Final(h_[e]); // mb need to zero it first
-    //std::cout << "H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
-
-    sha_h_gamma.Update(h_[e]);
   }
 
+  // 2
+  osuCrypto::SHA1 sha_h_gamma(sizeof(block));
+  for (auto e = 0; e < M; ++e) {
+    sha_h_gamma.Update(h_[e]);
+  }
   sha_h_gamma.Final(h_gamma_.bytes);
 
   h_gamma = h_gamma_;

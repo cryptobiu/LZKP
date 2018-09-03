@@ -4,13 +4,13 @@
 
 #include "verifier.h"
 
+#include <stack>
+#include <queue>
 #include <cryptoTools/Crypto/PRNG.h>
 #include <cryptoTools/Crypto/sha1.h>
 
 #include "seedtree.h"
 
-#include <stack>
-#include <queue>
 
 using namespace lzkp;
 

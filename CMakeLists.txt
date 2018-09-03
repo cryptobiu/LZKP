@@ -30,4 +30,4 @@ add_executable(LZKP
         verifier.h
         seedtree.h settings.h)
 
-target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl)
+target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
