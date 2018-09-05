@@ -21,7 +21,7 @@ public:
   ~ProverWrapper();
 
   void r1(block &h_gamma);
-  void r3(const std::vector<bool> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi);
+  void r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi);
   void r5(const block &seed_ell, block &h_psi);
   void r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
           std::vector<block> &gamma_i_bar, std::vector<std::vector<FieldType>> &alpha_i_bar, std::vector<FieldType> &o_i_bar,
@@ -49,7 +49,7 @@ public:
   std::vector<block> master_seed_;
   block h_gamma_;
 
-  std::vector<bool> E_;
+  std::vector<uint8_t> E_;
   block seed_e_bar_;
   osuCrypto::PRNG prng_e_bar_;
   std::vector<block> g_;
@@ -118,7 +118,7 @@ void ProverWrapper<FieldType>::r1(block &h_gamma) {
 }
 
 template <class FieldType>
-void ProverWrapper<FieldType>::r3(const std::vector<bool> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi) {
+void ProverWrapper<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi) {
   E_ = E;
 
   // 1

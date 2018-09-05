@@ -42,8 +42,8 @@ add_executable(LZKP_TESTS
 
 target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
 
-add_executable(LZKP
-        protocol.cpp
+add_executable(LZKP_m61
+        protocol_m61.cpp
         settings.h
         prover_wrapper.cpp
         prover_wrapper.h
@@ -58,4 +58,4 @@ add_executable(LZKP
         Mersenne.cpp
         Mersenne.h)
 
-target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
+target_link_libraries(LZKP_m61 libcryptoTools.a libmiracl.a gsl ntl pthread gmp)

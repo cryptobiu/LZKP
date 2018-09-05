@@ -20,7 +20,7 @@ public:
   VerifierWrapper(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
   ~VerifierWrapper();
 
-  void r2(const block &h_gamma, std::vector<bool> &E);
+  void r2(const block &h_gamma, std::vector<uint8_t> &E);
   void r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell);
   void r6(const block &h_psi, std::vector<int> &i_bar);
   bool r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar,
@@ -44,7 +44,7 @@ public:
   std::vector<Verifier<FieldType> *> verifiers_;
 
   block h_gamma_;
-  std::vector<bool> E_;
+  std::vector<uint8_t> E_;
 
   block h_pi_;
   block seed_ell_;
@@ -72,7 +72,7 @@ VerifierWrapper<FieldType>::~VerifierWrapper() {
 }
 
 template <class FieldType>
-void VerifierWrapper<FieldType>::r2(const block &h_gamma, std::vector<bool> &E) {
+void VerifierWrapper<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> &E) {
   h_gamma_ = h_gamma;
 
   E_.resize(M);
@@ -84,9 +84,9 @@ void VerifierWrapper<FieldType>::r2(const block &h_gamma, std::vector<bool> &E) 
     int r = prng.get<osuCrypto::u32>() % i;
 
     if (!E_[r])
-      E_[r] = true;
+      E_[r] = 0xFF;
     else
-      E_[i - 1] = true;
+      E_[i - 1] = 0xFF;
   }
 
   E = E_;

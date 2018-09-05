@@ -123,7 +123,7 @@ void Verifier<FieldType>::r4() {
   block blk = seed_tree_.getSeed(N - 1);
   sha_gamma.Reset();
   sha_gamma.Update(blk);
-  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
+//  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
   for (auto i = 0; i < m; ++i) {
 //    NTL::BytesFromZZ(buf, b_square_[i][N - 1].elem._ZZ_p__rep, NTL::NumBytes(b_square_[i][N - 1].elem._ZZ_p__rep));
 //    sha_gamma.Update(buf, NTL::NumBytes(b_square_[i][N - 1].elem._ZZ_p__rep));
@@ -239,7 +239,7 @@ bool Verifier<FieldType>::r8(const std::vector<block> &seed_tree, const block &g
     sha_gamma.Reset();
     sha_gamma.Update(blk);
     if (i == N - 1) {
-      unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
+//      unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
       for (auto k = 0; k < m; ++k) {
 //        NTL::BytesFromZZ(buf, b_square[k].elem._ZZ_p__rep, NTL::NumBytes(b_square[k].elem._ZZ_p__rep));
 //        sha_gamma.Update(buf, NTL::NumBytes(b_square[k].elem._ZZ_p__rep));
@@ -263,7 +263,7 @@ bool Verifier<FieldType>::r8(const std::vector<block> &seed_tree, const block &g
   //std::cout << "Vr8 H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
 
   // 1.e
-  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
+//  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
   if (i_bar_ != N -1) {
     block gN_e, blk;
     if (i_bar_ != N - 1) {

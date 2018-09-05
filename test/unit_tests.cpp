@@ -232,7 +232,7 @@ TEST_CASE("verifier_r2") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   int sum = 0;
@@ -292,7 +292,7 @@ TEST_CASE("prover_r3") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -350,7 +350,7 @@ TEST_CASE("verifier_r4") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -429,7 +429,7 @@ TEST_CASE("prover_r5") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -501,7 +501,7 @@ TEST_CASE("verifier_r6") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -579,7 +579,7 @@ TEST_CASE("prover_r7") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -717,7 +717,7 @@ TEST_CASE("verifier_r8") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   for (auto e = 0; e < M; ++e) {
@@ -845,7 +845,7 @@ TEST_CASE("verifier_r8_ring31") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   for (auto e = 0; e < M; ++e) {
@@ -975,7 +975,7 @@ TEST_CASE("verifier_r8_MersenneIntElement") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   for (auto e = 0; e < M; ++e) {
@@ -1106,7 +1106,7 @@ TEST_CASE("verifier_r8_MersenneLongElement") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   for (auto e = 0; e < M; ++e) {
@@ -1237,7 +1237,7 @@ TEST_CASE("verifier_r8_MersenneLongElement") {
 //
 //  p.r1(h_gamma); // Run round 1
 //
-//  std::vector<bool> E;
+//  std::vector<uint8_t> E;
 //  v.r2(h_gamma, E); // Run round 2
 //
 //  for (auto e = 0; e < M; ++e) {
@@ -1366,7 +1366,7 @@ TEST_CASE("full_protocol_small_numbers") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -1444,7 +1444,7 @@ TEST_CASE("full_protocol_small_numbers1") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -1522,7 +1522,7 @@ TEST_CASE("full_protocol_small_numbers2") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;
@@ -1602,7 +1602,7 @@ TEST_CASE("full_protocol_small_numbers2_false") {
 
   p.r1(h_gamma); // Run round 1
 
-  std::vector<bool> E;
+  std::vector<uint8_t> E;
   v.r2(h_gamma, E); // Run round 2
 
   std::vector<block> seed, omegaN;

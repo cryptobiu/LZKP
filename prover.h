@@ -129,7 +129,7 @@ void Prover<FieldType>::r1(const block &master_seed) {
     sha_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
     sha_gamma.Update(blk); // Hash seed_e,i
     if (i == N - 1) {
-      unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
+//      unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
       for (auto k = 0; k < m; ++k) { // TODO: optimize
 //        NTL::BytesFromZZ(buf, b_square_[k][N - 1].elem._ZZ_p__rep, NTL::NumBytes(b_square_[k][N - 1].elem._ZZ_p__rep));
 //        sha_gamma.Update(buf, NTL::NumBytes(b_square_[k][N - 1].elem._ZZ_p__rep));
@@ -192,7 +192,7 @@ void Prover<FieldType>::r3() {
 
   // 2.f
   osuCrypto::SHA1 sha_omegaN(sizeof(block));
-  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
+//  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
   for (auto i = 0; i < m; ++i) {
 //    NTL::BytesFromZZ(buf, s_[i][N - 1].elem._ZZ_p__rep, NTL::NumBytes(s_[i][N - 1].elem._ZZ_p__rep));
 //    sha_omegaN.Update(buf, NTL::NumBytes(s_[i][N - 1].elem._ZZ_p__rep));
@@ -223,7 +223,7 @@ void Prover<FieldType>::r5() {
 
   // 2.a
   osuCrypto::SHA1 sha_psi(sizeof(block));
-  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
+//  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
