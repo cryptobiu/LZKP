@@ -1,20 +1,22 @@
 #ifndef LZKP_SETTINGS_H
 #define LZKP_SETTINGS_H
 
+#include <cstdint>
+
 
 namespace lzkp {
 
 
 class Settings {
 public:
-  Settings(int M, int N, uint64_t q, int m, int n, int tau) : M(M), N(N), q(q), m(m), n(n), tau(tau) {}
+  Settings(int M, int tau, int N, uint64_t q, int n, int m) : M(M), tau(tau), N(N), n(n), m(m) {}
 
   const int M;
-  const int N;
-  const uint64_t q;
-  const int m;
-  const int n; // n < m
   const int tau;
+  const int N;
+//  const uint64_t q;
+  const int n; // n < m
+  const int m;
 };
 
 

@@ -33,7 +33,12 @@ add_executable(LZKP_TESTS
         verifier.h
         seedtree.cpp
         seedtree.h
-        )
+        Mersenne.cpp
+        Mersenne.h
+        Ring31.cpp
+        Ring31.h
+        RingNTL.cpp
+        RingNTL.h)
 
 target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
 
@@ -50,6 +55,7 @@ add_executable(LZKP
         verifier.h
         seedtree.cpp
         seedtree.h
-        protocol.cpp)
+        Mersenne.cpp
+        Mersenne.h)
 
 target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
