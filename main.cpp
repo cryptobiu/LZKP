@@ -5,8 +5,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "prover_wrapper.h"
-#include "verifier_wrapper.h"
+#include "prover_logic.h"
+#include "verifier_logic.h"
 #include "settings.h"
 #include "seedtree.h"
 #include "Mersenne.h"
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    ProverWrapper<ZpMersenneLongElement> p(set, a, t, secret);
+    ProverLogic<ZpMersenneLongElement> p(set, a, t, secret);
 
     iovec *iov = new iovec[3000];
     ssize_t nwritten, nread;
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
       exit(EXIT_FAILURE);
     }
 
-    VerifierWrapper<ZpMersenneLongElement> v(set, a, t);
+    VerifierLogic<ZpMersenneLongElement> v(set, a, t);
 
     iovec *iov = new iovec[3000];
     ssize_t nwritten, nread;

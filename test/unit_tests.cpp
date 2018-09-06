@@ -7,8 +7,8 @@
 #include <cryptoTools/Crypto/PRNG.h>
 #include <seedtree.h>
 #include "seedtree.h"
-#include "prover_wrapper.h"
-#include "verifier_wrapper.h"
+#include "prover_logic.h"
+#include "verifier_logic.h"
 #include "Mersenne.h"
 #include "Ring31.h"
 #include "RingNTL.h"
@@ -95,7 +95,7 @@ TEST_CASE("prover_constructor") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
 }
 
 TEST_CASE("verifier_constuctor") {
@@ -137,7 +137,7 @@ TEST_CASE("verifier_constuctor") {
 
   Settings set(M, tau, N, q, n, m);
 
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 }
 
 TEST_CASE("prover_r1") {
@@ -179,7 +179,7 @@ TEST_CASE("prover_r1") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
 
   block h_gamma;
 
@@ -225,8 +225,8 @@ TEST_CASE("verifier_r2") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -285,8 +285,8 @@ TEST_CASE("prover_r3") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -343,8 +343,8 @@ TEST_CASE("verifier_r4") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -422,8 +422,8 @@ TEST_CASE("prover_r5") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -494,8 +494,8 @@ TEST_CASE("verifier_r6") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -572,8 +572,8 @@ TEST_CASE("prover_r7") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -710,8 +710,8 @@ TEST_CASE("verifier_r8") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneLongElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneLongElement> v(set, a, t);
+  ProverLogic<ZpMersenneLongElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneLongElement> v(set, a, t);
 
   block h_gamma;
 
@@ -838,8 +838,8 @@ TEST_CASE("verifier_r8_ring31") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<Ring31> p(set, a, t, secret);
-  VerifierWrapper<Ring31> v(set, a, t);
+  ProverLogic<Ring31> p(set, a, t, secret);
+  VerifierLogic<Ring31> v(set, a, t);
 
   block h_gamma;
 
@@ -968,8 +968,8 @@ TEST_CASE("verifier_r8_MersenneIntElement") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -1099,8 +1099,8 @@ TEST_CASE("verifier_r8_MersenneLongElement") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneLongElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneLongElement> v(set, a, t);
+  ProverLogic<ZpMersenneLongElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneLongElement> v(set, a, t);
 
   block h_gamma;
 
@@ -1230,8 +1230,8 @@ TEST_CASE("verifier_r8_MersenneLongElement") {
 //
 //  Settings set(M, tau, N, q, n, m);
 //
-//  ProverWrapper<RingNTL> p(set, a, t, secret);
-//  VerifierWrapper<RingNTL> v(set, a, t);
+//  ProverLogic<RingNTL> p(set, a, t, secret);
+//  VerifierLogic<RingNTL> v(set, a, t);
 //
 //  block h_gamma;
 //
@@ -1359,8 +1359,8 @@ TEST_CASE("full_protocol_small_numbers") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -1437,8 +1437,8 @@ TEST_CASE("full_protocol_small_numbers1") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -1515,8 +1515,8 @@ TEST_CASE("full_protocol_small_numbers2") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -1595,8 +1595,8 @@ TEST_CASE("full_protocol_small_numbers2_false") {
 
   Settings set(M, tau, N, q, n, m);
 
-  ProverWrapper<ZpMersenneIntElement> p(set, a, t, secret);
-  VerifierWrapper<ZpMersenneIntElement> v(set, a, t);
+  ProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
+  VerifierLogic<ZpMersenneIntElement> v(set, a, t);
 
   block h_gamma;
 
@@ -1672,8 +1672,8 @@ TEST_CASE("full_protocol_small_numbers2_false") {
 //
 //  Settings set(M, N, q, m, n, tau);
 //
-//  ProverWrapper p(set, a, t, secret);
-//  VerifierWrapper v(set, a, t);
+//  ProverLogic p(set, a, t, secret);
+//  VerifierLogic v(set, a, t);
 //
 //  block h_gamma;
 //
@@ -1749,8 +1749,8 @@ TEST_CASE("full_protocol_small_numbers2_false") {
 //
 //  Settings set(M, N, q, m, n, tau);
 //
-//  ProverWrapper p(set, a, t, secret);
-//  VerifierWrapper v(set, a, t);
+//  ProverLogic p(set, a, t, secret);
+//  VerifierLogic v(set, a, t);
 //
 //  block h_gamma;
 //

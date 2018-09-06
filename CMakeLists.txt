@@ -23,12 +23,12 @@ ENDIF(Boost_FOUND)
 add_executable(LZKP_TESTS
         test/unit_tests.cpp
         settings.h
-        prover_wrapper.cpp
-        prover_wrapper.h
+        prover_logic.cpp
+        prover_logic.h
         prover.cpp
         prover.h
-        verifier_wrapper.cpp
-        verifier_wrapper.h
+        verifier_logic.cpp
+        verifier_logic.h
         verifier.cpp
         verifier.h
         seedtree.cpp
@@ -36,26 +36,24 @@ add_executable(LZKP_TESTS
         Mersenne.cpp
         Mersenne.h
         Ring31.cpp
-        Ring31.h
-        RingNTL.cpp
-        RingNTL.h)
+        Ring31.h)
 
 target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
 
-add_executable(LZKP_m61
-        protocol_m61.cpp
+add_executable(LZKP
+        main.cpp
         settings.h
-        prover_wrapper.cpp
-        prover_wrapper.h
+        prover_logic.cpp
+        prover_logic.h
         prover.cpp
         prover.h
-        verifier_wrapper.cpp
-        verifier_wrapper.h
+        verifier_logic.cpp
+        verifier_logic.h
         verifier.cpp
         verifier.h
         seedtree.cpp
         seedtree.h
         Mersenne.cpp
-        Mersenne.h)
+        Mersenne.h party.h prover_party.cpp prover_party.h factory.cpp factory.h verifier_party.cpp verifier_party.h)
 
-target_link_libraries(LZKP_m61 libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
+target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp)

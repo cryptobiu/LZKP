@@ -2,7 +2,7 @@
 // Created by roee on 9/3/18.
 //
 
-#include "prover_wrapper.h"
+#include "prover_logic.h"
 
 #include <vector>
 #include <thread>

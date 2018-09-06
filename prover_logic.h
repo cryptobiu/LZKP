@@ -10,15 +10,17 @@
 #include "prover.h"
 #include "Mersenne.h"
 
+#include <thread>
+
 
 namespace lzkp {
 
 
 template <class FieldType>
-class ProverWrapper {
+class ProverLogic {
 public:
-  ProverWrapper(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
-  ~ProverWrapper();
+  ProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
+  ~ProverLogic();
 
   void r1(block &h_gamma);
   void r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi);
@@ -61,13 +63,13 @@ public:
 };
 
 template <class FieldType>
-ProverWrapper<FieldType>::ProverWrapper(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
+ProverLogic<FieldType>::ProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
     : a_(a), t_(t), secret_(secret), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
   provers_.resize(M);
 }
 
 template <class FieldType>
-ProverWrapper<FieldType>::~ProverWrapper() {
+ProverLogic<FieldType>::~ProverLogic() {
   for (auto e = 0; e < M; ++e) {
     if (provers_[e])
       delete provers_[e];
@@ -75,7 +77,7 @@ ProverWrapper<FieldType>::~ProverWrapper() {
 }
 
 template <class FieldType>
-void ProverWrapper<FieldType>::r1(block &h_gamma) {
+void ProverLogic<FieldType>::r1(block &h_gamma) {
   master_seed_.resize(M);
 
   osuCrypto::PRNG prng;
@@ -87,26 +89,26 @@ void ProverWrapper<FieldType>::r1(block &h_gamma) {
   }
 
   // 2 - ** can be parallelized **
-//  const size_t nthreads = std::thread::hardware_concurrency();
-//  std::vector<std::thread> threads(nthreads);
-//
-//  for(auto t = 0u; t < nthreads; t++) {
-//    threads[t] = std::thread(std::bind(
-//        [&](const int bi, const int ei, const int t) {
-//          for (auto e = bi; e < ei; ++e) {
-//            provers_[e] = new Prover(set_, a_, t_, secret_);
-//
-//            provers_[e]->r1(master_seed_[e]);
-//          }
-//        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
-//  }
-//  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+  const size_t nthreads = std::thread::hardware_concurrency();
+  std::vector<std::thread> threads(nthreads);
 
-  for (auto e = 0; e < M; ++e) {
-    provers_[e] = new Prover<FieldType>(set_, a_, t_, secret_);
+  for(auto t = 0u; t < nthreads; t++) {
+    threads[t] = std::thread(std::bind(
+        [&](const int bi, const int ei, const int t) {
+          for (auto e = bi; e < ei; ++e) {
+            provers_[e] = new Prover<FieldType>(set_, a_, t_, secret_);
 
-    provers_[e]->r1(master_seed_[e]);
+            provers_[e]->r1(master_seed_[e]);
+          }
+        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
   }
+  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+
+//  for (auto e = 0; e < M; ++e) {
+//    provers_[e] = new Prover<FieldType>(set_, a_, t_, secret_);
+//
+//    provers_[e]->r1(master_seed_[e]);
+//  }
 
   osuCrypto::SHA1 sha_h_gamma(sizeof(block));
   for (auto e = 0; e < M; ++e) {
@@ -118,7 +120,7 @@ void ProverWrapper<FieldType>::r1(block &h_gamma) {
 }
 
 template <class FieldType>
-void ProverWrapper<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi) {
+void ProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi) {
   E_ = E;
 
   // 1
@@ -134,25 +136,27 @@ void ProverWrapper<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<blo
   }
 
   // ** can be parallelized **
-//  const size_t nthreads = std::thread::hardware_concurrency();
-//  std::vector<std::thread> threads(nthreads);
+  const size_t nthreads = std::thread::hardware_concurrency();
+  std::vector<std::thread> threads(nthreads);
 
-//  for(auto t = 0u; t < nthreads; t++) {
-//    threads[t] = std::thread(std::bind(
-//        [&](const int bi, const int ei, const int t) {
-//          for (auto e = bi; e < ei; ++e) {
-//
-//          }
-//        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
-//  }
-//  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-
-  for (auto e = 0; e < M; ++e) {
-    if (!E[e]) {
-      provers_[e]->r3();
-//      std::cout << "Gamma0 " << e << " " << provers_[e]->gamma_[0].halves[0] << " " << provers_[e]->gamma_[0].halves[1] << std::endl;
-    }
+  for(auto t = 0u; t < nthreads; t++) {
+    threads[t] = std::thread(std::bind(
+        [&](const int bi, const int ei, const int t) {
+          for (auto e = bi; e < ei; ++e) {
+            if (!E_[e]) {
+              provers_[e]->r3();
+            }
+          }
+        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
   }
+  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+//
+//  for (auto e = 0; e < M; ++e) {
+//    if (!E[e]) {
+//      provers_[e]->r3();
+//      std::cout << "Gamma0 " << e << " " << provers_[e]->gamma_[0].halves[0] << " " << provers_[e]->gamma_[0].halves[1] << std::endl;
+//    }
+//  }
 
   // 2.h
   seed.resize(tau);
@@ -174,7 +178,7 @@ void ProverWrapper<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<blo
 }
 
 template <class FieldType>
-void ProverWrapper<FieldType>::r5(const block &seed_ell, block &h_psi) {
+void ProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
   seed_ell_ = seed_ell;
 
   prng_seed_ell_.SetSeed(seed_ell_.b);
@@ -200,15 +204,30 @@ void ProverWrapper<FieldType>::r5(const block &seed_ell, block &h_psi) {
   }
 
   // ** can be parallelized **
-  for (auto e = 0; e < M; ++e) {
-    if (!E_[e]) {
-      provers_[e]->r5();
+  const size_t nthreads = std::thread::hardware_concurrency();
+  std::vector<std::thread> threads(nthreads);
 
+  for(auto t = 0u; t < nthreads; t++) {
+    threads[t] = std::thread(std::bind(
+        [&](const int bi, const int ei, const int t) {
+          for (auto e = bi; e < ei; ++e) {
+            if (!E_[e]) {
+              provers_[e]->r5();
+            }
+          }
+        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
+  }
+  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+
+//  for (auto e = 0; e < M; ++e) {
+//    if (!E_[e]) {
+//      provers_[e]->r5();
+//
 //      std::cout << e << std::endl;
 //      for (auto i = 0; i < N; ++i)
 //        std::cout << "\t" << provers_[e]->o_[i] << std::endl;
-    }
-  }
+//    }
+//  }
 
   osuCrypto::SHA1 sha_h_psi(sizeof(block));
 
@@ -227,7 +246,7 @@ void ProverWrapper<FieldType>::r5(const block &seed_ell, block &h_psi) {
 }
 
 template <class FieldType>
-void ProverWrapper<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
+void ProverLogic<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
                        std::vector<block> &gamma_i_bar, std::vector<std::vector<FieldType>> &alpha_i_bar, std::vector<FieldType> &o_i_bar,
                        std::vector<std::vector<FieldType>> &b_square, std::vector<std::vector<FieldType>> &s) {
   seed_tree.resize(M - tau);
@@ -252,11 +271,27 @@ void ProverWrapper<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_b
   seed_e_bar = seed_e_bar_;
 
   // ** can be parallelized **
-  for (auto e = 0; e < M; ++e) {
-    if (!E_[e])
-      provers_[e]->r7(seed_tree[map[e]], gamma_i_bar[map[e]], alpha_i_bar[map[e]],
-                      o_i_bar[map[e]], b_square[map[e]], s[map[e]]);
+  const size_t nthreads = std::thread::hardware_concurrency();
+  std::vector<std::thread> threads(nthreads);
+
+  for(auto t = 0u; t < nthreads; t++) {
+    threads[t] = std::thread(std::bind(
+        [&](const int bi, const int ei, const int t) {
+          for (auto e = bi; e < ei; ++e) {
+            if (!E_[e]) {
+              provers_[e]->r7(seed_tree[map[e]], gamma_i_bar[map[e]], alpha_i_bar[map[e]],
+                              o_i_bar[map[e]], b_square[map[e]], s[map[e]]);
+            }
+          }
+        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
   }
+  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+
+//  for (auto e = 0; e < M; ++e) {
+//    if (!E_[e])
+//      provers_[e]->r7(seed_tree[map[e]], gamma_i_bar[map[e]], alpha_i_bar[map[e]],
+//                      o_i_bar[map[e]], b_square[map[e]], s[map[e]]);
+//  }
 }
 
 

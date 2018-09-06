@@ -10,15 +10,17 @@
 #include "verifier.h"
 #include "Mersenne.h"
 
+#include <thread>
+
 
 namespace lzkp {
 
 
 template <class FieldType>
-class VerifierWrapper {
+class VerifierLogic {
 public:
-  VerifierWrapper(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
-  ~VerifierWrapper();
+  VerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
+  ~VerifierLogic();
 
   void r2(const block &h_gamma, std::vector<uint8_t> &E);
   void r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell);
@@ -58,13 +60,13 @@ public:
 
 
 template <class FieldType>
-VerifierWrapper<FieldType>::VerifierWrapper(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
+VerifierLogic<FieldType>::VerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
     : a_(a), t_(t), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
   verifiers_.resize(M);
 }
 
 template <class FieldType>
-VerifierWrapper<FieldType>::~VerifierWrapper() {
+VerifierLogic<FieldType>::~VerifierLogic() {
   for (auto e = 0; e < M; ++e) {
     if (verifiers_[e])
       delete verifiers_[e];
@@ -72,7 +74,7 @@ VerifierWrapper<FieldType>::~VerifierWrapper() {
 }
 
 template <class FieldType>
-void VerifierWrapper<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> &E) {
+void VerifierLogic<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> &E) {
   h_gamma_ = h_gamma;
 
   E_.resize(M);
@@ -93,7 +95,7 @@ void VerifierWrapper<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> &
 }
 
 template <class FieldType>
-void VerifierWrapper<FieldType>::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell) {
+void VerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell) {
 //  seed_ = seed;
 //  omegaN_ = omegaN;
   h_pi_ = h_pi;
@@ -113,6 +115,21 @@ void VerifierWrapper<FieldType>::r4(const std::vector<block> &seed, const std::v
   }
 
   // ** can be parallelized **
+//  const size_t nthreads = std::thread::hardware_concurrency();
+//  std::vector<std::thread> threads(nthreads);
+//
+//  for(auto t = 0u; t < nthreads; t++) {
+//    threads[t] = std::thread(std::bind(
+//        [&](const int bi, const int ei, const int t) {
+//          for (auto e = bi; e < ei; ++e) {
+//            if (!E_[e]) {
+//              verifiers_[e]->r4();
+//            }
+//          }
+//        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
+//  }
+//  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+//
   for (auto e = 0; e < M; ++e) {
     if (E_[e]) {
       verifiers_[e]->r4();
@@ -140,7 +157,7 @@ void VerifierWrapper<FieldType>::r4(const std::vector<block> &seed, const std::v
 }
 
 template <class FieldType>
-void VerifierWrapper<FieldType>::r6(const block &h_psi, std::vector<int> &i_bar) {
+void VerifierLogic<FieldType>::r6(const block &h_psi, std::vector<int> &i_bar) {
   h_psi_ = h_psi;
 
   i_bar.resize(M - tau);
@@ -159,7 +176,7 @@ void VerifierWrapper<FieldType>::r6(const block &h_psi, std::vector<int> &i_bar)
 }
 
 template <class FieldType>
-bool VerifierWrapper<FieldType>::r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar, const std::vector<std::vector<FieldType>> &alpha_i_bar,
+bool VerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar, const std::vector<std::vector<FieldType>> &alpha_i_bar,
                          const std::vector<FieldType> &o_i_bar, const std::vector<std::vector<FieldType>> &b_square,
                          const std::vector<std::vector<FieldType>> &s) {
   seed_e_bar_ = seed_e_bar;
@@ -193,15 +210,34 @@ bool VerifierWrapper<FieldType>::r8(const block &seed_e_bar, const std::vector<s
   }
 
   // ** can be parallelized **
-  for (auto e = 0; e < M; ++e) {
-    if (E_[e])
-      continue;
+  const size_t nthreads = std::thread::hardware_concurrency();
+  std::vector<std::thread> threads(nthreads);
 
-    const int cur_map = map[e];
+  for(auto t = 0u; t < nthreads; t++) {
+    threads[t] = std::thread(std::bind(
+        [&](const int bi, const int ei, const int t) {
+          for (auto e = bi; e < ei; ++e) {
+            if (E_[e])
+              continue;
 
-    verifiers_[e]->r8(seed_tree[cur_map], gamma_i_bar[cur_map], alpha_i_bar[cur_map], o_i_bar[cur_map],
-                      b_square[cur_map], s[cur_map]);
+            const int cur_map = map[e];
+
+            verifiers_[e]->r8(seed_tree[cur_map], gamma_i_bar[cur_map], alpha_i_bar[cur_map], o_i_bar[cur_map],
+                              b_square[cur_map], s[cur_map]);
+          }
+        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
   }
+  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
+
+//  for (auto e = 0; e < M; ++e) {
+//    if (E_[e])
+//      continue;
+//
+//    const int cur_map = map[e];
+//
+//    verifiers_[e]->r8(seed_tree[cur_map], gamma_i_bar[cur_map], alpha_i_bar[cur_map], o_i_bar[cur_map],
+//                      b_square[cur_map], s[cur_map]);
+//  }
 
   for (auto e = 0; e < M; ++e) {
     if (E_[e])
