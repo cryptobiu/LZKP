@@ -47,6 +47,8 @@ int main(int argc, char *argv[]) {
 
   string ip;
   int port;
+
+  bool multi_threaded = false;
 //  uint64_t seed;
 
   po::variables_map vm;
@@ -76,9 +78,14 @@ int main(int argc, char *argv[]) {
       ("is_accepted,a", po::bool_switch(&is_accepted), "should proof be accepted?")
       ;
 
+    po::options_description performence("Performence options");
+    performence.add_options()
+      ("multi_threaded,x", po::bool_switch(&multi_threaded), "should execute in multi-threading?")
+      ;
+
     po::options_description cmdline_options;
 
-    cmdline_options.add(generic).add(network).add(parameter);
+    cmdline_options.add(generic).add(network).add(performence).add(parameter);
 
     store(parse_command_line(argc, argv, cmdline_options), vm);
 

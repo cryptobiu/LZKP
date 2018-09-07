@@ -43,6 +43,9 @@ protected:
   std::vector<FieldType> t_;
 
   Settings set_;
+
+  bool multi_threaded_ = false;
+
 };
 
 template<class FieldType>
@@ -71,20 +74,14 @@ int CacVerifierParty<FieldType>::parseArguments(int argc, const char* const argv
     ("port", po::value<int>(&this->port_)->required(), "port")
     ;
 
-//  po::options_description parameter("Parameter options");
-//  parameter.add_options()
-//          ("q,q", po::value<int>(&q), "field type (15=15BitField, 31=MersenneInt, 61=MersenneLong)")
-//          ("M,M", po::value<int>(&M), "number of MPCs 'in the head'")
-//          ("tau,t", po::value<int>(&tau), "number of games to open")
-//          ("N,N", po::value<int>(&N), "number of parties in each MPC")
-//          ("n,n", po::value<int>(&n), "rows in matrix")
-//          ("m,m", po::value<int>(&m), "columns in matrix")
-//          ("is_accepted,a", po::bool_switch(&is_accepted), "should proof be accepted?")
-//          ;
+  po::options_description performence("Performence options");
+  performence.add_options()
+    ("multi_threaded,x", po::bool_switch(&multi_threaded_), "should execute in multi-threading?")
+    ;
 
   po::options_description cmdline_options;
 
-  cmdline_options.add(network);
+  cmdline_options.add(network).add(performence);
 
   po::store(po::command_line_parser(argc, argv).options(cmdline_options).allow_unregistered().run(), vm);
 
@@ -94,6 +91,11 @@ int CacVerifierParty<FieldType>::parseArguments(int argc, const char* const argv
   std::cout << "Parsed parameters: " << std::endl;
   std::cout << "\tIP: " << this->ip_ << std::endl;
   std::cout << "\tPort: " << this->port_ << std::endl;
+
+  if (multi_threaded_)
+    std::cout << "\tMulti-threading enabled" << std::endl;
+  else
+    std::cout << "\tMulti-threading disabled" << std::endl;
 #endif
 
   return 0;
@@ -175,7 +177,7 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
 
 template<class FieldType>
 bool CacVerifierParty<FieldType>::runOnline() {
-  CacVerifierLogic<FieldType> v(set_, a_, t_);
+  CacVerifierLogic<FieldType> v(set_, a_, t_, multi_threaded_);
 
   iovec *iov = new iovec[3000];
   ssize_t nwritten, nread;

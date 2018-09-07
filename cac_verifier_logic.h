@@ -19,7 +19,7 @@ namespace lzkp {
 template <class FieldType>
 class CacVerifierLogic {
 public:
-  CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
+  CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded = false);
   ~CacVerifierLogic();
 
   void r2(const block &h_gamma, std::vector<uint8_t> &E);
@@ -42,6 +42,8 @@ public:
   const int n;
   const int m;
 
+  size_t nthreads_;
+
   std::vector<CacVerifier<FieldType> *> verifiers_;
 
   block h_gamma_;
@@ -59,8 +61,13 @@ public:
 
 
 template <class FieldType>
-CacVerifierLogic<FieldType>::CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
+CacVerifierLogic<FieldType>::CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded)
     : a_(a), t_(t), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
+  if (multi_threaded)
+    nthreads_ = std::thread::hardware_concurrency();
+  else
+    nthreads_ = 1;
+
   verifiers_.resize(M);
 }
 
@@ -95,8 +102,6 @@ void CacVerifierLogic<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> 
 
 template <class FieldType>
 void CacVerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell) {
-//  seed_ = seed;
-//  omegaN_ = omegaN;
   h_pi_ = h_pi;
 
   // 1
@@ -209,10 +214,9 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
   }
 
   // ** can be parallelized **
-  const size_t nthreads = std::thread::hardware_concurrency();
-  std::vector<std::thread> threads(nthreads);
+  std::vector<std::thread> threads(nthreads_);
 
-  for(auto t = 0u; t < nthreads; t++) {
+  for(auto t = 0u; t < nthreads_; t++) {
     threads[t] = std::thread(std::bind(
         [&](const int bi, const int ei, const int t) {
           for (auto e = bi; e < ei; ++e) {
@@ -224,19 +228,9 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
             verifiers_[e]->r8(seed_tree[cur_map], gamma_i_bar[cur_map], alpha_i_bar[cur_map], o_i_bar[cur_map],
                               b_square[cur_map], s[cur_map]);
           }
-        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
+        }, t * M / nthreads_, (t + 1) == nthreads_ ? M : (t + 1) * M / nthreads_, t));
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-
-//  for (auto e = 0; e < M; ++e) {
-//    if (E_[e])
-//      continue;
-//
-//    const int cur_map = map[e];
-//
-//    verifiers_[e]->r8(seed_tree[cur_map], gamma_i_bar[cur_map], alpha_i_bar[cur_map], o_i_bar[cur_map],
-//                      b_square[cur_map], s[cur_map]);
-//  }
 
   for (auto e = 0; e < M; ++e) {
     if (E_[e])

@@ -19,7 +19,7 @@ namespace lzkp {
 template <class FieldType>
 class CacProverLogic {
 public:
-  CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
+  CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded = false);
   ~CacProverLogic();
 
   void r1(block &h_gamma);
@@ -45,6 +45,8 @@ public:
   const int n;
   const int m;
 
+  size_t nthreads_;
+
   std::vector<CacProver<FieldType> *> provers_;
 
   std::vector<block> master_seed_;
@@ -62,8 +64,13 @@ public:
 };
 
 template <class FieldType>
-CacProverLogic<FieldType>::CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
+CacProverLogic<FieldType>::CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded)
     : a_(a), t_(t), secret_(secret), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
+  if (multi_threaded)
+    nthreads_ = std::thread::hardware_concurrency();
+  else
+    nthreads_ = 1;
+
   provers_.resize(M);
 }
 
@@ -88,10 +95,9 @@ void CacProverLogic<FieldType>::r1(block &h_gamma) {
   }
 
   // 2 - ** can be parallelized **
-  const size_t nthreads = std::thread::hardware_concurrency();
-  std::vector<std::thread> threads(nthreads);
+  std::vector<std::thread> threads(nthreads_);
 
-  for(auto t = 0u; t < nthreads; t++) {
+  for(auto t = 0u; t < nthreads_; t++) {
     threads[t] = std::thread(std::bind(
         [&](const int bi, const int ei, const int t) {
           for (auto e = bi; e < ei; ++e) {
@@ -99,15 +105,9 @@ void CacProverLogic<FieldType>::r1(block &h_gamma) {
 
             provers_[e]->r1(master_seed_[e]);
           }
-        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
+        }, t * M / nthreads_, (t + 1) == nthreads_ ? M : (t + 1) * M / nthreads_, t));
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-
-//  for (auto e = 0; e < M; ++e) {
-//    provers_[e] = new CacProver<FieldType>(set_, a_, t_, secret_);
-//
-//    provers_[e]->r1(master_seed_[e]);
-//  }
 
   osuCrypto::SHA1 sha_h_gamma(sizeof(block));
   for (auto e = 0; e < M; ++e) {
@@ -135,10 +135,9 @@ void CacProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<bl
   }
 
   // ** can be parallelized **
-  const size_t nthreads = std::thread::hardware_concurrency();
-  std::vector<std::thread> threads(nthreads);
+  std::vector<std::thread> threads(nthreads_);
 
-  for(auto t = 0u; t < nthreads; t++) {
+  for(auto t = 0u; t < nthreads_; t++) {
     threads[t] = std::thread(std::bind(
         [&](const int bi, const int ei, const int t) {
           for (auto e = bi; e < ei; ++e) {
@@ -146,16 +145,9 @@ void CacProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<bl
               provers_[e]->r3();
             }
           }
-        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
+        }, t * M / nthreads_, (t + 1) == nthreads_ ? M : (t + 1) * M / nthreads_, t));
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-//
-//  for (auto e = 0; e < M; ++e) {
-//    if (!E[e]) {
-//      provers_[e]->r3();
-//      std::cout << "Gamma0 " << e << " " << provers_[e]->gamma_[0].halves[0] << " " << provers_[e]->gamma_[0].halves[1] << std::endl;
-//    }
-//  }
 
   // 2.h
   seed.resize(tau);
@@ -203,10 +195,9 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
   }
 
   // ** can be parallelized **
-  const size_t nthreads = std::thread::hardware_concurrency();
-  std::vector<std::thread> threads(nthreads);
+  std::vector<std::thread> threads(nthreads_);
 
-  for(auto t = 0u; t < nthreads; t++) {
+  for(auto t = 0u; t < nthreads_; t++) {
     threads[t] = std::thread(std::bind(
         [&](const int bi, const int ei, const int t) {
           for (auto e = bi; e < ei; ++e) {
@@ -214,19 +205,9 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
               provers_[e]->r5();
             }
           }
-        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
+        }, t * M / nthreads_, (t + 1) == nthreads_ ? M : (t + 1) * M / nthreads_, t));
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-
-//  for (auto e = 0; e < M; ++e) {
-//    if (!E_[e]) {
-//      provers_[e]->r5();
-//
-//      std::cout << e << std::endl;
-//      for (auto i = 0; i < N; ++i)
-//        std::cout << "\t" << provers_[e]->o_[i] << std::endl;
-//    }
-//  }
 
   osuCrypto::SHA1 sha_h_psi(sizeof(block));
 
@@ -270,10 +251,9 @@ void CacProverLogic<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_
   seed_e_bar = seed_e_bar_;
 
   // ** can be parallelized **
-  const size_t nthreads = std::thread::hardware_concurrency();
-  std::vector<std::thread> threads(nthreads);
+  std::vector<std::thread> threads(nthreads_);
 
-  for(auto t = 0u; t < nthreads; t++) {
+  for(auto t = 0u; t < nthreads_; t++) {
     threads[t] = std::thread(std::bind(
         [&](const int bi, const int ei, const int t) {
           for (auto e = bi; e < ei; ++e) {
@@ -282,15 +262,9 @@ void CacProverLogic<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_
                               o_i_bar[map[e]], b_square[map[e]], s[map[e]]);
             }
           }
-        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
+        }, t * M / nthreads_, (t + 1) == nthreads_ ? M : (t + 1) * M / nthreads_, t));
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-
-//  for (auto e = 0; e < M; ++e) {
-//    if (!E_[e])
-//      provers_[e]->r7(seed_tree[map[e]], gamma_i_bar[map[e]], alpha_i_bar[map[e]],
-//                      o_i_bar[map[e]], b_square[map[e]], s[map[e]]);
-//  }
 }
 
 

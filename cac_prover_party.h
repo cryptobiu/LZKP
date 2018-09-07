@@ -53,6 +53,8 @@ protected:
   int n;
   int m;
   bool is_accepted = false;
+
+  bool multi_threaded_ = false;
 };
 
 template<class FieldType>
@@ -80,6 +82,11 @@ int CacProverParty<FieldType>::parseArguments(int argc, const char* const argv[]
     ("port", po::value<int>(&this->port_)->required(), "port")
     ;
 
+  po::options_description performence("Performence options");
+  performence.add_options()
+    ("multi_threaded,x", po::bool_switch(&multi_threaded_), "should execute in multi-threading?")
+    ;
+
   po::options_description parameter("Parameter options");
   parameter.add_options()
     ("M,M", po::value<int>(&M), "number of MPCs 'in the head'")
@@ -92,7 +99,7 @@ int CacProverParty<FieldType>::parseArguments(int argc, const char* const argv[]
 
   po::options_description cmdline_options;
 
-  cmdline_options.add(network).add(parameter);
+  cmdline_options.add(network).add(performence).add(parameter);
 
   po::store(po::command_line_parser(argc, argv).options(cmdline_options).allow_unregistered().run(), vm);
 
@@ -108,6 +115,10 @@ int CacProverParty<FieldType>::parseArguments(int argc, const char* const argv[]
   std::cout << "\tm: " << m << std::endl;
   std::cout << "\tis_accepted: " << is_accepted << std::endl;
 
+  if (multi_threaded_)
+    std::cout << "\tMulti-threading enabled" << std::endl;
+  else
+    std::cout << "\tMultit-hreading disabled" << std::endl;
 #endif
 
   return 0;
@@ -257,7 +268,7 @@ int CacProverParty<FieldType>::generateData() {
 
 template<class FieldType>
 bool CacProverParty<FieldType>::runOnline() {
-  CacProverLogic<FieldType> p(set_, a_, t_, secret_);
+  CacProverLogic<FieldType> p(set_, a_, t_, secret_, multi_threaded_);
 
   iovec *iov = new iovec[3000];
   ssize_t nwritten, nread;
