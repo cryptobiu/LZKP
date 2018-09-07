@@ -2,13 +2,13 @@
 // Created by roee on 9/3/18.
 //
 
-#ifndef LZKP_VERIFIER_WRAPPER_H
-#define LZKP_VERIFIER_WRAPPER_H
+#ifndef __LZKP_CAC_VERIFIER_LOGIC_H_FILE__
+#define __LZKP_CAC_VERIFIER_LOGIC_H_FILE__
 
 
 #include "settings.h"
-#include "verifier.h"
-#include "Mersenne.h"
+#include "cac_verifier.h"
+#include "fields/mersenne.h"
 
 #include <thread>
 
@@ -17,10 +17,10 @@ namespace lzkp {
 
 
 template <class FieldType>
-class VerifierLogic {
+class CacVerifierLogic {
 public:
-  VerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
-  ~VerifierLogic();
+  CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
+  ~CacVerifierLogic();
 
   void r2(const block &h_gamma, std::vector<uint8_t> &E);
   void r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell);
@@ -39,11 +39,10 @@ public:
   const int M;
   const int tau;
   const int N;
-//  const uint64_t q;
   const int n;
   const int m;
 
-  std::vector<Verifier<FieldType> *> verifiers_;
+  std::vector<CacVerifier<FieldType> *> verifiers_;
 
   block h_gamma_;
   std::vector<uint8_t> E_;
@@ -60,13 +59,13 @@ public:
 
 
 template <class FieldType>
-VerifierLogic<FieldType>::VerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
+CacVerifierLogic<FieldType>::CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
     : a_(a), t_(t), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
   verifiers_.resize(M);
 }
 
 template <class FieldType>
-VerifierLogic<FieldType>::~VerifierLogic() {
+CacVerifierLogic<FieldType>::~CacVerifierLogic() {
   for (auto e = 0; e < M; ++e) {
     if (verifiers_[e])
       delete verifiers_[e];
@@ -74,7 +73,7 @@ VerifierLogic<FieldType>::~VerifierLogic() {
 }
 
 template <class FieldType>
-void VerifierLogic<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> &E) {
+void CacVerifierLogic<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> &E) {
   h_gamma_ = h_gamma;
 
   E_.resize(M);
@@ -95,14 +94,14 @@ void VerifierLogic<FieldType>::r2(const block &h_gamma, std::vector<uint8_t> &E)
 }
 
 template <class FieldType>
-void VerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell) {
+void CacVerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::vector<block> &omegaN, const block &h_pi, block &seed_ell) {
 //  seed_ = seed;
 //  omegaN_ = omegaN;
   h_pi_ = h_pi;
 
   // 1
   for (auto e = 0, o_id = 0, s_id = 0; e < M; ++e) {
-    verifiers_[e] = new Verifier<FieldType>(set_, a_, t_);
+    verifiers_[e] = new CacVerifier<FieldType>(set_, a_, t_);
 
     if (E_[e]) {
       // 2.a
@@ -157,7 +156,7 @@ void VerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::vec
 }
 
 template <class FieldType>
-void VerifierLogic<FieldType>::r6(const block &h_psi, std::vector<int> &i_bar) {
+void CacVerifierLogic<FieldType>::r6(const block &h_psi, std::vector<int> &i_bar) {
   h_psi_ = h_psi;
 
   i_bar.resize(M - tau);
@@ -176,7 +175,7 @@ void VerifierLogic<FieldType>::r6(const block &h_psi, std::vector<int> &i_bar) {
 }
 
 template <class FieldType>
-bool VerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar, const std::vector<std::vector<FieldType>> &alpha_i_bar,
+bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<std::vector<block>> &seed_tree, const std::vector<block> &gamma_i_bar, const std::vector<std::vector<FieldType>> &alpha_i_bar,
                          const std::vector<FieldType> &o_i_bar, const std::vector<std::vector<FieldType>> &b_square,
                          const std::vector<std::vector<FieldType>> &s) {
   seed_e_bar_ = seed_e_bar;
@@ -293,4 +292,4 @@ bool VerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<std
 }
 
 
-#endif //LZKP_VERIFIER_WRAPPER_H
+#endif // __LZKP_CAC_VERIFIER_LOGIC_H_FILE__

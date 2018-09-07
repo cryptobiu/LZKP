@@ -1,5 +1,5 @@
-#ifndef LZKP_VERIFIER_H
-#define LZKP_VERIFIER_H
+#ifndef __LZKP_CAC_VERIFIER_H_FILE___
+#define __LZKP_CAC_VERIFIER_H_FILE___
 
 
 #include <stack>
@@ -17,10 +17,10 @@ namespace lzkp {
 
 
 template <class FieldType>
-class Verifier {
+class CacVerifier {
 public:
-  Verifier(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
-  ~Verifier();
+  CacVerifier(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
+  ~CacVerifier();
 
   void r4(); // Local variable seed_ must be set before calling this method
   bool r8(const std::vector<block> &seed_tree, const block &gamma_i_bar,
@@ -61,16 +61,16 @@ public:
 };
 
 template <class FieldType>
-Verifier<FieldType>::Verifier(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
+CacVerifier<FieldType>::CacVerifier(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
     : a_(a), t_(t), N(s.N), n(s.n), m(s.m) {
 }
 
 template <class FieldType>
-Verifier<FieldType>::~Verifier() {
+CacVerifier<FieldType>::~CacVerifier() {
 }
 
 template <class FieldType>
-void Verifier<FieldType>::r4() {
+void CacVerifier<FieldType>::r4() {
   seed_tree_.resize(N);
   seed_tree_.generate(seed_); // Generate seed_tree
   gamma_.resize(N);
@@ -144,7 +144,7 @@ void Verifier<FieldType>::r4() {
 }
 
 template <class FieldType>
-bool Verifier<FieldType>::r8(const std::vector<block> &seed_tree, const block &gamma_i_bar,
+bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block &gamma_i_bar,
                   const std::vector<FieldType> &alpha_i_bar, const FieldType &o_i_bar,
                   const std::vector<FieldType> &b_square, const std::vector<FieldType> &s) {
   reject_ = false;
@@ -428,4 +428,4 @@ bool Verifier<FieldType>::r8(const std::vector<block> &seed_tree, const block &g
 }
 
 
-#endif //LZKP_VERIFIER_H
+#endif // __LZKP_CAC_VERIFIER_H_FILE___

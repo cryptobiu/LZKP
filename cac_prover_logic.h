@@ -2,13 +2,13 @@
 // Created by roee on 9/3/18.
 //
 
-#ifndef LZKP_PROVER_WRAPPER_H
-#define LZKP_PROVER_WRAPPER_H
+#ifndef __LZKP_CAC_PROVER_LOGIC_H_FILE__
+#define __LZKP_CAC_PROVER_LOGIC_H_FILE__
 
 
 #include "settings.h"
-#include "prover.h"
-#include "Mersenne.h"
+#include "cac_prover.h"
+#include "fields/mersenne.h"
 
 #include <thread>
 
@@ -17,10 +17,10 @@ namespace lzkp {
 
 
 template <class FieldType>
-class ProverLogic {
+class CacProverLogic {
 public:
-  ProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
-  ~ProverLogic();
+  CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
+  ~CacProverLogic();
 
   void r1(block &h_gamma);
   void r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi);
@@ -35,18 +35,17 @@ public:
   const std::vector<std::vector<FieldType>> &a_;
   const std::vector<FieldType> &t_;
 
-  // Prover's secret
+  // CacProver's secret
   const std::vector<FieldType> secret_;
 
   const Settings &set_;
   const int M;
   const int tau;
   const int N;
-//  const uint64_t q;
   const int n;
   const int m;
 
-  std::vector<Prover<FieldType> *> provers_;
+  std::vector<CacProver<FieldType> *> provers_;
 
   std::vector<block> master_seed_;
   block h_gamma_;
@@ -63,13 +62,13 @@ public:
 };
 
 template <class FieldType>
-ProverLogic<FieldType>::ProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
+CacProverLogic<FieldType>::CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
     : a_(a), t_(t), secret_(secret), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
   provers_.resize(M);
 }
 
 template <class FieldType>
-ProverLogic<FieldType>::~ProverLogic() {
+CacProverLogic<FieldType>::~CacProverLogic() {
   for (auto e = 0; e < M; ++e) {
     if (provers_[e])
       delete provers_[e];
@@ -77,7 +76,7 @@ ProverLogic<FieldType>::~ProverLogic() {
 }
 
 template <class FieldType>
-void ProverLogic<FieldType>::r1(block &h_gamma) {
+void CacProverLogic<FieldType>::r1(block &h_gamma) {
   master_seed_.resize(M);
 
   osuCrypto::PRNG prng;
@@ -96,7 +95,7 @@ void ProverLogic<FieldType>::r1(block &h_gamma) {
     threads[t] = std::thread(std::bind(
         [&](const int bi, const int ei, const int t) {
           for (auto e = bi; e < ei; ++e) {
-            provers_[e] = new Prover<FieldType>(set_, a_, t_, secret_);
+            provers_[e] = new CacProver<FieldType>(set_, a_, t_, secret_);
 
             provers_[e]->r1(master_seed_[e]);
           }
@@ -105,7 +104,7 @@ void ProverLogic<FieldType>::r1(block &h_gamma) {
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
 //  for (auto e = 0; e < M; ++e) {
-//    provers_[e] = new Prover<FieldType>(set_, a_, t_, secret_);
+//    provers_[e] = new CacProver<FieldType>(set_, a_, t_, secret_);
 //
 //    provers_[e]->r1(master_seed_[e]);
 //  }
@@ -120,7 +119,7 @@ void ProverLogic<FieldType>::r1(block &h_gamma) {
 }
 
 template <class FieldType>
-void ProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi) {
+void CacProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<block> &seed, std::vector<block> &omegaN, block &h_pi) {
   E_ = E;
 
   // 1
@@ -178,7 +177,7 @@ void ProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<block
 }
 
 template <class FieldType>
-void ProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
+void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
   seed_ell_ = seed_ell;
 
   prng_seed_ell_.SetSeed(seed_ell_.b);
@@ -246,7 +245,7 @@ void ProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
 }
 
 template <class FieldType>
-void ProverLogic<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
+void CacProverLogic<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_bar, std::vector<std::vector<block>> &seed_tree,
                        std::vector<block> &gamma_i_bar, std::vector<std::vector<FieldType>> &alpha_i_bar, std::vector<FieldType> &o_i_bar,
                        std::vector<std::vector<FieldType>> &b_square, std::vector<std::vector<FieldType>> &s) {
   seed_tree.resize(M - tau);
@@ -298,4 +297,4 @@ void ProverLogic<FieldType>::r7(const std::vector<int> &i_bar, block &seed_e_bar
 }
 
 
-#endif //LZKP_PROVER_WRAPPER_H
+#endif // __LZKP_CAC_PROVER_LOGIC_H_FILE__

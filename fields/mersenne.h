@@ -3,15 +3,18 @@
 // Adjusted by Roee on 04/09/18.
 //
 
-#ifndef LZKP_MERSENNE_H
-#define LZKP_MERSENNE_H
+#ifndef __LZKP_MERSENNE_H_FILE__
+#define __LZKP_MERSENNE_H_FILE__
+
 
 #include <iostream>
 #include <vector>
 #include <x86intrin.h>
 #include <gmp.h>
 
+
 typedef uint8_t byte;
+
 
 struct ZpMersenneIntElement {
 
@@ -324,4 +327,4 @@ public:
 inline std::ostream& operator<<(std::ostream& s, const ZpMersenneLongElement &a) { return s << a.elem; }
 
 
-#endif //LZKP_MERSENNE_H
+#endif // __LZKP_MERSENNE_H_FILE__

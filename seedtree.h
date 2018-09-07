@@ -3,17 +3,12 @@
 
 #include <vector>
 
+#include "block.h"
 #include <cryptoTools/Crypto/PRNG.h>
 
 
 namespace lzkp {
 
-
-typedef union {
-    osuCrypto::u64 halves[2];
-    unsigned char bytes[16];
-    osuCrypto::block b;
-} block;
 
 class SeedTree {
 public:

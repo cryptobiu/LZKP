@@ -3,7 +3,7 @@
 // Adjusted by Roee on 04/09/18.
 //
 
-#include "Mersenne.h"
+#include "mersenne.h"
 
 //#include <cstring>
 

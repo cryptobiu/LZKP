@@ -1,5 +1,5 @@
-#ifndef __LZKP_PROVER_H_FILE___
-#define __LZKP_PROVER_H_FILE___
+#ifndef __LZKP_CAC_PROVER_H_FILE___
+#define __LZKP_CAC_PROVER_H_FILE___
 
 
 #include <stack>
@@ -15,10 +15,10 @@ namespace lzkp {
 
 
 template <class FieldType>
-class Prover {
+class CacProver {
 public:
-  Prover(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
-  ~Prover();
+  CacProver(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
+  ~CacProver();
 
   void r1(const block &master_seed);
   void r3(); // Local variable g_ must be set before calling this method
@@ -33,7 +33,7 @@ public:
   const std::vector<std::vector<FieldType>> &a_;
   const std::vector<FieldType> &t_;
 
-  // Prover's secret
+  // CacProver's secret
   const std::vector<FieldType> secret_;
 
   const int N;
@@ -67,16 +67,16 @@ public:
 };
 
 template <class FieldType>
-Prover<FieldType>::Prover(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
+CacProver<FieldType>::CacProver(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
     : a_(a), t_(t), secret_(secret), N(s.N), n(s.n), m(s.m) {
 }
 
 template <class FieldType>
-Prover<FieldType>::~Prover() {
+CacProver<FieldType>::~CacProver() {
 }
 
 template <class FieldType>
-void Prover<FieldType>::r1(const block &master_seed) {
+void CacProver<FieldType>::r1(const block &master_seed) {
   master_seed_ = master_seed;
 
   // 1.a
@@ -151,7 +151,7 @@ void Prover<FieldType>::r1(const block &master_seed) {
 }
 
 template <class FieldType>
-void Prover<FieldType>::r3() {
+void CacProver<FieldType>::r3() {
   s_.resize(m);
   alpha_.resize(m);
   alpha_sum_.resize(m);
@@ -219,7 +219,7 @@ void Prover<FieldType>::r3() {
 }
 
 template <class FieldType>
-void Prover<FieldType>::r5() {
+void CacProver<FieldType>::r5() {
   o_.resize(N);
 
   // 2.a
@@ -260,7 +260,7 @@ void Prover<FieldType>::r5() {
 }
 
 template <class FieldType>
-void Prover<FieldType>::r7(std::vector<block> &seed_tree, block &gamma_i_bar, std::vector<FieldType> &alpha_i_bar,
+void CacProver<FieldType>::r7(std::vector<block> &seed_tree, block &gamma_i_bar, std::vector<FieldType> &alpha_i_bar,
                 FieldType &o_i_bar, std::vector<FieldType> &b_square, std::vector<FieldType> &s) {
   seed_tree.clear();
 
@@ -314,4 +314,4 @@ void Prover<FieldType>::r7(std::vector<block> &seed_tree, block &gamma_i_bar, st
 
 
 }
-#endif
+#endif // __LZKP_CAC_PROVER_H_FILE___
