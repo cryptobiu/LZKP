@@ -119,26 +119,19 @@ void CacVerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::
   }
 
   // ** can be parallelized **
-//  const size_t nthreads = std::thread::hardware_concurrency();
-//  std::vector<std::thread> threads(nthreads);
-//
-//  for(auto t = 0u; t < nthreads; t++) {
-//    threads[t] = std::thread(std::bind(
-//        [&](const int bi, const int ei, const int t) {
-//          for (auto e = bi; e < ei; ++e) {
-//            if (!E_[e]) {
-//              verifiers_[e]->r4();
-//            }
-//          }
-//        }, t * M / nthreads, (t + 1) == nthreads ? M : (t + 1) * M / nthreads, t));
-//  }
-//  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-//
-  for (auto e = 0; e < M; ++e) {
-    if (E_[e]) {
-      verifiers_[e]->r4();
-    }
+  std::vector<std::thread> threads(nthreads_);
+
+  for(auto t = 0u; t < nthreads_; t++) {
+    threads[t] = std::thread(std::bind(
+        [&](const int bi, const int ei, const int t) {
+          for (auto e = bi; e < ei; ++e) {
+            if (E_[e]) {
+              verifiers_[e]->r4();
+            }
+          }
+        }, t * M / nthreads_, (t + 1) == nthreads_ ? M : (t + 1) * M / nthreads_, t));
   }
+  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
   // 2
   seed_ell_.b = osuCrypto::sysRandomSeed();
