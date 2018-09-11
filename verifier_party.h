@@ -2,8 +2,8 @@
 // Created by roee on 9/6/18.
 //
 
-#ifndef LZKP_VERIFIER_PARTY_H
-#define LZKP_VERIFIER_PARTY_H
+#ifndef __LZKP_VERIFIER_PARTY_H_FILE__
+#define __LZKP_VERIFIER_PARTY_H_FILE__
 
 
 #include "party.h"
@@ -20,9 +20,7 @@ class VerifierParty : public Party {
 public:
   VerifierParty() : Party() { }
   ~VerifierParty() {
-#ifdef DEBUG
-    std::cout << "Closing channel" << std::endl;
-#endif
+    debug("Closing channel" << std::endl);
     close(sock_);
   }
 
@@ -41,15 +39,12 @@ template<class FieldType>
 int VerifierParty<FieldType>::initCommunication() {
   struct sockaddr_in serv_addr;
 
-#ifdef DEBUG
-  std::cout << "Initializing communication channel..." << std::endl;
-  std::cout << "\tCreating socket... ";
-#endif
+  debug("Initializing communication channel..." << std::endl);
+  debug("\tCreating socket... ");
 
   if ((sock_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-#ifdef DEBUG
-  std::cout << "error (" << sock_ << ")" << std::endl;
-#endif
+    debug("error (" << sock_ << ")" << std::endl);
+
     return -1;
   }
 
@@ -60,33 +55,25 @@ int VerifierParty<FieldType>::initCommunication() {
   serv_addr.sin_port = htons(port_);
 
   // Convert IPv4 and IPv6 addresses from text to binary form
-#ifdef DEBUG
-  std::cout << "done (" << sock_ << ")" << std::endl;
-  std::cout << "\tconverting IP (" << this->ip_.c_str() << ") from text to binary form... ";
-#endif
+  debug("done (" << sock_ << ")" << std::endl);
+  debug("\tConverting IP (" << this->ip_.c_str() << ") from text to binary form... ");
 
   if (int r = inet_pton(AF_INET, this->ip_.c_str(), &serv_addr.sin_addr) <= 0) {
-#ifdef DEBUG
-    std::cout << "error (" << r << ")" << std::endl;
-#endif
+    debug("error (" << r << ")" << std::endl);
+
     return -2;
   }
 
-#ifdef DEBUG
-  std::cout << "done" << std::endl;
-  std::cout << "\tconnecting to " << ip_ << ":" << port_ << "... ";
-#endif
+  debug("done" << std::endl);
+  debug("\tConnecting to " << ip_ << ":" << port_ << "... ");
 
   if (int r = connect(sock_, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-#ifdef DEBUG
-    std::cout << "error (" << r << ")" << std::endl;
-#endif
+    debug("error (" << r << ")" << std::endl);
+
     return -3;
   }
 
-#ifdef DEBUG
-  std::cout << "Initializing communication channel... done" << std::endl;
-#endif
+  debug("Initializing communication channel... done" << std::endl);
 
   return 0;
 }
@@ -95,4 +82,4 @@ int VerifierParty<FieldType>::initCommunication() {
 }
 
 
-#endif //LZKP_VERIFIER_PARTY_H
+#endif // __LZKP_VERIFIER_PARTY_H_FILE__

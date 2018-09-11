@@ -3,6 +3,12 @@
 #include "factory.h"
 #include "party.h"
 
+#ifdef DEBUG
+  #define debug(x) std::cerr << x
+#else
+  #define debug(x)
+#endif
+
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
@@ -128,13 +134,11 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-#ifdef DEBUG
-  std::cout << "Protocol type: " << protocol_type << std::endl;
-  std::cout << "IsProver? " << is_prover << std::endl;
-  std::cout << "IP: " << ip << std::endl;
-  std::cout << "Port: " << port << std::endl;
-  std::cout << "q: " << q << std::endl;
-#endif
+  debug("Protocol type: " << protocol_type << std::endl);
+  debug("IsProver? " << is_prover << std::endl);
+  debug("IP: " << ip << std::endl);
+  debug("Port: " << port << std::endl);
+  debug("q: " << q << std::endl);
 
   Party *party = Factory::create(protocol_type, is_prover, q);
 
@@ -143,9 +147,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (party->init(argc, argv)) {
-#ifdef DEBUG
-    std::cout << "protocol initialization error" << std::endl;
-#endif
+    debug("protocol initialization error" << std::endl);
 
     delete party;
 

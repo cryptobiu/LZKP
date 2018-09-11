@@ -17,7 +17,10 @@
 namespace po = boost::program_options;
 
 #ifdef DEBUG
-#include <boost/type_index.hpp>
+  #define debug(x) std::cerr << x
+  #include <boost/type_index.hpp>
+#else
+  #define debug(x)
 #endif
 
 #include "block.h"

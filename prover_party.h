@@ -2,8 +2,8 @@
 // Created by roee on 9/6/18.
 //
 
-#ifndef LZKP_PROVER_PARTY_H
-#define LZKP_PROVER_PARTY_H
+#ifndef __LZKP_PROVER_PARTY_H_FILE__
+#define __LZKP_PROVER_PARTY_H_FILE__
 
 
 #include "party.h"
@@ -21,10 +21,8 @@ class ProverParty : public Party {
 public:
   ProverParty() : Party() { }
   ~ProverParty() {
-#ifdef DEBUG
-std::cout << "Closing channel" << std::endl;
-#endif
-  close(sock_);
+    debug("Closing channel" << std::endl);
+    close(sock_);
   }
 
 protected:
@@ -42,28 +40,22 @@ int ProverParty<FieldType>::initCommunication() {
   int opt = 1;
   int addrlen = sizeof(address);
 
-#ifdef DEBUG
-  std::cout << "Initializing communication channel..." << std::endl;
-  std::cout << "\tCreating socket... ";
-#endif
+  debug("Initializing communication channel..." << std::endl);
+  debug("\tCreating socket... ");
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-#ifdef DEBUG
-    std::cout << "error (" << fd << ")" << std::endl;
-#endif
+    debug("error (" << fd << ")" << std::endl);
+
     return -1;
   }
 
-#ifdef DEBUG
-  std::cout << "done (" << fd << ")" << std::endl;
-  std::cout << "\tSetting socket options... ";
-#endif
+  debug("done (" << fd << ")" << std::endl);
+  debug("\tSetting socket options... ");
 
   // Forcefully attaching socket to the port 8080
   if (int r = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-#ifdef DEBUG
-    std::cout << "error (" << r << ")" << std::endl;
-#endif
+    debug("error (" << r << ")" << std::endl);
+
     return -2;
   }
 
@@ -71,45 +63,36 @@ int ProverParty<FieldType>::initCommunication() {
   address.sin_addr.s_addr = INADDR_ANY;
   address.sin_port = htons(port_);
 
-#ifdef DEBUG
-  std::cout << "done" << std::endl;
-  std::cout << "\tBinding socket... ";
-#endif
+  debug("done" << std::endl);
+  debug("\tBinding socket... ");
 
   // Forcefully attaching socket to the port
   if (int r = bind(fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-#ifdef DEBUG
-    std::cout << "error (" << r << ")" << std::endl;
-#endif
+    debug("error (" << r << ")" << std::endl);
+
     return -3;
   }
 
-#ifdef DEBUG
-  std::cout << "done" << std::endl;
-  std::cout << "\tListening on port " << port_ << "... ";
-#endif
+  debug("done" << std::endl);
+  debug("\tListening on port " << port_ << "... ");
+
   if (int r = listen(fd, 3) < 0) {
-#ifdef DEBUG
-    std::cout << "error (" << r << ")" << std::endl;
-#endif
+    debug("error (" << r << ")" << std::endl);
+
     return -4;
   }
 
-#ifdef DEBUG
-  std::cout << "done" << std::endl;
-  std::cout << "\tAccepting connction... ";
-#endif
+  debug("done" << std::endl);
+  debug("\tAccepting connction... ");
+
   if ((sock_ = accept(fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-#ifdef DEBUG
-    std::cout << "error (" << sock_ << ")" << std::endl;
-#endif
+    debug("error (" << sock_ << ")" << std::endl);
+
     return -5;
   }
 
-#ifdef DEBUG
-  std::cout << "done" << std::endl;
-  std::cout << "Initializing communication channel... done" << std::endl;
-#endif
+  debug("done" << std::endl);
+  debug("Initializing communication channel... done" << std::endl);
 
   return 0;
 }
@@ -117,4 +100,4 @@ int ProverParty<FieldType>::initCommunication() {
 
 }
 
-#endif //LZKP_PROVER_PARTY_H
+#endif // __LZKP_PROVER_PARTY_H_FILE__

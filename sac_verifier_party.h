@@ -2,33 +2,33 @@
 // Created by lzkp on 9/7/18.
 //
 
-#ifndef __LZKP_CAC_VERIFIER_PARTY_H_FILE__
-#define __LZKP_CAC_VERIFIER_PARTY_H_FILE__
+#ifndef __LZKP_SAC_VERIFIER_PARTY_H_FILE__
+#define __LZKP_SAC_VERIFIER_PARTY_H_FILE__
 
 
 #include "verifier_party.h"
 
 #include "parameters.h"
-#include "cac_verifier_logic.h"
+#include "sac_verifier_logic.h"
 
 
 namespace lzkp {
 
 
 template <class FieldType>
-class CacVerifierParty : public VerifierParty<FieldType> {
+class SacVerifierParty : public VerifierParty<FieldType> {
 public:
-  CacVerifierParty() : VerifierParty<FieldType>() {
-    debug("Constructing CacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
+  SacVerifierParty() : VerifierParty<FieldType>() {
+    debug("Constructing SacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
   }
-  ~CacVerifierParty() {
-    debug("Destructing CacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
+  ~SacVerifierParty() {
+    debug("Destructing SacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
   }
 
   virtual int init(int argc, const char* const argv[]);
   virtual bool runOnline();
 
-  static const int PROTOCOL_TYPE = 0;
+  static const int PROTOCOL_TYPE = 1;
 
 protected:
   virtual int parseArguments(int argc, const char* const argv[]);
@@ -45,7 +45,7 @@ protected:
 };
 
 template<class FieldType>
-int CacVerifierParty<FieldType>::init(int argc, const char* const argv[]) {
+int SacVerifierParty<FieldType>::init(int argc, const char* const argv[]) {
   parseArguments(argc, argv);
   int com = this->initCommunication();
 
@@ -61,7 +61,7 @@ int CacVerifierParty<FieldType>::init(int argc, const char* const argv[]) {
 }
 
 template<class FieldType>
-int CacVerifierParty<FieldType>::parseArguments(int argc, const char* const argv[]) {
+int SacVerifierParty<FieldType>::parseArguments(int argc, const char* const argv[]) {
   po::variables_map vm;
 
   po::options_description network("Network options");
@@ -96,13 +96,13 @@ int CacVerifierParty<FieldType>::parseArguments(int argc, const char* const argv
 }
 
 template<class FieldType>
-int CacVerifierParty<FieldType>::negotiateParameters() {
+int SacVerifierParty<FieldType>::negotiateParameters() {
   debug("Negotiating protocol parameters..." << std::endl);
 
   iovec iov[1];
   ssize_t nwritten, nread;
 
-  int protocol_type = CacVerifierParty::PROTOCOL_TYPE;
+  int protocol_type = SacVerifierParty::PROTOCOL_TYPE;
 
   debug("\tTransmitting protocol type... ");
 
@@ -113,6 +113,7 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
 
   debug("done" << std::endl);
   debug("\tTransmitting field characteristic ... ");
+
 
   uint64_t q = FieldType::p;
 
@@ -131,7 +132,6 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
 
   debug("done" << std::endl);
   debug("\t\tM: " << this->par_.M << std::endl);
-  debug("\t\ttau: " << this->par_.tau << std::endl);
   debug("\t\tN: " << this->par_.N << std::endl);
   debug("\t\tn: " << this->par_.n << std::endl);
   debug("\t\tm: " << this->par_.m << std::endl);
@@ -160,10 +160,10 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
 }
 
 template<class FieldType>
-bool CacVerifierParty<FieldType>::runOnline() {
-  CacVerifierLogic<FieldType> v(par_, a_, t_, multi_threaded_);
+bool SacVerifierParty<FieldType>::runOnline() {
+  SacVerifierLogic<FieldType> v(par_, a_, t_, multi_threaded_);
 
-  iovec *iov = new iovec[(par_.M - par_.tau) * 4 + 3]; // 1 + (M - tau) + 1 + (M - tau) + 1 + i_id, i_id maximum value is 2 * (M - tau)
+  iovec *iov = new iovec[par_.M * 5 + 4]; // 1 + par_.M + 1 + par_.M + 2 + par_.M * 3
   ssize_t nwritten, nread;
 
   // ** Round 1 output **
@@ -174,99 +174,80 @@ bool CacVerifierParty<FieldType>::runOnline() {
   assert (nread == (int)iov[0].iov_len);
 
   // ** Round 2 **
-  std::vector<uint8_t> E;
-  v.r2(h_gamma, E); // Run round 2
-  iov[0].iov_base = E.data();
-  iov[0].iov_len = E.size() * sizeof(E[0]);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
-
-  // ** Round 3 output **
-  std::vector<block> seed(par_.tau), omegaN(par_.M - par_.tau);
-  block h_pi;
-  iov[0].iov_base = seed.data();
-  iov[0].iov_len = seed.size() * sizeof(seed[0]);
-  iov[1].iov_base = omegaN.data();
-  iov[1].iov_len = omegaN.size() * sizeof(omegaN[0]);
-  iov[2].iov_base = &h_pi;
-  iov[2].iov_len = sizeof(h_pi);
-  nread = readv(this->sock_, iov, 3);
-  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
-
-  // ** Round 4 **
   block seed_ell;
-  v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+  v.r2(h_gamma, seed_ell); // Run round 2
   iov[0].iov_base = &seed_ell;
   iov[0].iov_len = sizeof(seed_ell);
   nwritten = writev(this->sock_, iov, 1);
   assert (nwritten == (int)iov[0].iov_len);
 
-  // ** Round 5 output **
-  block h_psi;
-  iov[0].iov_base = &h_psi;
-  iov[0].iov_len = sizeof(h_psi);
-  nread = readv(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  // ** Round 3 output **
+  block h_pi, h_psi, h_theta;
+  iov[0].iov_base = &h_pi;
+  iov[0].iov_len = sizeof(h_pi);
+  iov[1].iov_base = &h_psi;
+  iov[1].iov_len = sizeof(h_psi);
+  iov[2].iov_base = &h_theta;
+  iov[2].iov_len = sizeof(h_theta);
+  nread = readv(this->sock_, iov, 3);
+  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
 
-  // ** Round 6 **
+  // ** Round 4 **
   std::vector<int> i_bar;
-  v.r6(h_psi, i_bar); // Run round 6
+  v.r4(h_pi, h_psi, h_theta, i_bar); // Run round 4
   iov[0].iov_base = i_bar.data();
   iov[0].iov_len = i_bar.size() * sizeof(i_bar[0]);
   nwritten = writev(this->sock_, iov, 1);
   assert (nwritten == (int)iov[0].iov_len);
 
-  // ** Round 7 output **
-  block seed_e_bar;
-  std::vector<std::vector<block>> seed_tree(par_.M - par_.tau);
-  std::vector<block> gamma_i_bar(par_.M - par_.tau);
-  std::vector<std::vector<FieldType>> alpha_i_bar(par_.M - par_.tau), b_square(par_.M - par_.tau), s(par_.M - par_.tau);
-  std::vector<FieldType> o_i_bar(par_.M - par_.tau);
+  // ** Round 5 output **
+  block seed_global;
+  std::vector<std::vector<block>> seed_tree(par_.M);
+  std::vector<block> gamma_i_bar(par_.M);
+  std::vector<std::vector<FieldType>> alpha_i_bar(par_.M), b_square(par_.M), s(par_.M), s_square(par_.M);
+  std::vector<FieldType> o_i_bar(par_.M), v_i_bar(par_.M);
   auto iov_id = 0;
-  iov[iov_id].iov_base = &seed_e_bar;
-  iov[iov_id++].iov_len = sizeof(seed_e_bar);
-  for (auto i = 0; i < par_.M - par_.tau; ++i) {
+  iov[iov_id].iov_base = &seed_global;
+  iov[iov_id++].iov_len = sizeof(seed_global);
+  for (auto i = 0; i < par_.M; ++i) {
     seed_tree[i].resize(log(par_.N)/log(2));
     iov[iov_id].iov_base = seed_tree[i].data();
     iov[iov_id++].iov_len = seed_tree[i].size() * sizeof(seed_tree[i][0]);
   }
   iov[iov_id].iov_base = gamma_i_bar.data();
   iov[iov_id++].iov_len = gamma_i_bar.size() * sizeof(gamma_i_bar[0]);
-  for (auto i = 0; i < par_.M - par_.tau; ++i) {
+  for (auto i = 0; i < par_.M; ++i) {
     alpha_i_bar[i].resize(par_.m);
     iov[iov_id].iov_base = alpha_i_bar[i].data();
     iov[iov_id++].iov_len = alpha_i_bar[i].size() * sizeof(alpha_i_bar[i][0]);
   }
   iov[iov_id].iov_base = o_i_bar.data();
   iov[iov_id++].iov_len = o_i_bar.size() * sizeof(o_i_bar[0]);
+  iov[iov_id].iov_base = v_i_bar.data();
+  iov[iov_id++].iov_len = v_i_bar.size() * sizeof(v_i_bar[0]);
   int i_id = 0;
-  for (auto e = 0, e_id = 0; e < par_.M; ++e) {
-    if (E[e])
-      continue;
-
+  for (auto e = 0; e < par_.M; ++e) {
     if (v.verifiers_[e]->i_bar_ != par_.N - 1) {
-      b_square[e_id].resize(par_.m);
-      iov[iov_id].iov_base = b_square[e_id].data();
-      iov[iov_id++].iov_len = b_square[e_id].size() * sizeof(b_square[e_id][0]);
-      s[e_id].resize(par_.m);
-      iov[iov_id].iov_base = s[e_id].data();
-      iov[iov_id++].iov_len = s[e_id].size() * sizeof(s[e_id][0]);
+      b_square[e].resize(par_.m);
+      iov[iov_id].iov_base = b_square[e].data();
+      iov[iov_id++].iov_len = b_square[e].size() * sizeof(b_square[e][0]);
+      s[e].resize(par_.m);
+      iov[iov_id].iov_base = s[e].data();
+      iov[iov_id++].iov_len = s[e].size() * sizeof(s[e][0]);
+      s_square[e].resize(par_.m);
+      iov[iov_id].iov_base = s_square[e].data();
+      iov[iov_id++].iov_len = s_square[e].size() * sizeof(s_square[e][0]);
 
-      i_id += 2;
+      i_id += 3;
     }
-
-    e_id++;
   }
-  nread = readv(this->sock_, iov, 1 + (par_.M - par_.tau) + 1 + (par_.M - par_.tau) + 1 + i_id);
-  std::cout << nread << std::endl;
-  std::cout << (int)(iov[0].iov_len + iov[1].iov_len * (par_.M - par_.tau)  + iov[par_.M - par_.tau + 1].iov_len +
-                     iov[par_.M - par_.tau + 2].iov_len * (par_.M - par_.tau) + iov[2 * (par_.M - par_.tau) + 2].iov_len +
-                     iov[2 * (par_.M - par_.tau) + 3].iov_len * i_id) << std::endl;
-  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len * (par_.M - par_.tau)  + iov[par_.M - par_.tau + 1].iov_len +
-                         iov[par_.M - par_.tau + 2].iov_len * (par_.M - par_.tau) + iov[2 * (par_.M - par_.tau) + 2].iov_len +
-                         iov[2 * (par_.M - par_.tau) + 3].iov_len * i_id));
+  nread = readv(this->sock_, iov, 1 + par_.M + 1 + par_.M + 2 + i_id);
+  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len * par_.M + iov[par_.M + 1].iov_len +
+                            iov[par_.M + 2].iov_len * par_.M + iov[2 * par_.M + 2].iov_len + iov[2 * par_.M + 3].iov_len +
+                            iov[2 * par_.M + 4].iov_len * i_id));
 
-  bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 8
+
+  bool flag = v.r6(seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 6
 
   if (flag)
     std::cout << "Proof accepted" << std::endl;
@@ -282,4 +263,4 @@ bool CacVerifierParty<FieldType>::runOnline() {
 }
 
 
-#endif // __LZKP_CAC_VERIFIER_PARTY_H_FILE__
+#endif // __LZKP_SAC_VERIFIER_PARTY_H_FILE__
