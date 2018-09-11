@@ -270,7 +270,7 @@ template<class FieldType>
 bool CacProverParty<FieldType>::runOnline() {
   CacProverLogic<FieldType> p(set_, a_, t_, secret_, multi_threaded_);
 
-  iovec *iov = new iovec[3000];
+  iovec *iov = new iovec[(M - tau) * 4 + 3]; // 1 + (M - tau) + 1 + (M - tau) + 1 + i_id, i_id maximum value is 2 * (M - tau)
   ssize_t nwritten, nread;
 
   // ** Round 1 **
@@ -301,7 +301,7 @@ bool CacProverParty<FieldType>::runOnline() {
   nwritten = writev(this->sock_, iov, 3);
   assert (nwritten == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
 
-  // ** Round 4 output**
+  // ** Round 4 output **
   block seed_ell;
   iov[0].iov_base = &seed_ell;
   iov[0].iov_len = sizeof(seed_ell);
@@ -362,6 +362,10 @@ bool CacProverParty<FieldType>::runOnline() {
     e_id++;
   }
   nwritten = writev(this->sock_, iov, 1 + (M - tau) + 1 + (M - tau) + 1 + i_id);
+  std::cout << nwritten << std::endl;
+  std::cout << (int)(iov[0].iov_len + iov[1].iov_len * (M - tau) + iov[M - tau + 1].iov_len +
+                     iov[M - tau + 2].iov_len * (M - tau) + iov[2 * (M - tau) + 2].iov_len +
+                     iov[2 * (M - tau) + 3].iov_len * i_id) << std::endl;
   assert (nwritten == (int)(iov[0].iov_len + iov[1].iov_len * (M - tau) + iov[M - tau + 1].iov_len +
                             iov[M - tau + 2].iov_len * (M - tau) + iov[2 * (M - tau) + 2].iov_len +
                             iov[2 * (M - tau) + 3].iov_len * i_id));

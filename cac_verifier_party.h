@@ -179,7 +179,7 @@ template<class FieldType>
 bool CacVerifierParty<FieldType>::runOnline() {
   CacVerifierLogic<FieldType> v(set_, a_, t_, multi_threaded_);
 
-  iovec *iov = new iovec[3000];
+  iovec *iov = new iovec[(set_.M - set_.tau) * 4 + 3]; // 1 + (M - tau) + 1 + (M - tau) + 1 + i_id, i_id maximum value is 2 * (M - tau)
   ssize_t nwritten, nread;
 
   // ** Round 1 output **
@@ -274,6 +274,10 @@ bool CacVerifierParty<FieldType>::runOnline() {
     e_id++;
   }
   nread = readv(this->sock_, iov, 1 + (set_.M - set_.tau) + 1 + (set_.M - set_.tau) + 1 + i_id);
+  std::cout << nread << std::endl;
+  std::cout << (int)(iov[0].iov_len + iov[1].iov_len * (set_.M - set_.tau)  + iov[set_.M - set_.tau + 1].iov_len +
+                     iov[set_.M - set_.tau + 2].iov_len * (set_.M - set_.tau) + iov[2 * (set_.M - set_.tau) + 2].iov_len +
+                     iov[2 * (set_.M - set_.tau) + 3].iov_len * i_id) << std::endl;
   assert (nread == (int)(iov[0].iov_len + iov[1].iov_len * (set_.M - set_.tau)  + iov[set_.M - set_.tau + 1].iov_len +
                          iov[set_.M - set_.tau + 2].iov_len * (set_.M - set_.tau) + iov[2 * (set_.M - set_.tau) + 2].iov_len +
                          iov[2 * (set_.M - set_.tau) + 3].iov_len * i_id));

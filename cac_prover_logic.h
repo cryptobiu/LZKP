@@ -8,7 +8,6 @@
 
 #include "settings.h"
 #include "cac_prover.h"
-#include "fields/mersenne.h"
 
 #include <thread>
 

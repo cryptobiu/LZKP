@@ -26,6 +26,7 @@ public:
   bool r8(const std::vector<block> &seed_tree, const block &gamma_i_bar,
           const std::vector<FieldType> &alpha_i_bar, const FieldType &o_i_bar, const std::vector<FieldType> &b_square,
           const std::vector<FieldType> &s); // Local variables omegaN_ (from round 4), g_, w_,  must be set before calling this method
+
 private:
 public:
   // Public known values
@@ -33,7 +34,6 @@ public:
   const std::vector<FieldType> &t_;
 
   const int N;
-//  const uint64_t q;
   const int n;
   const int m;
 
@@ -125,10 +125,7 @@ void CacVerifier<FieldType>::r4() {
   block blk = seed_tree_.getSeed(N - 1);
   sha_gamma.Reset();
   sha_gamma.Update(blk);
-//  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
   for (auto i = 0; i < m; ++i) {
-//    NTL::BytesFromZZ(buf, b_square_[i][N - 1].elem._ZZ_p__rep, NTL::NumBytes(b_square_[i][N - 1].elem._ZZ_p__rep));
-//    sha_gamma.Update(buf, NTL::NumBytes(b_square_[i][N - 1].elem._ZZ_p__rep));
     sha_gamma.Update(b_square_[i][N - 1].elem);
   }
   sha_gamma.Update(r_[N - 1]);
@@ -140,7 +137,6 @@ void CacVerifier<FieldType>::r4() {
     sha_h.Update(gamma_[i]);
   }
   sha_h.Final(h_); // mb need to zero it first
-  //std::cout << "Vr4 H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
 }
 
 template <class FieldType>
@@ -164,7 +160,6 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
     // Check for leaf
     if (item.second.second - item.second.first == 1) {
       if (item.second.first != i_bar_) {
-//        std::cout << "pop leaf " << item.second.first << " " << seed_tree[s_it].halves[0] << std::endl;
         partial_seeds_[item.second.first] = seed_tree[s_it++];
       }
       continue;
@@ -179,7 +174,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
     }
     else {
       std::queue<std::pair<int, block>> seed_queue;
-//      std::cout << "pop seed " << item.first << " " << seed_tree[s_it].halves[0] << std::endl;
+
       seed_queue.push(std::make_pair(item.first, seed_tree[s_it++]));
 
       osuCrypto::PRNG prng;
@@ -191,13 +186,10 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
         } else { // Internal node
           block bb;
           bb = prng.get<block>();
-//          std::cout << "gen seed " << seed_queue.front().first * 2 + 1 << " " << bb.halves[0] << std::endl;
           seed_queue.push(std::make_pair(seed_queue.front().first * 2 + 1, bb));
+
           bb = prng.get<block>();
-//          std::cout << "gen seed " << seed_queue.front().first * 2 + 2 << " " << bb.halves[0] << std::endl;
           seed_queue.push(std::make_pair(seed_queue.front().first * 2 + 2, bb));
-//          seed_queue.push(std::make_pair(seed_queue.front().first * 2 + 1, prng.get<block>()));
-//          seed_queue.push(std::make_pair(seed_queue.front().first * 2 + 2, prng.get<block>()));
         }
 
         seed_queue.pop();
@@ -206,20 +198,20 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   }
 
   // 1.b
+  gamma_.resize(N);
+  r_.resize(N);
+  b_.resize(m);
+  b_square_.resize(m);
+
+  for (auto mm = 0; mm < m; ++mm){
+    b_[mm].resize(N);
+    b_square_[mm].resize(N);
+  }
+
   std::vector<osuCrypto::PRNG> prng(N);
   for (auto i = 0; i < N; ++i) {
     if (i == i_bar_)
       continue;
-
-    gamma_.resize(N);
-    r_.resize(N);
-    b_.resize(m);
-    b_square_.resize(m);
-
-    for (auto mm = 0; mm < m; ++mm){
-      b_[mm].resize(N);
-      b_square_[mm].resize(N);
-    }
 
     prng[i].SetSeed(partial_seeds_[i].b);
     r_[i] = prng[i].get<block>();
@@ -241,10 +233,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
     sha_gamma.Reset();
     sha_gamma.Update(blk);
     if (i == N - 1) {
-//      unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
       for (auto k = 0; k < m; ++k) {
-//        NTL::BytesFromZZ(buf, b_square[k].elem._ZZ_p__rep, NTL::NumBytes(b_square[k].elem._ZZ_p__rep));
-//        sha_gamma.Update(buf, NTL::NumBytes(b_square[k].elem._ZZ_p__rep));
         sha_gamma.Update(b_square[k].elem);
       }
     }
@@ -261,29 +250,23 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
     else
       sha_h.Update(gamma_i_bar);
   }
-  sha_h.Final(h_); // mb need to zero it first
-  //std::cout << "Vr8 H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
+  sha_h.Final(h_);
 
   // 1.e
-//  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
-  if (i_bar_ != N -1) {
+  if (i_bar_ != N - 1) {
     block gN_e, blk;
-    if (i_bar_ != N - 1) {
-      gN_e = prng[N - 1].get<block>();
-      osuCrypto::SHA1 sha_omega(sizeof(block));
-      for (auto i = 0; i < m; ++i) {
-//        NTL::BytesFromZZ(buf, s[i].elem._ZZ_p__rep, NTL::NumBytes(s[i].elem._ZZ_p__rep));
-//        sha_omega.Update(buf, NTL::NumBytes(s[i].elem._ZZ_p__rep));
-        sha_omega.Update(s[i].elem);
-      }
-      sha_omega.Update(gN_e);
-      sha_omega.Final(blk);
+
+    gN_e = prng[N - 1].get<block>();
+    osuCrypto::SHA1 sha_omega(sizeof(block));
+    for (auto i = 0; i < m; ++i) {
+      sha_omega.Update(s[i].elem);
     }
+    sha_omega.Update(gN_e);
+    sha_omega.Final(blk);
 
     if (!eq(blk.b, omegaN_.b)) {
-//      std::cout << "1\t" << blk.b << " " << omegaN_.b << std::endl;
-
       reject_ = true;
+
       return false;
     }
   }
@@ -334,13 +317,9 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   for (auto mm = 0; mm < m; ++mm) {
     for (auto nn = 0; nn < N; ++nn) {
       if (nn != i_bar_) {
-//        NTL::BytesFromZZ(buf, alpha_computed[mm][nn].elem._ZZ_p__rep, NTL::NumBytes(alpha_computed[mm][nn].elem._ZZ_p__rep));
-//        sha_pi.Update(buf, NTL::NumBytes(alpha_computed[mm][nn].elem._ZZ_p__rep));
         sha_pi.Update(alpha_computed[mm][nn].elem);
       }
       else {
-//        NTL::BytesFromZZ(buf, alpha_i_bar[mm].elem._ZZ_p__rep, NTL::NumBytes(alpha_i_bar[mm].elem._ZZ_p__rep));
-//        sha_pi.Update(buf, NTL::NumBytes(alpha_i_bar[mm].elem._ZZ_p__rep));
         sha_pi.Update(alpha_i_bar[mm].elem);
       }
     }
@@ -372,7 +351,6 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
       }
 
       o_[i] += coefficients_[l] * ((t_[l] / FieldType(N)) - tmp);
-//      o_[i] += coefficients_[l] * (t_[l] - tmp);
     }
 
     for (auto k = 0; k < m; ++k) {
@@ -390,11 +368,9 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   }
 
   // 1.k
-  sigma_o = 0;
+  sigma_o = FieldType(0);
 
   for (auto i = 0; i < N; ++i) {
-//    NTL::BytesFromZZ(buf, o_[i].elem._ZZ_p__rep, NTL::NumBytes(o_[i].elem._ZZ_p__rep));
-//    sha_psi.Update(buf, NTL::NumBytes(o_[i].elem._ZZ_p__rep));
     sha_psi.Update(o_[i].elem);
 
     sigma_o += o_[i]; // for step 1.k
@@ -402,24 +378,12 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   sha_psi.Update(w_);
   sha_psi.Final(psi_);
 
-  //std::cout << "V WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
-  //std::cout << "V PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
-
   // 1.l
   if (sigma_o != FieldType(0)) {
-    //std::cout << "BAR: " << cur_i_bar << " 2\t" << sigma_o << std::endl;
     reject_ = true;
-//    return false;
+
+    return false;
   }
-
-
-//    for (auto k = 0; k < m; ++k) {
-  //std::cout << "V alpha_sum " << k << " " << alpha_sum_computed[k] << std::endl;
-//    }
-
-
-
-  //std::cout << "V PI E " << e << " " << pi.halves[0] << pi.halves[1] << std::endl;
 
   return true;
 }

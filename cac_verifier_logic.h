@@ -8,7 +8,6 @@
 
 #include "settings.h"
 #include "cac_verifier.h"
-#include "fields/mersenne.h"
 
 #include <thread>
 
@@ -248,6 +247,7 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
     sha_h_pi.Update(verifiers_[e]->pi_); // For step 3
     sha_h_psi.Update(verifiers_[e]->psi_); // For step 4
   }
+
   block h_gamma_computed;
   sha_h_gamma.Final(h_gamma_computed);
 
