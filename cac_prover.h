@@ -6,7 +6,7 @@
 #include <cryptoTools/Crypto/sha1.h>
 
 #include "seedtree.h"
-#include "settings.h"
+#include "parameters.h"
 
 //#include <NTL/ZZ_p.h>
 
@@ -17,7 +17,7 @@ namespace lzkp {
 template <class FieldType>
 class CacProver {
 public:
-  CacProver(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
+  CacProver(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
   ~CacProver();
 
   void r1(const block &master_seed);
@@ -66,7 +66,7 @@ public:
 };
 
 template <class FieldType>
-CacProver<FieldType>::CacProver(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
+CacProver<FieldType>::CacProver(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
     : a_(a), t_(t), secret_(secret), N(s.N), n(s.n), m(s.m) {
 }
 

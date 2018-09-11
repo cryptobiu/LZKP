@@ -6,7 +6,7 @@
 #define __LZKP_CAC_PROVER_LOGIC_H_FILE__
 
 
-#include "settings.h"
+#include "parameters.h"
 #include "cac_prover.h"
 
 #include <thread>
@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class CacProverLogic {
 public:
-  CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded = false);
+  CacProverLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded = false);
   ~CacProverLogic();
 
   void r1(block &h_gamma);
@@ -37,7 +37,7 @@ public:
   // CacProver's secret
   const std::vector<FieldType> secret_;
 
-  const Settings &set_;
+  const Parameters &par_;
   const int M;
   const int tau;
   const int N;
@@ -63,8 +63,8 @@ public:
 };
 
 template <class FieldType>
-CacProverLogic<FieldType>::CacProverLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded)
-    : a_(a), t_(t), secret_(secret), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
+CacProverLogic<FieldType>::CacProverLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded)
+    : a_(a), t_(t), secret_(secret), par_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
   if (multi_threaded)
     nthreads_ = std::thread::hardware_concurrency();
   else
@@ -100,7 +100,7 @@ void CacProverLogic<FieldType>::r1(block &h_gamma) {
     threads[t] = std::thread(std::bind(
         [&](const int bi, const int ei, const int t) {
           for (auto e = bi; e < ei; ++e) {
-            provers_[e] = new CacProver<FieldType>(set_, a_, t_, secret_);
+            provers_[e] = new CacProver<FieldType>(par_, a_, t_, secret_);
 
             provers_[e]->r1(master_seed_[e]);
           }

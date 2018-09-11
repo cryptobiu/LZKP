@@ -101,7 +101,7 @@ TEST_CASE("seedtree_seeds") {
 //    }
 //  }
 //
-//  Settings set(M, tau, N, q, n, m);
+//  Parameters set(M, tau, N, q, n, m);
 //
 //  CacProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
 //  CacVerifierLogic<ZpMersenneIntElement> v(set, a, t);
@@ -232,7 +232,7 @@ TEST_CASE("seedtree_seeds") {
 //    }
 //  }
 //
-//  Settings set(M, tau, N, q, n, m);
+//  Parameters set(M, tau, N, q, n, m);
 //
 //  CacProverLogic<ZpMersenneLongElement> p(set, a, t, secret);
 //  CacVerifierLogic<ZpMersenneLongElement> v(set, a, t);
@@ -492,7 +492,7 @@ TEST_CASE("seedtree_seeds") {
 //    }
 //  }
 //
-//  Settings set(M, tau, N, q, n, m);
+//  Parameters set(M, tau, N, q, n, m);
 //
 //  CacProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
 //  CacVerifierLogic<ZpMersenneIntElement> v(set, a, t);
@@ -570,7 +570,7 @@ TEST_CASE("seedtree_seeds") {
 //    }
 //  }
 //
-//  Settings set(M, tau, N, q, n, m);
+//  Parameters set(M, tau, N, q, n, m);
 //
 //  CacProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
 //  CacVerifierLogic<ZpMersenneIntElement> v(set, a, t);
@@ -648,7 +648,7 @@ TEST_CASE("seedtree_seeds") {
 //    }
 //  }
 //
-//  Settings set(M, tau, N, q, n, m);
+//  Parameters set(M, tau, N, q, n, m);
 //
 //  CacProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
 //  CacVerifierLogic<ZpMersenneIntElement> v(set, a, t);
@@ -728,7 +728,7 @@ TEST_CASE("seedtree_seeds") {
 //
 //  secret[0] += ZpMersenneIntElement(2);
 //
-//  Settings set(M, tau, N, q, n, m);
+//  Parameters set(M, tau, N, q, n, m);
 //
 //  CacProverLogic<ZpMersenneIntElement> p(set, a, t, secret);
 //  CacVerifierLogic<ZpMersenneIntElement> v(set, a, t);

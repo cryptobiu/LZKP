@@ -29,7 +29,7 @@ add_executable(LZKP_TESTS
         test/unit_tests.cpp
         test/unit_tests_field15bit.cpp
         test/unit_tests_ZpMersenneIntElement.cpp
-        settings.h
+        parameters.h
         seedtree.cpp seedtree.h
         fields/field_15_bit.cpp fields/field_15_bit.h
         fields/mersenne.cpp fields/mersenne.h
@@ -43,7 +43,7 @@ target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl ntl pthread gm
 
 add_executable(LZKP
         main.cpp
-        settings.h
+        parameters.h
         seedtree.cpp seedtree.h
         fields/mersenne.cpp fields/mersenne.h
         fields/field_15_bit.cpp fields/field_15_bit.h block.h

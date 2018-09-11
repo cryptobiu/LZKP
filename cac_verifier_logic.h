@@ -6,7 +6,7 @@
 #define __LZKP_CAC_VERIFIER_LOGIC_H_FILE__
 
 
-#include "settings.h"
+#include "parameters.h"
 #include "cac_verifier.h"
 
 #include <thread>
@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class CacVerifierLogic {
 public:
-  CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded = false);
+  CacVerifierLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded = false);
   ~CacVerifierLogic();
 
   void r2(const block &h_gamma, std::vector<uint8_t> &E);
@@ -34,7 +34,7 @@ public:
   const std::vector<std::vector<FieldType>> &a_;
   const std::vector<FieldType> &t_;
 
-  const Settings &set_;
+  const Parameters &par_;
   const int M;
   const int tau;
   const int N;
@@ -60,8 +60,8 @@ public:
 
 
 template <class FieldType>
-CacVerifierLogic<FieldType>::CacVerifierLogic(const Settings &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded)
-    : a_(a), t_(t), set_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
+CacVerifierLogic<FieldType>::CacVerifierLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded)
+    : a_(a), t_(t), par_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
   if (multi_threaded)
     nthreads_ = std::thread::hardware_concurrency();
   else
@@ -105,7 +105,7 @@ void CacVerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::
 
   // 1
   for (auto e = 0, o_id = 0, s_id = 0; e < M; ++e) {
-    verifiers_[e] = new CacVerifier<FieldType>(set_, a_, t_);
+    verifiers_[e] = new CacVerifier<FieldType>(par_, a_, t_);
 
     if (E_[e]) {
       // 2.a

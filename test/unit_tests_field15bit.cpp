@@ -54,7 +54,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_constructor") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
 
@@ -101,7 +101,7 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_constructor") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacVerifierLogic<Field15Bit> v(param, a, t);
 
@@ -148,7 +148,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r1") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
 
@@ -193,7 +193,7 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r2") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -253,7 +253,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r3") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -311,7 +311,7 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r4") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -391,7 +391,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r5") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -465,7 +465,7 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r6") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -545,7 +545,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -685,7 +685,7 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -810,7 +810,7 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8_reject") {
 
   secret[0] += Field15Bit(1); // Proof should be rejected now
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<Field15Bit> p(param, a, t, secret);
   CacVerifierLogic<Field15Bit> v(param, a, t);
@@ -889,7 +889,7 @@ TEST_CASE("sac_prover_logic<Field15Bit>_constructor") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
 
@@ -935,7 +935,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_constructor") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacVerifierLogic<Field15Bit> v(param, a, t);
 
@@ -981,7 +981,7 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r1") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
 
@@ -1026,7 +1026,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r2") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);
@@ -1084,7 +1084,7 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r3") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);
@@ -1165,7 +1165,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r4") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);
@@ -1233,7 +1233,7 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r5") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);
@@ -1359,7 +1359,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);
@@ -1484,7 +1484,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6_reject") {
 
   secret[0] += Field15Bit(1); // Proof should be rejected now
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);
@@ -1554,7 +1554,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);
@@ -1626,7 +1626,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
 
   secret[0] += Field15Bit(1); // Proof should be rejected now
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<Field15Bit> p(param, a, t, secret);
   SacVerifierLogic<Field15Bit> v(param, a, t);

@@ -1,20 +1,15 @@
 #include <iostream>
 
-
 #include "factory.h"
 #include "party.h"
-
-//#include "settings.h"
-//#include "seedtree.h"
-//#include "Mersenne.h"
-
-//#define PORT 20000
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
+
 using namespace std;
 using namespace lzkp;
+
 
 /* Function used to check that of 'for_what' is specified, then
    'required_option' is specified too. */
@@ -49,7 +44,6 @@ int main(int argc, char *argv[]) {
   int port;
 
   bool multi_threaded = false;
-//  uint64_t seed;
 
   po::variables_map vm;
 
@@ -144,6 +138,10 @@ int main(int argc, char *argv[]) {
 
   Party *party = Factory::create(protocol_type, is_prover, q);
 
+  if (party == nullptr) {
+    return 1;
+  }
+
   if (party->init(argc, argv)) {
 #ifdef DEBUG
     std::cout << "protocol initialization error" << std::endl;
@@ -157,20 +155,6 @@ int main(int argc, char *argv[]) {
   party->runOnline();
 
   delete party;
-
-  return 0;
-
-
-
-
-//  }
-//  else {
-//
-//
-//
-//
-//
-//  }
 
   return 0;
 }

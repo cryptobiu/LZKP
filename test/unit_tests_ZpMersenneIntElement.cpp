@@ -54,7 +54,7 @@ TEST_CASE("cac_prover_logic<ZpMersenneIntElement>_constructor") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
 
@@ -101,7 +101,7 @@ TEST_CASE("cac_verifier_logic<ZpMersenneIntElement>_constructor") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
 
@@ -148,7 +148,7 @@ TEST_CASE("cac_prover_logic<ZpMersenneIntElement>_r1") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
 
@@ -193,7 +193,7 @@ TEST_CASE("cac_verifier_logic<ZpMersenneIntElement>_r2") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -253,7 +253,7 @@ TEST_CASE("cac_prover_logic<ZpMersenneIntElement>_r3") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -311,7 +311,7 @@ TEST_CASE("cac_verifier_logic<ZpMersenneIntElement>_r4") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -391,7 +391,7 @@ TEST_CASE("cac_prover_logic<ZpMersenneIntElement>_r5") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -465,7 +465,7 @@ TEST_CASE("cac_verifier_logic<ZpMersenneIntElement>_r6") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -545,7 +545,7 @@ TEST_CASE("cac_prover_logic<ZpMersenneIntElement>_r7") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -685,7 +685,7 @@ TEST_CASE("cac_verifier_logic<ZpMersenneIntElement>_r8") {
     }
   }
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -810,7 +810,7 @@ TEST_CASE("cac_verifier_logic<ZpMersenneIntElement>_r8_false") {
 
   secret[0] += ZpMersenneIntElement(1); // Proof should be rejected now
 
-  Settings param(M, tau, N, n, m);
+  Parameters param(M, tau, N, n, m);
 
   CacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   CacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -889,7 +889,7 @@ TEST_CASE("sac_prover_logic<ZpMersenneIntElement>_constructor") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
 
@@ -935,7 +935,7 @@ TEST_CASE("sac_verifier_logic<ZpMersenneIntElement>_constructor") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
 
@@ -981,7 +981,7 @@ TEST_CASE("sac_prover_logic<ZpMersenneIntElement>_r1") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
 
@@ -1026,7 +1026,7 @@ TEST_CASE("sac_verifier_logic<ZpMersenneIntElement>_r2") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -1078,7 +1078,7 @@ TEST_CASE("sac_prover_logic<ZpMersenneIntElement>_r3") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -1156,7 +1156,7 @@ TEST_CASE("sac_prover_logic<ZpMersenneIntElement>_r4") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -1224,7 +1224,7 @@ TEST_CASE("sac_prover_logic<ZpMersenneIntElement>_r5") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -1350,7 +1350,7 @@ TEST_CASE("sac_verifier_logic<ZpMersenneIntElement>_r6") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -1475,7 +1475,7 @@ TEST_CASE("sac_verifier_logic<ZpMersenneIntElement>_r6_reject") {
 
   secret[0] += ZpMersenneIntElement(1); // Proof should be rejected now
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -1545,7 +1545,7 @@ TEST_CASE("sac_verifier_logic<ZpMersenneIntElement>_protocol_big_numbers") {
     }
   }
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);
@@ -1617,7 +1617,7 @@ TEST_CASE("sac_verifier_logic<ZpMersenneIntElement>_protocol_big_numbers_reject"
 
   secret[0] += ZpMersenneIntElement(1); // Proof should be rejected now
 
-  Settings param(M, 0, N, n, m);
+  Parameters param(M, 0, N, n, m);
 
   SacProverLogic<ZpMersenneIntElement> p(param, a, t, secret);
   SacVerifierLogic<ZpMersenneIntElement> v(param, a, t);

@@ -8,7 +8,7 @@
 
 #include "prover_party.h"
 
-#include "settings.h"
+#include "parameters.h"
 #include "cac_prover_logic.h"
 
 
@@ -46,7 +46,7 @@ protected:
   // Prover's secret
   std::vector<FieldType> secret_;
 
-  Settings set_;
+  Parameters par_;
   int M;
   int tau;
   int N;
@@ -160,15 +160,15 @@ int CacProverParty<FieldType>::negotiateParameters() {
 #endif
   assert (q == (uint64_t)FieldType::p);
 
-  set_ = Settings(M, tau, N, n, m);
+  par_ = Parameters(M, tau, N, n, m);
 
 #ifdef DEBUG
   std::cout << "done" << std::endl;
   std::cout << "\tTransmitting protocol parameters... ";
 #endif
 
-  iov[0].iov_base = &set_;
-  iov[0].iov_len = sizeof(set_);
+  iov[0].iov_base = &par_;
+  iov[0].iov_len = sizeof(par_);
   nwritten = writev(this->sock_, iov, 1);
   assert (nwritten == (int)iov[0].iov_len);
 
@@ -268,7 +268,7 @@ int CacProverParty<FieldType>::generateData() {
 
 template<class FieldType>
 bool CacProverParty<FieldType>::runOnline() {
-  CacProverLogic<FieldType> p(set_, a_, t_, secret_, multi_threaded_);
+  CacProverLogic<FieldType> p(par_, a_, t_, secret_, multi_threaded_);
 
   iovec *iov = new iovec[(M - tau) * 4 + 3]; // 1 + (M - tau) + 1 + (M - tau) + 1 + i_id, i_id maximum value is 2 * (M - tau)
   ssize_t nwritten, nread;
