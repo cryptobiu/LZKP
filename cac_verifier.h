@@ -19,7 +19,7 @@ namespace lzkp {
 template <class FieldType>
 class CacVerifier {
 public:
-  CacVerifier(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
+  CacVerifier(const Parameters &s, FieldType **&a, FieldType *&t);
   ~CacVerifier();
 
   void r4(); // Local variable seed_ must be set before calling this method
@@ -30,8 +30,10 @@ public:
 private:
 public:
   // Public known values
-  const std::vector<std::vector<FieldType>> &a_;
-  const std::vector<FieldType> &t_;
+//  const std::vector<std::vector<FieldType>> &a_;
+//  const std::vector<FieldType> &t_;
+  FieldType **&a_;
+  FieldType *&t_;
 
   const int N;
   const int n;
@@ -61,7 +63,7 @@ public:
 };
 
 template <class FieldType>
-CacVerifier<FieldType>::CacVerifier(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
+CacVerifier<FieldType>::CacVerifier(const Parameters &s, FieldType **&a, FieldType *&t)
     : a_(a), t_(t), N(s.N), n(s.n), m(s.m) {
 }
 

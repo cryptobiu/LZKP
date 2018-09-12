@@ -6,8 +6,8 @@
 
 #include <stack>
 #include <cryptoTools/Crypto/PRNG.h>
-#include <seedtree.h>
 #include "seedtree.h"
+#include "utils.h"
 #include "cac_prover_logic.h"
 #include "cac_verifier_logic.h"
 #include "sac_prover_logic.h"
@@ -23,15 +23,12 @@ TEST_CASE("cac_prover_logic<Field15Bit>_constructor") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -63,6 +60,10 @@ TEST_CASE("cac_prover_logic<Field15Bit>_constructor") {
   REQUIRE(p.N == N);
   REQUIRE(p.n == n);
   REQUIRE(p.m == m);
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_verifier_logic<Field15Bit>_constructor") {
@@ -70,15 +71,12 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_constructor") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -110,6 +108,10 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_constructor") {
   REQUIRE(v.N == N);
   REQUIRE(v.n == n);
   REQUIRE(v.m == m);
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_prover_logic<Field15Bit>_r1") {
@@ -117,15 +119,12 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r1") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -155,6 +154,10 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r1") {
   block h_gamma;
 
   p.r1(h_gamma); // Run round 1
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_verifier_logic<Field15Bit>_r2") {
@@ -162,15 +165,12 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r2") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -215,6 +215,10 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r2") {
   }
 
   REQUIRE(sum == tau);
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_prover_logic<Field15Bit>_r3") {
@@ -222,15 +226,12 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r3") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -273,6 +274,10 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r3") {
 
   REQUIRE(seed.size() == tau);
   REQUIRE(omegaN.size() == M - tau);
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_verifier_logic<Field15Bit>_r4") {
@@ -280,15 +285,12 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r4") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -353,6 +355,10 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r4") {
       REQUIRE(v.verifiers_[e]->coefficients_.size() == n + m);
     }
   }
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_prover_logic<Field15Bit>_r5") {
@@ -360,15 +366,12 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r5") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -427,6 +430,10 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r5") {
       REQUIRE(p.provers_[e]->coefficients_[i] == v.verifiers_[e]->coefficients_[i]);
     }
   }
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_verifier_logic<Field15Bit>_r6") {
@@ -434,15 +441,12 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r6") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -507,6 +511,10 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r6") {
 
     REQUIRE(i_bar[e_id++] == v.verifiers_[e]->i_bar_);
   }
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
@@ -514,15 +522,12 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -647,6 +652,10 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
 
     e_it++;
   }
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
@@ -654,15 +663,12 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -770,6 +776,10 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
   }
 
   REQUIRE(flag);
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("cac_verifier_logic<Field15Bit>_r8_reject") {
@@ -777,15 +787,12 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8_reject") {
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
+  Field15Bit **a;
+  Field15Bit *t, *secret;
 
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
+  a = allocate2D<Field15Bit>(n, m);
+  t = allocate1D<Field15Bit>(n);
+  secret = allocate1D<Field15Bit>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
@@ -851,6 +858,10 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8_reject") {
   bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 8
 
   REQUIRE(!flag);
+
+  free2Darray(a);
+  free1Darray(t);
+  free1Darray(secret);
 }
 
 TEST_CASE("sac_prover_logic<Field15Bit>_constructor") {

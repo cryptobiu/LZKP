@@ -8,7 +8,7 @@
 #include "seedtree.h"
 #include "parameters.h"
 
-//#include <NTL/ZZ_p.h>
+#include "utils.h"
 
 
 namespace lzkp {
@@ -17,7 +17,7 @@ namespace lzkp {
 template <class FieldType>
 class CacProver {
 public:
-  CacProver(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
+  CacProver(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret);
   ~CacProver();
 
   void r1(const block &master_seed);
@@ -30,11 +30,14 @@ public:
 private:
 public:
   // Public known values
-  const std::vector<std::vector<FieldType>> &a_;
-  const std::vector<FieldType> &t_;
+//  const std::vector<std::vector<FieldType>> &a_;
+//  const std::vector<FieldType> &t_;
+  FieldType **&a_;
+  FieldType *&t_;
 
   // CacProver's secret
-  const std::vector<FieldType> secret_;
+//  const std::vector<FieldType> secret_;
+  FieldType *&secret_;
 
   const int N;
   const int n;
@@ -66,7 +69,7 @@ public:
 };
 
 template <class FieldType>
-CacProver<FieldType>::CacProver(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
+CacProver<FieldType>::CacProver(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret)
     : a_(a), t_(t), secret_(secret), N(s.N), n(s.n), m(s.m) {
 }
 

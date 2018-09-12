@@ -18,11 +18,15 @@ namespace lzkp {
 template <class FieldType>
 class CacVerifierParty : public VerifierParty<FieldType> {
 public:
-  CacVerifierParty() : VerifierParty<FieldType>() {
+  CacVerifierParty() : VerifierParty<FieldType>(), a_(nullptr), t_(nullptr) {
     debug("Constructing CacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
   }
+
   ~CacVerifierParty() {
     debug("Destructing CacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
+
+    free2Darray<FieldType>(a_);
+    free1Darray<FieldType>(t_);
   }
 
   virtual int init(int argc, const char* const argv[]);
@@ -35,13 +39,14 @@ protected:
   virtual int negotiateParameters();
 
   // Public known values
-  std::vector<std::vector<FieldType>> a_;
-  std::vector<FieldType> t_;
+//  std::vector<std::vector<FieldType>> a_;
+//  std::vector<FieldType> t_;
+  FieldType **a_;
+  FieldType *t_;
 
   Parameters par_;
 
   bool multi_threaded_ = false;
-
 };
 
 template<class FieldType>
@@ -99,7 +104,7 @@ template<class FieldType>
 int CacVerifierParty<FieldType>::negotiateParameters() {
   debug("Negotiating protocol parameters..." << std::endl);
 
-  iovec iov[1];
+  iovec iov[2];
 //  ssize_t nwritten, nread;
 
   int protocol_type = CacVerifierParty::PROTOCOL_TYPE;
@@ -140,23 +145,32 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
   debug("\t\tm: " << this->par_.m << std::endl);
   debug("\tReceiving protocol public data... ");
 
-  iovec *iov2 = new iovec[par_.n + 1];
+  a_ = allocate2D<FieldType>(par_.n, par_.m);
+  t_ = allocate1D<FieldType>(par_.n);
 
-  a_.resize(par_.n);
-  for (auto i = 0; i < par_.n; ++i) {
-    a_[i].resize(par_.m);
-    iov2[i].iov_base = a_[i].data();
-    iov2[i].iov_len = a_[i].size() * sizeof(a_[i][0]);
-  }
-  t_.resize(par_.n);
-  iov2[par_.n].iov_base = t_.data();
-  iov2[par_.n].iov_len = t_.size() * sizeof(t_[0]);
+  iov[0].iov_base = a_;
+  iov[0].iov_len = par_.n * par_.m * sizeof(FieldType);
+  iov[1].iov_base = t_;
+  iov[1].iov_len = par_.n * sizeof(FieldType);
+  this->writevWrapper(iov, 2, iov[0].iov_len + iov[1].iov_len);
 
-  this->readvWrapper(iov2, par_.n + 1, iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
+//  iovec *iov2 = new iovec[par_.n + 1];
+
+//  a_.resize(par_.n);
+//  for (auto i = 0; i < par_.n; ++i) {
+//    a_[i].resize(par_.m);
+//    iov2[i].iov_base = a_[i].data();
+//    iov2[i].iov_len = a_[i].size() * sizeof(a_[i][0]);
+//  }
+//  t_.resize(par_.n);
+//  iov2[par_.n].iov_base = t_.data();
+//  iov2[par_.n].iov_len = t_.size() * sizeof(t_[0]);
+//
+//  this->readvWrapper(iov2, par_.n + 1, iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
 //  nread = readv(this->sock_, iov2, par_.n + 1);
 //  assert (nread == (int)iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
 
-  delete[] iov2;
+//  delete[] iov2;
 
   debug("done" << std::endl);
   debug("Negotiating protocol parameters... done" << std::endl);

@@ -25,6 +25,7 @@ namespace po = boost::program_options;
 #endif
 
 #include "block.h"
+#include "utils.h"
 
 
 namespace lzkp {

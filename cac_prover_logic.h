@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class CacProverLogic {
 public:
-  CacProverLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded = false);
+  CacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, bool multi_threaded = false);
   ~CacProverLogic();
 
   void r1(block &h_gamma);
@@ -31,11 +31,14 @@ public:
 private:
 public:
   // Public known values
-  const std::vector<std::vector<FieldType>> &a_;
-  const std::vector<FieldType> &t_;
+//  const std::vector<std::vector<FieldType>> &a_;
+//  const std::vector<FieldType> &t_;
+  FieldType **&a_;
+  FieldType *&t_;
 
   // CacProver's secret
-  const std::vector<FieldType> secret_;
+//  const std::vector<FieldType> secret_;
+  FieldType *&secret_;
 
   const Parameters &par_;
   const int M;
@@ -63,7 +66,7 @@ public:
 };
 
 template <class FieldType>
-CacProverLogic<FieldType>::CacProverLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded)
+CacProverLogic<FieldType>::CacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, bool multi_threaded)
     : a_(a), t_(t), secret_(secret), par_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
   if (multi_threaded)
     nthreads_ = std::thread::hardware_concurrency();

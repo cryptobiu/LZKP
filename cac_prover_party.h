@@ -18,11 +18,16 @@ namespace lzkp {
 template <class FieldType>
 class CacProverParty : public ProverParty<FieldType> {
 public:
-  CacProverParty() : ProverParty<FieldType>() {
+  CacProverParty() : ProverParty<FieldType>(), a_(nullptr), t_(nullptr), secret_(nullptr) {
     debug("Constructing CacProverParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
   }
+
   ~CacProverParty() {
     debug("Destructing CacProverParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
+
+    free2Darray<FieldType>(a_);
+    free1Darray<FieldType>(t_);
+    free1Darray<FieldType>(secret_);
   }
 
   virtual int init(int argc, const char* const argv[]);
@@ -36,11 +41,14 @@ protected:
   virtual int generateData();
 
   // Public known values
-  std::vector<std::vector<FieldType>> a_;
-  std::vector<FieldType> t_;
+  FieldType **a_;
+  FieldType *t_;
+//  std::vector<std::vector<FieldType>> a_;
+//  std::vector<FieldType> t_;
 
   // Prover's secret
-  std::vector<FieldType> secret_;
+  FieldType *secret_;
+//  std::vector<FieldType> secret_;
 
   Parameters par_;
   int M;
@@ -122,7 +130,7 @@ template<class FieldType>
 int CacProverParty<FieldType>::negotiateParameters() {
   debug("Negotiating protocol parameters..." << std::endl);
 
-  iovec iov[1];
+  iovec iov[2];
 //  ssize_t nwritten, nread;
 
   int protocol_type;
@@ -168,19 +176,24 @@ int CacProverParty<FieldType>::negotiateParameters() {
 
   debug("\tTransmitting protocol public data... ");
 
-  iovec *iov2 = new iovec[n + 1];
+//  iovec *iov2 = new iovec[n + 1];
 
-  for (auto i = 0; i < n; ++i) {
-    iov2[i].iov_base = a_[i].data();
-    iov2[i].iov_len = a_[i].size() * sizeof(a_[i][0]);
-  }
-  iov2[n].iov_base = t_.data();
-  iov2[n].iov_len = t_.size() * sizeof(t_[0]);
-  this->writevWrapper(iov2, n + 1, iov2[0].iov_len * n + (int)iov2[n].iov_len);
+//  for (auto i = 0; i < n; ++i) {
+//    iov2[i].iov_base = a_[i].data();
+//    iov2[i].iov_len = a_[i].size() * sizeof(a_[i][0]);
+//  }
+//  iov2[n].iov_base = t_.data();
+//  iov2[n].iov_len = t_.size() * sizeof(t_[0]);
+  iov[0].iov_base = this->a_;
+  iov[0].iov_len = n * m * sizeof(FieldType);
+  iov[1].iov_base = this->t_;
+  iov[1].iov_len = n * sizeof(FieldType);
+  this->writevWrapper(iov, 2, iov[0].iov_len + iov[1].iov_len);
+//  this->writevWrapper(iov2, n + 1, iov2[0].iov_len * n + (int)iov2[n].iov_len);
 //  nwritten = writev(this->sock_, iov2, n + 1);
 //  assert (nwritten == (int)iov2[0].iov_len * n + (int)iov2[n].iov_len);
 
-  delete[] iov2;
+//  delete[] iov2;
 
   debug("done" << std::endl);
   debug("Negotiating protocol parameters... done" << std::endl);
@@ -192,12 +205,15 @@ template<class FieldType>
 int CacProverParty<FieldType>::generateData() {
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  a_.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a_[i].resize(m);
+//  a_.resize(n);
+//  for (auto i = 0; i < n; ++i)
+//    a_[i].resize(m);
+  a_ = allocate2D<FieldType>(n, m);
 
-  t_.resize(n);
-  secret_.resize(m);
+//  t_.resize(n);
+//  secret_.resize(m);
+  t_ = allocate1D<FieldType>(n);
+  secret_ = allocate1D<FieldType>(m);
 
   debug("\tStaring data generation..." << std::endl);
   debug("\t\tGenerating matrix (A)... ");
