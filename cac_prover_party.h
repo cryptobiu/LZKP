@@ -176,19 +176,7 @@ int CacProverParty<FieldType>::negotiateParameters() {
   }
   iov2[n].iov_base = t_.data();
   iov2[n].iov_len = t_.size() * sizeof(t_[0]);
-
-  FieldType *aa = new FieldType[n * m + n];
-  std::cout << "2\n";
-//  for (auto i = 0; i < n; ++i)
-//    std::memcpy(aa + i * m * sizeof(FieldType), a_[i].data(), m * sizeof(FieldType));
-//  iov2[0].iov_base = aa;
-//  iov2[0].iov_len = m * n * sizeof(FieldType);
-//  iov2[1].iov_base = t_.data();
-//  iov2[1].iov_len = t_.size() * sizeof(t_[0]);
-  std::cout << "1\n";
-  this->writeWrapper(aa, (n * m + n) * sizeof(FieldType));
-//  this->writevWrapper(iov2, 2, iov2[0].iov_len + iov2[1].iov_len);
-//  this->writevWrapper(iov2, n + 1, iov2[0].iov_len * n + (int)iov2[n].iov_len);
+  this->writevWrapper(iov2, n + 1, iov2[0].iov_len * n + (int)iov2[n].iov_len);
 //  nwritten = writev(this->sock_, iov2, n + 1);
 //  assert (nwritten == (int)iov2[0].iov_len * n + (int)iov2[n].iov_len);
 

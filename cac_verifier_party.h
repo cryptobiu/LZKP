@@ -152,17 +152,7 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
   iov2[par_.n].iov_base = t_.data();
   iov2[par_.n].iov_len = t_.size() * sizeof(t_[0]);
 
-  FieldType *aa = new FieldType[par_.n * par_.m + par_.n];
-
-  iov2[0].iov_base = aa;
-  iov2[0].iov_len = par_.m * par_.n * sizeof(FieldType);
-  iov2[1].iov_base = t_.data();
-  iov2[1].iov_len = t_.size() * sizeof(t_[0]);
-//  this->readvWrapper(iov2, 2, iov2[0].iov_len + iov2[1].iov_len);
-  this->readWrapper(aa, (par_.n * par_.m + par_.n) * sizeof(FieldType));
-  for (auto i = 0; i < par_.n; ++i)
-    std::memcpy(a_[i].data(), aa + i * par_.m * sizeof(FieldType), par_.m * sizeof(FieldType));
-//  this->readvWrapper(iov2, par_.n + 1, iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
+  this->readvWrapper(iov2, par_.n + 1, iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
 //  nread = readv(this->sock_, iov2, par_.n + 1);
 //  assert (nread == (int)iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
 

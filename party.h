@@ -44,8 +44,8 @@ protected:
   virtual int negotiateParameters() = 0;
   int writeWrapper(void *buf, size_t count);
   int readWrapper(void *buf, size_t count);
-  int writevWrapper(const iovec *iov, int iovcnt, ssize_t nexpected);
-  int readvWrapper(const iovec *iov, int iovcnt, ssize_t nexpected);
+  int writevWrapper(iovec *iov, int iovcnt, ssize_t nexpected);
+  int readvWrapper(iovec *iov, int iovcnt, ssize_t nexpected);
 
   int sock_;
 };
