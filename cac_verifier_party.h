@@ -11,7 +11,7 @@
 #include "parameters.h"
 #include "cac_verifier_logic.h"
 
-
+#include <cstring>
 namespace lzkp {
 
 
@@ -100,7 +100,7 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
   debug("Negotiating protocol parameters..." << std::endl);
 
   iovec iov[1];
-  ssize_t nwritten, nread;
+//  ssize_t nwritten, nread;
 
   int protocol_type = CacVerifierParty::PROTOCOL_TYPE;
 
@@ -108,8 +108,9 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
 
   iov[0].iov_base = &protocol_type;
   iov[0].iov_len = sizeof(protocol_type);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+//  nwritten = writev(this->sock_, iov, 1);
+//  assert (nwritten == (int)iov[0].iov_len);
 
   debug("done" << std::endl);
   debug("\tTransmitting field characteristic ... ");
@@ -118,16 +119,18 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
 
   iov[0].iov_base = &q;
   iov[0].iov_len = sizeof(q);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+//  nwritten = writev(this->sock_, iov, 1);
+//  assert (nwritten == (int)iov[0].iov_len);
 
   debug("done" << std::endl);
   debug("\tReceiving protocol parameters... ");
 
   iov[0].iov_base = &this->par_;
   iov[0].iov_len = sizeof(this->par_);
-  nread = readv(this->sock_, iov, 1);
-  assert (nread == (int)iov[0].iov_len);
+  this->readvWrapper(iov, 1, iov[0].iov_len);
+//  nread = readv(this->sock_, iov, 1);
+//  assert (nread == (int)iov[0].iov_len);
 
   debug("done" << std::endl);
   debug("\t\tM: " << this->par_.M << std::endl);
@@ -148,8 +151,20 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
   t_.resize(par_.n);
   iov2[par_.n].iov_base = t_.data();
   iov2[par_.n].iov_len = t_.size() * sizeof(t_[0]);
-  nread = readv(this->sock_, iov2, par_.n + 1);
-  assert (nread == (int)iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
+
+  FieldType *aa = new FieldType[par_.n * par_.m + par_.n];
+
+  iov2[0].iov_base = aa;
+  iov2[0].iov_len = par_.m * par_.n * sizeof(FieldType);
+  iov2[1].iov_base = t_.data();
+  iov2[1].iov_len = t_.size() * sizeof(t_[0]);
+//  this->readvWrapper(iov2, 2, iov2[0].iov_len + iov2[1].iov_len);
+  this->readWrapper(aa, (par_.n * par_.m + par_.n) * sizeof(FieldType));
+  for (auto i = 0; i < par_.n; ++i)
+    std::memcpy(a_[i].data(), aa + i * par_.m * sizeof(FieldType), par_.m * sizeof(FieldType));
+//  this->readvWrapper(iov2, par_.n + 1, iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
+//  nread = readv(this->sock_, iov2, par_.n + 1);
+//  assert (nread == (int)iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
 
   delete[] iov2;
 
@@ -164,22 +179,32 @@ bool CacVerifierParty<FieldType>::runOnline() {
   CacVerifierLogic<FieldType> v(par_, a_, t_, multi_threaded_);
 
   iovec *iov = new iovec[(par_.M - par_.tau) * 4 + 3]; // 1 + (M - tau) + 1 + (M - tau) + 1 + i_id, i_id maximum value is 2 * (M - tau)
-  ssize_t nwritten, nread;
+//  ssize_t nwritten, nread;
+
+  debug("Online phase:" << std::endl);
 
   // ** Round 1 output **
   block h_gamma;
   iov[0].iov_base = &h_gamma;
   iov[0].iov_len = sizeof(h_gamma);
-  nread = readv(this->sock_, iov, 1);
-  assert (nread == (int)iov[0].iov_len);
+  debug("\tReceiving output of round #1... ");
+  this->readvWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
+//  nread = readv(this->sock_, iov, 1);
+//  assert (nread == (int)iov[0].iov_len);
 
   // ** Round 2 **
   std::vector<uint8_t> E;
+  debug("\tExecuting round #2... ");
   v.r2(h_gamma, E); // Run round 2
+  debug("done" << std::endl);
   iov[0].iov_base = E.data();
   iov[0].iov_len = E.size() * sizeof(E[0]);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  debug("\tSending output of round #2... ");
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
+//  nwritten = writev(this->sock_, iov, 1);
+//  assert (nwritten == (int)iov[0].iov_len);
 
   // ** Round 3 output **
   std::vector<block> seed(par_.tau), omegaN(par_.M - par_.tau);
@@ -190,31 +215,47 @@ bool CacVerifierParty<FieldType>::runOnline() {
   iov[1].iov_len = omegaN.size() * sizeof(omegaN[0]);
   iov[2].iov_base = &h_pi;
   iov[2].iov_len = sizeof(h_pi);
-  nread = readv(this->sock_, iov, 3);
-  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
+  debug("\tReceiving output of round #3... ");
+  this->readvWrapper(iov, 3, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len);
+  debug("done" << std::endl);
+//  nread = readv(this->sock_, iov, 3);
+//  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
 
   // ** Round 4 **
   block seed_ell;
+  debug("\tExecuting round #4... ");
   v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+  debug("done" << std::endl);
   iov[0].iov_base = &seed_ell;
   iov[0].iov_len = sizeof(seed_ell);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  debug("\tSending output of round #4... ");
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
+//  nwritten = writev(this->sock_, iov, 1);
+//  assert (nwritten == (int)iov[0].iov_len);
 
   // ** Round 5 output **
   block h_psi;
   iov[0].iov_base = &h_psi;
   iov[0].iov_len = sizeof(h_psi);
-  nread = readv(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  debug("\tReceiving output of round #5... ");
+  this->readvWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
+//  nread = readv(this->sock_, iov, 1);
+//  assert (nwritten == (int)iov[0].iov_len);
 
   // ** Round 6 **
   std::vector<int> i_bar;
+  debug("\tExecuting round #6... ");
   v.r6(h_psi, i_bar); // Run round 6
+  debug("done" << std::endl);
   iov[0].iov_base = i_bar.data();
   iov[0].iov_len = i_bar.size() * sizeof(i_bar[0]);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  debug("\tSending output of round #6... ");
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
+//  nwritten = writev(this->sock_, iov, 1);
+//  assert (nwritten == (int)iov[0].iov_len);
 
   // ** Round 7 output **
   block seed_e_bar;
@@ -257,21 +298,25 @@ bool CacVerifierParty<FieldType>::runOnline() {
 
     e_id++;
   }
-  nread = readv(this->sock_, iov, 1 + (par_.M - par_.tau) + 1 + (par_.M - par_.tau) + 1 + i_id);
-  std::cout << nread << std::endl;
-  std::cout << (int)(iov[0].iov_len + iov[1].iov_len * (par_.M - par_.tau)  + iov[par_.M - par_.tau + 1].iov_len +
-                     iov[par_.M - par_.tau + 2].iov_len * (par_.M - par_.tau) + iov[2 * (par_.M - par_.tau) + 2].iov_len +
-                     iov[2 * (par_.M - par_.tau) + 3].iov_len * i_id) << std::endl;
-  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len * (par_.M - par_.tau)  + iov[par_.M - par_.tau + 1].iov_len +
-                         iov[par_.M - par_.tau + 2].iov_len * (par_.M - par_.tau) + iov[2 * (par_.M - par_.tau) + 2].iov_len +
-                         iov[2 * (par_.M - par_.tau) + 3].iov_len * i_id));
+  debug("\tReceiving output of round #7... ");
+  this->readvWrapper(iov, 1 + (par_.M - par_.tau) + 1 + (par_.M - par_.tau) + 1 + i_id, iov[0].iov_len + iov[1].iov_len * (par_.M - par_.tau)  + iov[par_.M - par_.tau + 1].iov_len +
+                                                                                        iov[par_.M - par_.tau + 2].iov_len * (par_.M - par_.tau) + iov[2 * (par_.M - par_.tau) + 2].iov_len +
+                                                                                        iov[2 * (par_.M - par_.tau) + 3].iov_len * i_id);
+  debug("done" << std::endl);
+//  nread = readv(this->sock_, iov, 1 + (par_.M - par_.tau) + 1 + (par_.M - par_.tau) + 1 + i_id);
+//  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len * (par_.M - par_.tau)  + iov[par_.M - par_.tau + 1].iov_len +
+//                         iov[par_.M - par_.tau + 2].iov_len * (par_.M - par_.tau) + iov[2 * (par_.M - par_.tau) + 2].iov_len +
+//                         iov[2 * (par_.M - par_.tau) + 3].iov_len * i_id));
 
   bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 8
 
+  debug(std::endl;)
   if (flag)
-    std::cout << "Proof accepted" << std::endl;
+    std::cout << "\tProof accepted" << std::endl;
   else
-    std::cout << "Proof rejected" << std::endl;
+    std::cout << "\tProof rejected" << std::endl;
+
+  debug("Online phase... done" << std::endl);
 
   delete[] iov;
 

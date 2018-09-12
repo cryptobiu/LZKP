@@ -26,7 +26,7 @@ public:
   }
 
 protected:
-  virtual int initCommunication();
+  int initCommunication();
   virtual int generateData() = 0;
 
 protected:

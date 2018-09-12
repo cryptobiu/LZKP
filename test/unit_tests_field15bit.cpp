@@ -1518,144 +1518,144 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6_reject") {
   REQUIRE(!flag);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers") {
-  auto M = 700, N = 32, n = 512, m = 4096;
-
-  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
-
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
-
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
-
-  // Random matrix A
-  for (auto nn = 0; nn < n; ++nn) {
-    for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
-    }
-  }
-
-  // Random vector secret
-  for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
-  }
-
-  // Calculate t
-  for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
-
-    for (auto mm = 0; mm < m; ++mm) {
-      t[nn] += a[nn][mm] * secret[mm];
-    }
-  }
-
-  Parameters param(M, 0, N, n, m);
-
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
-
-  block h_gamma;
-
-  p.r1(h_gamma); // Run round 1
-
-  block seed_ell;
-
-  v.r2(h_gamma, seed_ell); // Run round 2
-
-  block h_pi, h_psi, h_theta;
-
-  p.r3(seed_ell, h_pi, h_psi, h_theta); // Run round 3
-
-  std::vector<int> i_bar;
-
-  v.r4(h_pi, h_psi, h_theta, i_bar); // Run round 4
-
-  block seed_global;
-  std::vector<std::vector<block>> seed_tree;
-  std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
-  std::vector<Field15Bit> o_i_bar, v_i_bar;
-
-  p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
-
-  bool flag = v.r6(seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 6
-
-  REQUIRE(flag);
-}
-
-TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
-  auto M = 700, N = 32, n = 512, m = 4096;
-
-  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
-
-  std::vector<std::vector<Field15Bit>> a;
-  std::vector<Field15Bit> t, secret;
-
-  a.resize(n);
-  for (auto i = 0; i < n; ++i)
-    a[i].resize(m);
-
-  t.resize(n);
-  secret.resize(m);
-
-  // Random matrix A
-  for (auto nn = 0; nn < n; ++nn) {
-    for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
-    }
-  }
-
-  // Random vector secret
-  for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
-  }
-
-  // Calculate t
-  for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
-
-    for (auto mm = 0; mm < m; ++mm) {
-      t[nn] += a[nn][mm] * secret[mm];
-    }
-  }
-
-  secret[0] += Field15Bit(1); // Proof should be rejected now
-
-  Parameters param(M, 0, N, n, m);
-
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
-
-  block h_gamma;
-
-  p.r1(h_gamma); // Run round 1
-
-  block seed_ell;
-
-  v.r2(h_gamma, seed_ell); // Run round 2
-
-  block h_pi, h_psi, h_theta;
-
-  p.r3(seed_ell, h_pi, h_psi, h_theta); // Run round 3
-
-  std::vector<int> i_bar;
-
-  v.r4(h_pi, h_psi, h_theta, i_bar); // Run round 4
-
-  block seed_global;
-  std::vector<std::vector<block>> seed_tree;
-  std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
-  std::vector<Field15Bit> o_i_bar, v_i_bar;
-
-  p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
-
-  bool flag = v.r6(seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 6
-
-  REQUIRE(!flag);
-}
+//TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers") {
+//  auto M = 700, N = 32, n = 512, m = 4096;
+//
+//  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
+//
+//  std::vector<std::vector<Field15Bit>> a;
+//  std::vector<Field15Bit> t, secret;
+//
+//  a.resize(n);
+//  for (auto i = 0; i < n; ++i)
+//    a[i].resize(m);
+//
+//  t.resize(n);
+//  secret.resize(m);
+//
+//  // Random matrix A
+//  for (auto nn = 0; nn < n; ++nn) {
+//    for (auto mm = 0; mm < m; ++mm) {
+//      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+//    }
+//  }
+//
+//  // Random vector secret
+//  for (auto mm = 0; mm < m; ++mm) {
+//    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+//  }
+//
+//  // Calculate t
+//  for (auto nn = 0; nn < n; ++nn) {
+//    t[nn] = Field15Bit(0);
+//
+//    for (auto mm = 0; mm < m; ++mm) {
+//      t[nn] += a[nn][mm] * secret[mm];
+//    }
+//  }
+//
+//  Parameters param(M, 0, N, n, m);
+//
+//  SacProverLogic<Field15Bit> p(param, a, t, secret);
+//  SacVerifierLogic<Field15Bit> v(param, a, t);
+//
+//  block h_gamma;
+//
+//  p.r1(h_gamma); // Run round 1
+//
+//  block seed_ell;
+//
+//  v.r2(h_gamma, seed_ell); // Run round 2
+//
+//  block h_pi, h_psi, h_theta;
+//
+//  p.r3(seed_ell, h_pi, h_psi, h_theta); // Run round 3
+//
+//  std::vector<int> i_bar;
+//
+//  v.r4(h_pi, h_psi, h_theta, i_bar); // Run round 4
+//
+//  block seed_global;
+//  std::vector<std::vector<block>> seed_tree;
+//  std::vector<block> gamma_i_bar;
+//  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
+//  std::vector<Field15Bit> o_i_bar, v_i_bar;
+//
+//  p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
+//
+//  bool flag = v.r6(seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 6
+//
+//  REQUIRE(flag);
+//}
+//
+//TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
+//  auto M = 700, N = 32, n = 512, m = 4096;
+//
+//  osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
+//
+//  std::vector<std::vector<Field15Bit>> a;
+//  std::vector<Field15Bit> t, secret;
+//
+//  a.resize(n);
+//  for (auto i = 0; i < n; ++i)
+//    a[i].resize(m);
+//
+//  t.resize(n);
+//  secret.resize(m);
+//
+//  // Random matrix A
+//  for (auto nn = 0; nn < n; ++nn) {
+//    for (auto mm = 0; mm < m; ++mm) {
+//      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+//    }
+//  }
+//
+//  // Random vector secret
+//  for (auto mm = 0; mm < m; ++mm) {
+//    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+//  }
+//
+//  // Calculate t
+//  for (auto nn = 0; nn < n; ++nn) {
+//    t[nn] = Field15Bit(0);
+//
+//    for (auto mm = 0; mm < m; ++mm) {
+//      t[nn] += a[nn][mm] * secret[mm];
+//    }
+//  }
+//
+//  secret[0] += Field15Bit(1); // Proof should be rejected now
+//
+//  Parameters param(M, 0, N, n, m);
+//
+//  SacProverLogic<Field15Bit> p(param, a, t, secret);
+//  SacVerifierLogic<Field15Bit> v(param, a, t);
+//
+//  block h_gamma;
+//
+//  p.r1(h_gamma); // Run round 1
+//
+//  block seed_ell;
+//
+//  v.r2(h_gamma, seed_ell); // Run round 2
+//
+//  block h_pi, h_psi, h_theta;
+//
+//  p.r3(seed_ell, h_pi, h_psi, h_theta); // Run round 3
+//
+//  std::vector<int> i_bar;
+//
+//  v.r4(h_pi, h_psi, h_theta, i_bar); // Run round 4
+//
+//  block seed_global;
+//  std::vector<std::vector<block>> seed_tree;
+//  std::vector<block> gamma_i_bar;
+//  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
+//  std::vector<Field15Bit> o_i_bar, v_i_bar;
+//
+//  p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
+//
+//  bool flag = v.r6(seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 6
+//
+//  REQUIRE(!flag);
+//}
