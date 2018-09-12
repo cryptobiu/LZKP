@@ -2,8 +2,8 @@
 // Created by roee on 9/6/18.
 //
 
-#ifndef LZKP_PARTY_H
-#define LZKP_PARTY_H
+#ifndef __LZKP_PARTY_H_FILE__
+#define __LZKP_PARTY_H_FILE__
 
 
 #include <sys/socket.h>
@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <cerrno>
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -41,10 +42,14 @@ protected:
   virtual int parseArguments(int argc, const char *const *argv) = 0;
   virtual int initCommunication() = 0;
   virtual int negotiateParameters() = 0;
+  int writeWrapper(void *buf, size_t count);
+  int readWrapper(void *buf, size_t count);
+  int writevWrapper(const iovec *iov, int iovcnt, ssize_t nexpected);
+  int readvWrapper(const iovec *iov, int iovcnt, ssize_t nexpected);
 
   int sock_;
 };
 
 
 }
-#endif //LZKP_PARTY_H
+#endif // __LZKP_PARTY_H_FILE__

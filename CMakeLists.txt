@@ -51,12 +51,12 @@ add_executable(LZKP
         cac_prover.cpp cac_prover.h
         cac_verifier_logic.cpp cac_verifier_logic.h
         cac_verifier.cpp cac_verifier.h
-        party.h
+        party.cpp party.h
         factory.h
         prover_party.cpp prover_party.h factory.cpp
         verifier_party.cpp verifier_party.h
         cac_prover_party.cpp cac_prover_party.h
         cac_verifier_party.cpp cac_verifier_party.h
-        )
+        party.cpp)
 
 target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp boost_program_options)

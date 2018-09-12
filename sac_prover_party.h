@@ -110,7 +110,7 @@ int SacProverParty<FieldType>::parseArguments(int argc, const char* const argv[]
   if (multi_threaded_)
     debug("\tMulti-threading enabled" << std::endl);
   else
-  debug("\tMultit-hreading disabled" << std::endl);
+    debug("\tMultit-hreading disabled" << std::endl);
 
   return 0;
 }

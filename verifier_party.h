@@ -24,11 +24,8 @@ public:
     close(sock_);
   }
 
-//  virtual int init(int argc, char **argv);
-//  virtual bool runOnline();
-
 protected:
-    virtual int initCommunication();
+    int initCommunication();
 
 protected:
   std::string ip_;
@@ -72,6 +69,7 @@ int VerifierParty<FieldType>::initCommunication() {
 
     return -3;
   }
+  debug("done" << std::endl);
 
   debug("Initializing communication channel... done" << std::endl);
 
