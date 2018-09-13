@@ -604,7 +604,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
 
     const auto cur_i_bar = i_bar[e_it];
     REQUIRE(cur_i_bar == p.provers_[e]->i_bar_);
-    REQUIRE(seed_tree[e_it].size() == (log(N)/log(2)));
+    REQUIRE(seed_tree[e_it].size() == (log(N) / log(2)));
 
     std::stack<std::pair<int, std::pair<int, int>>> seed_stack;
 

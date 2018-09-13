@@ -30,8 +30,6 @@ public:
 private:
 public:
   // Public known values
-//  const std::vector<std::vector<FieldType>> &a_;
-//  const std::vector<FieldType> &t_;
   FieldType **&a_;
   FieldType *&t_;
 

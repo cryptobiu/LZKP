@@ -31,13 +31,10 @@ public:
 private:
 public:
   // Public known values
-//  const std::vector<std::vector<FieldType>> &a_;
-//  const std::vector<FieldType> &t_;
   FieldType **&a_;
   FieldType *&t_;
 
   // CacProver's secret
-//  const std::vector<FieldType> secret_;
   FieldType *&secret_;
 
   const Parameters &par_;
@@ -216,9 +213,6 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
   for (auto e = 0; e < M; ++e) {
     if (!E_[e]) {
       sha_h_psi.Update(provers_[e]->psi_);
-
-      //std::cout << "WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
-      //std::cout << "PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
     }
   }
 

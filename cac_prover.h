@@ -30,13 +30,10 @@ public:
 private:
 public:
   // Public known values
-//  const std::vector<std::vector<FieldType>> &a_;
-//  const std::vector<FieldType> &t_;
   FieldType **&a_;
   FieldType *&t_;
 
   // CacProver's secret
-//  const std::vector<FieldType> secret_;
   FieldType *&secret_;
 
   const int N;

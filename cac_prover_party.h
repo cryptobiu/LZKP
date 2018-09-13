@@ -43,12 +43,9 @@ protected:
   // Public known values
   FieldType **a_;
   FieldType *t_;
-//  std::vector<std::vector<FieldType>> a_;
-//  std::vector<FieldType> t_;
 
   // Prover's secret
   FieldType *secret_;
-//  std::vector<FieldType> secret_;
 
   Parameters par_;
   int M;
@@ -138,8 +135,6 @@ int CacProverParty<FieldType>::negotiateParameters() {
   iov[0].iov_base = &protocol_type;
   iov[0].iov_len = sizeof(protocol_type);
   this->readvWrapper(iov, 1, iov[0].iov_len);
-//  nread = readv(this->sock_, iov, 1);
-//  assert (nread == (int)iov[0].iov_len);
 
   debug("\tValidating protocol type... ");
 
@@ -152,8 +147,6 @@ int CacProverParty<FieldType>::negotiateParameters() {
   iov[0].iov_base = &q;
   iov[0].iov_len = sizeof(q);
   this->readvWrapper(iov, 1, iov[0].iov_len);
-//  nread = readv(this->sock_, iov, 1);
-//  assert (nread == (int)iov[0].iov_len);
 
   debug("\tValidating field... ");
 
@@ -167,8 +160,6 @@ int CacProverParty<FieldType>::negotiateParameters() {
   iov[0].iov_base = &par_;
   iov[0].iov_len = sizeof(par_);
   this->writevWrapper(iov, 1, iov[0].iov_len);
-//  nwritten = writev(this->sock_, iov, 1);
-//  assert (nwritten == (int)iov[0].iov_len);
 
   debug("done" << std::endl);
 
@@ -176,25 +167,11 @@ int CacProverParty<FieldType>::negotiateParameters() {
 
   debug("\tTransmitting protocol public data... ");
 
-//  iovec *iov2 = new iovec[n + 1];
-
-//  for (auto i = 0; i < n; ++i) {
-//    iov2[i].iov_base = a_[i].data();
-//    iov2[i].iov_len = a_[i].size() * sizeof(a_[i][0]);
-//  }
-//  iov2[n].iov_base = t_.data();
-//  iov2[n].iov_len = t_.size() * sizeof(t_[0]);
   iov[0].iov_base = a_[0];
   iov[0].iov_len = n * m * sizeof(FieldType);
   iov[1].iov_base = t_;
   iov[1].iov_len = n * sizeof(FieldType);
   this->writevWrapper(iov, 2, iov[0].iov_len + iov[1].iov_len);
-//    this->writevWrapper(iov, 1, iov[0].iov_len);
-//  this->writevWrapper(iov2, n + 1, iov2[0].iov_len * n + (int)iov2[n].iov_len);
-//  nwritten = writev(this->sock_, iov, 2);
-//  assert (nwritten == (int)iov[0].iov_len + (int)iov[1].iov_len);
-
-//  delete[] iov2;
 
   debug("done" << std::endl);
   debug("Negotiating protocol parameters... done" << std::endl);
@@ -206,13 +183,7 @@ template<class FieldType>
 int CacProverParty<FieldType>::generateData() {
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-//  a_.resize(n);
-//  for (auto i = 0; i < n; ++i)
-//    a_[i].resize(m);
   a_ = allocate2D<FieldType>(n, m);
-
-//  t_.resize(n);
-//  secret_.resize(m);
   t_ = allocate1D<FieldType>(n);
   secret_ = allocate1D<FieldType>(m);
 
@@ -263,8 +234,7 @@ template<class FieldType>
 bool CacProverParty<FieldType>::runOnline() {
   CacProverLogic<FieldType> p(par_, a_, t_, secret_, multi_threaded_);
 
-  iovec *iov = new iovec[(M - tau) * 4 + 3]; // 1 + (M - tau) + 1 + (M - tau) + 1 + i_id, i_id maximum value is 2 * (M - tau)
-//  ssize_t nwritten, nread;
+  iovec iov[7];
 
   debug("Online phase..." << std::endl);
 
@@ -278,8 +248,6 @@ bool CacProverParty<FieldType>::runOnline() {
   debug("\tSending output of round #1... ");
   this->writevWrapper(iov, 1, iov[0].iov_len);
   debug("done" << std::endl);
-//  nwritten = writev(this->sock_, iov, 1);
-//  assert (nwritten == (int)iov[0].iov_len);
 
   // ** Round 2 output **
   std::vector<uint8_t> E(M);
@@ -288,8 +256,6 @@ bool CacProverParty<FieldType>::runOnline() {
   debug("\tReceiving output of round #2... ");
   this->readvWrapper(iov, 1, iov[0].iov_len);
   debug("done" << std::endl);
-//  nread = readv(this->sock_, iov, 1);
-//  assert (nread == (int)iov[0].iov_len);
 
   // ** Round 3 **
   std::vector<block> seed, omegaN;
@@ -306,8 +272,6 @@ bool CacProverParty<FieldType>::runOnline() {
   debug("\tSending output of round #3... ");
   this->writevWrapper(iov, 3, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len);
   debug("done" << std::endl);
-//  nwritten = writev(this->sock_, iov, 3);
-//  assert (nwritten == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
 
   // ** Round 4 output **
   block seed_ell;
@@ -316,8 +280,6 @@ bool CacProverParty<FieldType>::runOnline() {
   debug("\tReceiving output of round #4... ");
   this->readvWrapper(iov, 1, iov[0].iov_len);
   debug("done" << std::endl);
-//  nread = readv(this->sock_, iov, 1);
-//  assert (nread == (int)iov[0].iov_len);
 
   // ** Round 5 **
   block h_psi;
@@ -329,8 +291,6 @@ bool CacProverParty<FieldType>::runOnline() {
   debug("\tSending output of round #5... ");
   this->writevWrapper(iov, 1, iov[0].iov_len);
   debug("done" << std::endl);
-//  nwritten = writev(this->sock_, iov, 1);
-//  assert (nwritten == (int)iov[0].iov_len);
 
   // ** Round 6 output **
   std::vector<int> i_bar(M - tau);
@@ -339,8 +299,6 @@ bool CacProverParty<FieldType>::runOnline() {
   debug("\tReceiving output of round #6... ");
   this->readvWrapper(iov, 1, iov[0].iov_len);
   debug("done" << std::endl);
-//  nread = readv(this->sock_, iov, 1);
-//  assert (nread == (int)iov[0].iov_len);
 
   // ** Round 7 **
   block seed_e_bar;
@@ -351,46 +309,60 @@ bool CacProverParty<FieldType>::runOnline() {
   debug("\tExecuting round #7... ");
   p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
   debug("done" << std::endl);
-  auto iov_id = 0;
-  iov[iov_id].iov_base = &seed_e_bar;
-  iov[iov_id++].iov_len = sizeof(seed_e_bar);
-  for (auto i = 0; i < M - tau; ++i) {
-    iov[iov_id].iov_base = seed_tree[i].data();
-    iov[iov_id++].iov_len = seed_tree[i].size() * sizeof(seed_tree[i][0]);
-  }
-  iov[iov_id].iov_base = gamma_i_bar.data();
-  iov[iov_id++].iov_len = gamma_i_bar.size() * sizeof(gamma_i_bar[0]);
-  for (auto i = 0; i < M - tau; ++i) {
-    iov[iov_id].iov_base = alpha_i_bar[i].data();
-    iov[iov_id++].iov_len = alpha_i_bar[i].size() * sizeof(alpha_i_bar[i][0]);
-  }
-  iov[iov_id].iov_base = o_i_bar.data();
-  iov[iov_id++].iov_len = o_i_bar.size() * sizeof(o_i_bar[0]);
+
   int i_id = 0;
+  for (auto e = 0; e < M; ++e) {
+    if (E[e])
+      continue;
+
+    if (p.provers_[e]->i_bar_ != N - 1) {
+      i_id++;
+    }
+  }
+
+  block **seed_tree_f = allocate2D<block>(M - tau, (int)(log(N) / log(2)));
+  FieldType **alpha_i_bar_f = allocate2D<FieldType>(M - tau, m);
+  FieldType **b_square_f = allocate2D<FieldType>(i_id, m);
+  FieldType **s_f = allocate2D<FieldType>(i_id, m);
+
+  for (auto i = 0; i < M - tau; ++i) {
+    memcpy(seed_tree_f[i], seed_tree[i].data(), (int)(log(N) / log(2)) * sizeof(block));
+    memcpy(alpha_i_bar_f[i], alpha_i_bar[i].data(), m * sizeof(FieldType));
+  }
+
+  i_id = 0;
   for (auto e = 0, e_id = 0; e < M; ++e) {
     if (E[e])
       continue;
 
     if (p.provers_[e]->i_bar_ != N - 1) {
-      iov[iov_id].iov_base = b_square[e_id].data();
-      iov[iov_id++].iov_len = b_square[e_id].size() * sizeof(b_square[e_id][0]);
-      iov[iov_id].iov_base = s[e_id].data();
-      iov[iov_id++].iov_len = s[e_id].size() * sizeof(s[e_id][0]);
+      memcpy(b_square_f[i_id], b_square[e_id].data(), m * sizeof(FieldType));
+      memcpy(s_f[i_id], s[e_id].data(), m * sizeof(FieldType));
 
-      i_id += 2;
+      i_id++;
     }
 
     e_id++;
   }
+
+  iov[0].iov_base = &seed_e_bar;
+  iov[0].iov_len = sizeof(seed_e_bar);
+  iov[1].iov_base = seed_tree_f[0];
+  iov[1].iov_len = (M - tau) * (int)(log(N) / log(2)) * sizeof(block);
+  iov[2].iov_base = gamma_i_bar.data();
+  iov[2].iov_len = gamma_i_bar.size() * sizeof(gamma_i_bar[0]);
+  iov[3].iov_base = alpha_i_bar_f[0];
+  iov[3].iov_len = (M - tau) * m * sizeof(FieldType);
+  iov[4].iov_base = o_i_bar.data();
+  iov[4].iov_len = o_i_bar.size() * sizeof(o_i_bar[0]);
+  iov[5].iov_base = b_square_f[0];
+  iov[5].iov_len = i_id * m * sizeof(FieldType);
+  iov[6].iov_base = s_f[0];
+  iov[6].iov_len = i_id * m * sizeof(FieldType);
   debug("\tSending output of round #7... ");
-  this->writevWrapper(iov, 1 + (M - tau) + 1 + (M - tau) + 1 + i_id, iov[0].iov_len + iov[1].iov_len * (M - tau) + iov[M - tau + 1].iov_len +
-                                                                     iov[M - tau + 2].iov_len * (M - tau) + iov[2 * (M - tau) + 2].iov_len +
-                                                                     iov[2 * (M - tau) + 3].iov_len * i_id);
+  this->writevWrapper(iov, 7, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len + iov[3].iov_len +
+                              iov[4].iov_len + iov[5].iov_len + iov[6].iov_len);
   debug("done" << std::endl);
-//  nwritten = writev(this->sock_, iov, 1 + (M - tau) + 1 + (M - tau) + 1 + i_id);
-//  assert (nwritten == (int)(iov[0].iov_len + iov[1].iov_len * (M - tau) + iov[M - tau + 1].iov_len +
-//                            iov[M - tau + 2].iov_len * (M - tau) + iov[2 * (M - tau) + 2].iov_len +
-//                            iov[2 * (M - tau) + 3].iov_len * i_id));
 
 //  bool flag;
 //  iov[0].iov_base = &flag;
@@ -401,7 +373,10 @@ bool CacProverParty<FieldType>::runOnline() {
 
   debug("Online phase... done" << std::endl);
 
-  delete[] iov;
+  free2Darray<block>(seed_tree_f);
+  free2Darray<FieldType>(alpha_i_bar_f);
+  free2Darray<FieldType>(b_square_f);
+  free2Darray<FieldType>(s_f);
 
   return true;
 }

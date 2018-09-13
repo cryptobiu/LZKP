@@ -31,8 +31,6 @@ public:
 private:
 public:
   // Public known values
-//  const std::vector<std::vector<FieldType>> &a_;
-//  const std::vector<FieldType> &t_;
   FieldType **&a_;
   FieldType *&t_;
 
@@ -115,7 +113,6 @@ void CacVerifierLogic<FieldType>::r4(const std::vector<block> &seed, const std::
     }
     else {
       verifiers_[e]->omegaN_ = omegaN[o_id++];
-//      std::cout << "e " << e << " " << verifiers_[e]->omegaN_.b << std::endl;
     }
   }
 
@@ -240,7 +237,6 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
   osuCrypto::SHA1 sha_h_psi(sizeof(block));
 
   for (auto e = 0; e < M; ++e) {
-    //std::cout << "V H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
     sha_h_gamma.Update(verifiers_[e]->h_); // For step 2
 
     if (E_[e])
@@ -253,24 +249,20 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
   block h_gamma_computed;
   sha_h_gamma.Final(h_gamma_computed);
 
-  //std::cout << "V h_gammaC " << h_gamma_computed.halves[0] << " " << h_gamma_computed.halves[1] << std::endl;
-  //std::cout << "V h_gamma " << h_gamma_.halves[0] << " " << h_gamma_.halves[1] << std::endl;
   if (!eq(h_gamma_.b, h_gamma_computed.b))
     return false;
 
   // 3
   block pi;
   sha_h_pi.Final(pi);
-  //std::cout << "V pi " << pi.halves[0] << " " << pi.halves[1] << std::endl;
-  //std::cout << "V h_pi " << h_pi_.halves[0] << " " << h_pi_.halves[1] << std::endl;
+
   if (!eq(pi.b, h_pi_.b))
     return false;
 
   // 4
   block psi;
   sha_h_psi.Final(psi);
-  //std::cout << "V psi " << psi.halves[0] << " " << psi.halves[1] << std::endl;
-  //std::cout << "V h_psi_ " << h_psi_.halves[0] << " " << h_psi_.halves[1] << std::endl;
+
   if (!eq(psi.b, h_psi_.b))
     return false;
 
