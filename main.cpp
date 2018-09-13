@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     if (protocol_type != 0 && protocol_type != 1)
       throw po::validation_error(po::validation_error::invalid_option_value, "protocol_type");
 
-    if (vm.count("q") && !(q == 15 || q == 31 || q == 61))
+    if (vm.count("q") && !(q == 15 || q == 31 || q == 59 || q == 61))
       throw po::validation_error(po::validation_error::invalid_option_value, "q");
 
     if (vm.count("M") && M < 2)

@@ -12,7 +12,7 @@
 struct Field15Bit {
 //private:
 public: //TODO return to private after tesing
-  static const uint16_t p = 32749;
+  static const uint16_t p = 0x7FED; // 2^15 - 19
   uint16_t elem;
 
 public:

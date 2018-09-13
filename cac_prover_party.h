@@ -148,7 +148,7 @@ int CacProverParty<FieldType>::negotiateParameters() {
   this->readvWrapper(iov, 1, iov[0].iov_len);
 
   debug("\tValidating field... ");
-
+  
   assert (q == (uint64_t)FieldType::p);
 
   par_ = Parameters(M, tau, N, n, m);

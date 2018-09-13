@@ -8,7 +8,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DDEBUG)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -pedantic -g -O3 -march=native -mbmi -mbmi2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -g -O3 -march=native -mbmi -mbmi2")
 
 include_directories(.)
 
@@ -28,6 +28,7 @@ ENDIF(Boost_FOUND)
 add_executable(LZKP_TESTS
         test/unit_tests.cpp
         test/unit_tests_field15bit.cpp
+        test/unit_tests_field59bit.cpp
         test/unit_tests_ZpMersenneIntElement.cpp
         test/unit_tests_ZpMersenneLongElement.cpp
         block.h
@@ -35,6 +36,7 @@ add_executable(LZKP_TESTS
         parameters.h
         seedtree.cpp seedtree.h
         fields/field_15_bit.cpp fields/field_15_bit.h
+        fields/field_59_bit.cpp fields/field_59_bit.h
         fields/mersenne.cpp fields/mersenne.h
         cac_prover_logic.cpp cac_prover_logic.h
         cac_prover.cpp cac_prover.h
@@ -46,7 +48,7 @@ add_executable(LZKP_TESTS
         sac_verifier.cpp sac_verifier.h
         )
 
-target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl pthread gmp)
+target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl gmp pthread)
 
 add_executable(LZKP
         main.cpp
@@ -55,6 +57,7 @@ add_executable(LZKP
         parameters.h
         seedtree.cpp seedtree.h
         fields/field_15_bit.cpp fields/field_15_bit.h
+        fields/field_59_bit.cpp fields/field_59_bit.h
         fields/mersenne.cpp fields/mersenne.h
         cac_prover_logic.cpp cac_prover_logic.h
         cac_prover.cpp cac_prover.h
@@ -74,4 +77,4 @@ add_executable(LZKP
         sac_verifier_party.cpp sac_verifier_party.h
         )
 
-target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl pthread gmp boost_program_options)
+target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl gmp boost_program_options pthread)

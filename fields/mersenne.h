@@ -21,7 +21,7 @@ struct ZpMersenneIntElement {
 //private:
 public: //TODO return to private after tesing
 
-  static const unsigned int p = 2147483647;
+  static const unsigned int p = 0x7FFFFFFF; // 2^31 - 1;
   unsigned int elem;
 
 public:
@@ -180,7 +180,7 @@ class ZpMersenneLongElement {
 //private:
 public: //TODO return to private after tesing
 
-  static const unsigned long p = 2305843009213693951;
+  static const unsigned long p = 0x1FFFFFFFFFFFFFFF; // 2^61 - 1
   unsigned long elem;
 
 public:
