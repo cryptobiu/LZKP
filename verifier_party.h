@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class VerifierParty : public Party {
 public:
-  VerifierParty() : Party() { }
+  VerifierParty() : Party(), port_(0) { }
   ~VerifierParty() {
     debug("Closing channel... ");
     close(sock_);
@@ -71,6 +71,14 @@ int VerifierParty<FieldType>::initCommunication() {
     return -3;
   }
   debug("done" << std::endl);
+  debug("\tmeasuring RTT... ");
+  char dummy;
+  int n = 0;
+  n += read(sock_, &dummy, 1);
+  n += write(sock_, &dummy, 1);
+  assert(n == 2);
+  debug("done" << std::endl);
+
 
   debug("Initializing communication channel... done" << std::endl);
 

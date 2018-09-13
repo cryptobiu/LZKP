@@ -277,11 +277,11 @@ bool SacVerifierParty<FieldType>::runOnline() {
   else
     std::cout << "\tProof rejected" << std::endl;
 
-//  iov[0].iov_base = &flag;
-//  iov[0].iov_len = sizeof(flag);
-//  debug("\tSending protocol output... ");
-//  this->writevWrapper(iov, 1, iov[0].iov_len);
-//  debug("done" << std::endl);
+  iov[0].iov_base = &flag;
+  iov[0].iov_len = sizeof(flag);
+  debug("\tSending protocol output... ");
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
 
   debug("Online phase... done" << std::endl);
 

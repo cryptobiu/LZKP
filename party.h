@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <cerrno>
+#include <chrono>
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -33,7 +34,7 @@ namespace lzkp {
 
 class Party {
 public:
-  Party() : sock_(0) { }
+  Party() : sock_(0), RTT_(0) { }
   virtual ~Party() { };
 
   virtual int init(int argc, const char* const argv[]) = 0;
@@ -49,6 +50,9 @@ protected:
   int readvWrapper(iovec *iov, int iovcnt, ssize_t nexpected);
 
   int sock_;
+
+public:
+  int RTT_;
 };
 
 

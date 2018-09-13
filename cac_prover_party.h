@@ -363,12 +363,14 @@ bool CacProverParty<FieldType>::runOnline() {
                               iov[4].iov_len + iov[5].iov_len + iov[6].iov_len);
   debug("done" << std::endl);
 
-//  bool flag;
-//  iov[0].iov_base = &flag;
-//  iov[0].iov_len = sizeof(flag);
-//  debug("\tReceiving protocol output... ");
-//  this->readvWrapper(iov, 1, iov[0].iov_len);
-//  debug("done" << std::endl);
+  bool flag;
+  iov[0].iov_base = &flag;
+  iov[0].iov_len = sizeof(flag);
+  debug("\tReceiving protocol output... ");
+  this->readvWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
+
+  assert(flag == is_accepted);
 
   debug("Online phase... done" << std::endl);
 

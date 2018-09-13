@@ -155,11 +155,16 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  auto start = std::chrono::high_resolution_clock::now();
-  party->runOnline();
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-  std::cout << dur.count() << std::endl;
+  if (is_prover) {
+    auto start = std::chrono::high_resolution_clock::now();
+    party->runOnline();
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << dur.count() - party->RTT_ << std::endl;
+  }
+  else {
+    party->runOnline();
+  }
 
   delete party;
 
