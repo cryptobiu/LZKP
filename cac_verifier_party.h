@@ -148,11 +148,12 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
   a_ = allocate2D<FieldType>(par_.n, par_.m);
   t_ = allocate1D<FieldType>(par_.n);
 
-  iov[0].iov_base = a_;
+  iov[0].iov_base = a_[0];
   iov[0].iov_len = par_.n * par_.m * sizeof(FieldType);
   iov[1].iov_base = t_;
   iov[1].iov_len = par_.n * sizeof(FieldType);
-  this->writevWrapper(iov, 2, iov[0].iov_len + iov[1].iov_len);
+  this->readvWrapper(iov, 2, iov[0].iov_len + iov[1].iov_len);
+//  this->readvWrapper(iov, 1, iov[0].iov_len);
 
 //  iovec *iov2 = new iovec[par_.n + 1];
 
@@ -167,8 +168,8 @@ int CacVerifierParty<FieldType>::negotiateParameters() {
 //  iov2[par_.n].iov_len = t_.size() * sizeof(t_[0]);
 //
 //  this->readvWrapper(iov2, par_.n + 1, iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
-//  nread = readv(this->sock_, iov2, par_.n + 1);
-//  assert (nread == (int)iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
+//  nread = readv(this->sock_, iov, 2);
+//  assert (nread == (int)iov[0].iov_len + (int)iov[1].iov_len);
 
 //  delete[] iov2;
 
@@ -225,7 +226,7 @@ bool CacVerifierParty<FieldType>::runOnline() {
 //  nread = readv(this->sock_, iov, 3);
 //  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
 
-  // ** Round 4 **
+//   ** Round 4 **
   block seed_ell;
   debug("\tExecuting round #4... ");
   v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
@@ -319,6 +320,12 @@ bool CacVerifierParty<FieldType>::runOnline() {
     std::cout << "\tProof accepted" << std::endl;
   else
     std::cout << "\tProof rejected" << std::endl;
+
+//  iov[0].iov_base = &flag;
+//  iov[0].iov_len = sizeof(flag);
+//  debug("\tSending protocol output... ");
+//  this->writevWrapper(iov, 1, iov[0].iov_len);
+//  debug("done" << std::endl);
 
   debug("Online phase... done" << std::endl);
 

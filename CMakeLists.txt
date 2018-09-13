@@ -29,6 +29,7 @@ add_executable(LZKP_TESTS
         test/unit_tests.cpp
         test/unit_tests_field15bit.cpp
         test/unit_tests_ZpMersenneIntElement.cpp
+        utils.h
         parameters.h
         seedtree.cpp seedtree.h
         fields/field_15_bit.cpp fields/field_15_bit.h
@@ -37,12 +38,13 @@ add_executable(LZKP_TESTS
         cac_prover.cpp cac_prover.h
         cac_verifier_logic.cpp cac_verifier_logic.h
         cac_verifier.cpp cac_verifier.h
-        utils.h)
+        )
 
 target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
 
 add_executable(LZKP
         main.cpp
+        utils.h
         parameters.h
         seedtree.cpp seedtree.h
         fields/mersenne.cpp fields/mersenne.h
@@ -57,6 +59,6 @@ add_executable(LZKP
         verifier_party.cpp verifier_party.h
         cac_prover_party.cpp cac_prover_party.h
         cac_verifier_party.cpp cac_verifier_party.h
-        party.cpp utils.h)
+        )
 
 target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp boost_program_options)

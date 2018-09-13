@@ -184,14 +184,15 @@ int CacProverParty<FieldType>::negotiateParameters() {
 //  }
 //  iov2[n].iov_base = t_.data();
 //  iov2[n].iov_len = t_.size() * sizeof(t_[0]);
-  iov[0].iov_base = this->a_;
+  iov[0].iov_base = a_[0];
   iov[0].iov_len = n * m * sizeof(FieldType);
-  iov[1].iov_base = this->t_;
+  iov[1].iov_base = t_;
   iov[1].iov_len = n * sizeof(FieldType);
   this->writevWrapper(iov, 2, iov[0].iov_len + iov[1].iov_len);
+//    this->writevWrapper(iov, 1, iov[0].iov_len);
 //  this->writevWrapper(iov2, n + 1, iov2[0].iov_len * n + (int)iov2[n].iov_len);
-//  nwritten = writev(this->sock_, iov2, n + 1);
-//  assert (nwritten == (int)iov2[0].iov_len * n + (int)iov2[n].iov_len);
+//  nwritten = writev(this->sock_, iov, 2);
+//  assert (nwritten == (int)iov[0].iov_len + (int)iov[1].iov_len);
 
 //  delete[] iov2;
 
@@ -390,6 +391,13 @@ bool CacProverParty<FieldType>::runOnline() {
 //  assert (nwritten == (int)(iov[0].iov_len + iov[1].iov_len * (M - tau) + iov[M - tau + 1].iov_len +
 //                            iov[M - tau + 2].iov_len * (M - tau) + iov[2 * (M - tau) + 2].iov_len +
 //                            iov[2 * (M - tau) + 3].iov_len * i_id));
+
+//  bool flag;
+//  iov[0].iov_base = &flag;
+//  iov[0].iov_len = sizeof(flag);
+//  debug("\tReceiving protocol output... ");
+//  this->readvWrapper(iov, 1, iov[0].iov_len);
+//  debug("done" << std::endl);
 
   debug("Online phase... done" << std::endl);
 

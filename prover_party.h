@@ -21,8 +21,9 @@ class ProverParty : public Party {
 public:
   ProverParty() : Party() { }
   ~ProverParty() {
-    debug("Closing channel" << std::endl);
+    debug("Closing channel... ");
     close(sock_);
+    debug("done" << std::endl);
   }
 
 protected:

@@ -20,8 +20,9 @@ class VerifierParty : public Party {
 public:
   VerifierParty() : Party() { }
   ~VerifierParty() {
-    debug("Closing channel" << std::endl);
+    debug("Closing channel... ");
     close(sock_);
+    debug("done" << std::endl);
   }
 
 protected:

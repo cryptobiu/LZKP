@@ -156,6 +156,8 @@ int main(int argc, char *argv[]) {
 
   party->runOnline();
 
+//  sleep(10); // Graceful shutdown
+
   delete party;
 
   return 0;
