@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include "factory.h"
 #include "party.h"
@@ -154,9 +155,11 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  auto start = std::chrono::high_resolution_clock::now();
   party->runOnline();
-
-//  sleep(10); // Graceful shutdown
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  std::cout << dur.count() << std::endl;
 
   delete party;
 

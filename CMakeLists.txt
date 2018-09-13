@@ -46,7 +46,7 @@ add_executable(LZKP_TESTS
         sac_verifier.cpp sac_verifier.h
         )
 
-target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl ntl pthread gmp)
+target_link_libraries(LZKP_TESTS libcryptoTools.a libmiracl.a gsl pthread gmp)
 
 add_executable(LZKP
         main.cpp
@@ -74,4 +74,4 @@ add_executable(LZKP
         sac_verifier_party.cpp sac_verifier_party.h
         )
 
-target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl ntl pthread gmp boost_program_options)
+target_link_libraries(LZKP libcryptoTools.a libmiracl.a gsl pthread gmp boost_program_options)
