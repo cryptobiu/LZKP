@@ -128,7 +128,6 @@ int CacProverParty<FieldType>::negotiateParameters() {
   debug("Negotiating protocol parameters..." << std::endl);
 
   iovec iov[2];
-//  ssize_t nwritten, nread;
 
   int protocol_type;
 

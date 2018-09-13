@@ -17,7 +17,7 @@ namespace lzkp {
 template <class FieldType>
 class SacVerifier {
 public:
-  SacVerifier(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t);
+  SacVerifier(const Parameters &s, FieldType **&a, FieldType *&t);
   ~SacVerifier();
 
   void r2(); // Local variable seed_ell_ must be set before calling this method
@@ -29,8 +29,8 @@ public:
 private:
 public:
   // Public known values
-  const std::vector<std::vector<FieldType>> &a_;
-  const std::vector<FieldType> &t_;
+  FieldType **&a_;
+  FieldType *&t_;
 
   const int N;
   const int n;
@@ -68,7 +68,7 @@ public:
 };
 
 template <class FieldType>
-SacVerifier<FieldType>::SacVerifier(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t)
+SacVerifier<FieldType>::SacVerifier(const Parameters &s, FieldType **&a, FieldType *&t)
     : a_(a), t_(t), N(s.N), n(s.n), m(s.m) {
 }
 
@@ -94,80 +94,6 @@ void SacVerifier<FieldType>::r2() {
   }
 }
 
-//template <class FieldType>
-//void SacVerifier<FieldType>::r4() {
-//  seed_tree_.resize(N);
-//  seed_tree_.generate(seed_); // Generate seed_tree
-//  gamma_.resize(N);
-//
-//  r_.resize(N);
-//  b_.resize(m);
-//  b_square_.resize(m);
-//
-//  for (auto mm = 0; mm < m; ++mm){
-//    b_[mm].resize(N);
-//    b_square_[mm].resize(N);
-//  }
-//
-//  // *1* - 1.b
-//  for (auto i = 0; i < N - 1; ++i) {
-//    r_[i] = seed_tree_.getBlock(i);
-//
-//    for (auto mm = 0; mm < m; ++mm) {
-//      b_[mm][i]        = FieldType(seed_tree_.getBlock(i).halves[0]); // NEED TO FIND A WAY TO USE ALL 128 BITS
-//      b_square_[mm][i] = FieldType(seed_tree_.getBlock(i).halves[0]);
-//    }
-//  }
-//
-//  // *1* - 1.c
-//  r_[N - 1] = seed_tree_.getBlock(N - 1);
-//
-//  for (auto mm = 0; mm < m; ++mm) {
-//    b_[mm][N - 1] = FieldType(seed_tree_.getBlock(N - 1).halves[0]);
-//  }
-//
-//  // *1* - 1.d
-//  for (auto k = 0; k < m; ++k) {
-//    b_square_[k][N - 1] = FieldType(0);
-//    for (auto i = 0; i < N; ++i) {
-//      b_square_[k][N - 1] += b_[k][i];
-//    }
-//    b_square_[k][N - 1] *= b_square_[k][N - 1];
-//    for (auto i = 0; i < N - 1; ++i) {
-//      b_square_[k][N - 1] -= b_square_[k][i];
-//    }
-//  }
-//
-//  // *1* - 1.e
-//  osuCrypto::SHA1 sha_gamma(sizeof(block));
-//  for (auto i = 0; i < N - 1; ++i) {
-//    block blk = seed_tree_.getSeed(i);
-//    sha_gamma.Reset();
-//    sha_gamma.Update(blk);
-//    sha_gamma.Update(r_[i]);
-//    sha_gamma.Final(gamma_[i]);
-//  }
-//  block blk = seed_tree_.getSeed(N - 1);
-//  sha_gamma.Reset();
-//  sha_gamma.Update(blk);
-////  unsigned char buf[1024]; // MB NEED TO ZERO BUFFER, OR TO HASH ONLY PART OF IT
-//  for (auto i = 0; i < m; ++i) {
-////    NTL::BytesFromZZ(buf, b_square_[i][N - 1].elem._ZZ_p__rep, NTL::NumBytes(b_square_[i][N - 1].elem._ZZ_p__rep));
-////    sha_gamma.Update(buf, NTL::NumBytes(b_square_[i][N - 1].elem._ZZ_p__rep));
-//    sha_gamma.Update(b_square_[i][N - 1].elem);
-//  }
-//  sha_gamma.Update(r_[N - 1]);
-//  sha_gamma.Final(gamma_[N - 1]);
-//
-//  // *1* - 1.f
-//  osuCrypto::SHA1 sha_h(sizeof(block));
-//  for (auto i = 0; i < N; ++i) {
-//    sha_h.Update(gamma_[i]);
-//  }
-//  sha_h.Final(h_); // mb need to zero it first
-//  //std::cout << "Vr4 H " << e << " " << h_[e].halves[0] << " " << h_[e].halves[1] << std::endl;
-//}
-//
 template <class FieldType>
 bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block &gamma_i_bar,
                         const std::vector<FieldType> &alpha_i_bar, const FieldType &o_i_bar, const FieldType &v_i_bar,

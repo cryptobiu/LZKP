@@ -1,5 +1,5 @@
 //
-// Created by lzkp on 9/7/18.
+// Created by lzkp on 9/13/18.
 //
 
 #include "catch.hpp"
@@ -12,39 +12,39 @@
 #include "cac_verifier_logic.h"
 #include "sac_prover_logic.h"
 #include "sac_verifier_logic.h"
-#include "fields/field_15_bit.h"
+#include "fields/mersenne.h"
 
 
 using namespace lzkp;
 
 
-TEST_CASE("cac_prover_logic<Field15Bit>_constructor") {
+TEST_CASE("cac_prover_logic<ZpMersenneLongElement>_constructor") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -53,7 +53,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_constructor") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
 
   REQUIRE(p.M == M);
   REQUIRE(p.tau == tau);
@@ -66,33 +66,33 @@ TEST_CASE("cac_prover_logic<Field15Bit>_constructor") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_constructor") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_constructor") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -101,7 +101,7 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_constructor") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   REQUIRE(v.M == M);
   REQUIRE(v.tau == tau);
@@ -114,33 +114,33 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_constructor") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_prover_logic<Field15Bit>_r1") {
+TEST_CASE("cac_prover_logic<ZpMersenneLongElement>_r1") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -149,7 +149,7 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r1") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
 
   block h_gamma;
 
@@ -160,33 +160,33 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r1") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_r2") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_r2") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -195,8 +195,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r2") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -221,33 +221,33 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r2") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_prover_logic<Field15Bit>_r3") {
+TEST_CASE("cac_prover_logic<ZpMersenneLongElement>_r3") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -256,8 +256,8 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r3") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -280,33 +280,33 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r3") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_r4") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_r4") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -315,8 +315,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r4") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -361,33 +361,33 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r4") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_prover_logic<Field15Bit>_r5") {
+TEST_CASE("cac_prover_logic<ZpMersenneLongElement>_r5") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -396,8 +396,8 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r5") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -436,33 +436,33 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r5") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_r6") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_r6") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -471,8 +471,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r6") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -517,33 +517,33 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r6") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
+TEST_CASE("cac_prover_logic<ZpMersenneLongElement>_r7") {
   auto M = 50, tau = 13, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -552,8 +552,8 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -583,8 +583,8 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
   block seed_e_bar;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s;
-  std::vector<Field15Bit> o_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s;
+  std::vector<ZpMersenneLongElement> o_i_bar;
 
   p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
 
@@ -658,33 +658,33 @@ TEST_CASE("cac_prover_logic<Field15Bit>_r7") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_r8") {
   auto M = 50, tau = 13, N = 4, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -693,8 +693,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -724,8 +724,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
   block seed_e_bar;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s;
-  std::vector<Field15Bit> o_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s;
+  std::vector<ZpMersenneLongElement> o_i_bar;
 
   p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
 
@@ -782,45 +782,45 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_r8_reject") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_r8_reject") {
   auto M = 50, tau = 13, N = 4, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
     }
   }
 
-  secret[0] += Field15Bit(1); // Proof should be rejected now
+  secret[0] += ZpMersenneLongElement(1); // Proof should be rejected now
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -850,8 +850,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8_reject") {
   block seed_e_bar;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s;
-  std::vector<Field15Bit> o_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s;
+  std::vector<ZpMersenneLongElement> o_i_bar;
 
   p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
 
@@ -864,33 +864,33 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_r8_reject") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_protocol_big_numbers") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_protocol_big_numbers") {
   auto M = 200, tau = 100, N = 16, n = 128, m = 1024;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -899,8 +899,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_protocol_big_numbers") {
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -930,8 +930,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_protocol_big_numbers") {
   block seed_e_bar;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s;
-  std::vector<Field15Bit> o_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s;
+  std::vector<ZpMersenneLongElement> o_i_bar;
 
   p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
 
@@ -944,45 +944,45 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_protocol_big_numbers") {
   free1Darray(secret);
 }
 
-TEST_CASE("cac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
+TEST_CASE("cac_verifier_logic<ZpMersenneLongElement>_protocol_big_numbers_reject") {
   auto M = 200, tau = 100, N = 16, n = 128, m = 1024;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
     }
   }
 
-  secret[0] += Field15Bit(1); // Proof should be rejected now
+  secret[0] += ZpMersenneLongElement(1); // Proof should be rejected now
 
   Parameters param(M, tau, N, n, m);
 
-  CacProverLogic<Field15Bit> p(param, a, t, secret);
-  CacVerifierLogic<Field15Bit> v(param, a, t);
+  CacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  CacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1012,8 +1012,8 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
   block seed_e_bar;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s;
-  std::vector<Field15Bit> o_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s;
+  std::vector<ZpMersenneLongElement> o_i_bar;
 
   p.r7(i_bar, seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 7
 
@@ -1026,33 +1026,33 @@ TEST_CASE("cac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_prover_logic<Field15Bit>_constructor") {
+TEST_CASE("sac_prover_logic<ZpMersenneLongElement>_constructor") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1061,7 +1061,7 @@ TEST_CASE("sac_prover_logic<Field15Bit>_constructor") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
 
   REQUIRE(p.M == M);
   REQUIRE(p.N == N);
@@ -1073,33 +1073,33 @@ TEST_CASE("sac_prover_logic<Field15Bit>_constructor") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_constructor") {
+TEST_CASE("sac_verifier_logic<ZpMersenneLongElement>_constructor") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1108,7 +1108,7 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_constructor") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   REQUIRE(v.M == M);
   REQUIRE(v.N == N);
@@ -1120,33 +1120,33 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_constructor") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_prover_logic<Field15Bit>_r1") {
+TEST_CASE("sac_prover_logic<ZpMersenneLongElement>_r1") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1155,7 +1155,7 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r1") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
 
   block h_gamma;
 
@@ -1166,33 +1166,33 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r1") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_r2") {
+TEST_CASE("sac_verifier_logic<ZpMersenneLongElement>_r2") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1201,8 +1201,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r2") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1225,33 +1225,33 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r2") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_prover_logic<Field15Bit>_r3") {
+TEST_CASE("sac_prover_logic<ZpMersenneLongElement>_r3") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1260,8 +1260,8 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r3") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1292,14 +1292,14 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r3") {
       REQUIRE(p.provers_[e]->be_[i] == v.verifiers_[e]->be_[i]);
     }
 
-    Field15Bit o_sigma = Field15Bit(0);
-    Field15Bit v_sigma = Field15Bit(0);
+    ZpMersenneLongElement o_sigma = ZpMersenneLongElement(0);
+    ZpMersenneLongElement v_sigma = ZpMersenneLongElement(0);
     for (auto i = 0; i < N; ++i) {
       o_sigma += p.provers_[e]->o_[i];
       v_sigma += p.provers_[e]->v_[i];
     }
-    REQUIRE(o_sigma == Field15Bit(0));
-    REQUIRE(v_sigma == Field15Bit(0));
+    REQUIRE(o_sigma == ZpMersenneLongElement(0));
+    REQUIRE(v_sigma == ZpMersenneLongElement(0));
   }
 
   free2Darray(a);
@@ -1307,33 +1307,33 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r3") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_r4") {
+TEST_CASE("sac_verifier_logic<ZpMersenneLongElement>_r4") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1342,8 +1342,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r4") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1376,33 +1376,33 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r4") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_prover_logic<Field15Bit>_r5") {
+TEST_CASE("sac_prover_logic<ZpMersenneLongElement>_r5") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1411,8 +1411,8 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r5") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1433,8 +1433,8 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r5") {
   block seed_global;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
-  std::vector<Field15Bit> o_i_bar, v_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s, s_square;
+  std::vector<ZpMersenneLongElement> o_i_bar, v_i_bar;
 
   p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
 
@@ -1503,33 +1503,33 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r5") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_r6") {
+TEST_CASE("sac_verifier_logic<ZpMersenneLongElement>_r6") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1538,8 +1538,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1560,8 +1560,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6") {
   block seed_global;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
-  std::vector<Field15Bit> o_i_bar, v_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s, s_square;
+  std::vector<ZpMersenneLongElement> o_i_bar, v_i_bar;
 
   p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
 
@@ -1627,45 +1627,45 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_r6_reject") {
+TEST_CASE("sac_verifier_logic<ZpMersenneLongElement>_r6_reject") {
   auto M = 50, N = 8, n = 4, m = 32;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
     }
   }
 
-  secret[0] += Field15Bit(1); // Proof should be rejected now
+  secret[0] += ZpMersenneLongElement(1); // Proof should be rejected now
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1686,8 +1686,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6_reject") {
   block seed_global;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
-  std::vector<Field15Bit> o_i_bar, v_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s, s_square;
+  std::vector<ZpMersenneLongElement> o_i_bar, v_i_bar;
 
   p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
 
@@ -1700,33 +1700,33 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6_reject") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers") {
+TEST_CASE("sac_verifier_logic<ZpMersenneLongElement>_protocol_big_numbers") {
   auto M = 200, N = 16, n = 128, m = 1024;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
@@ -1735,8 +1735,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers") {
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1757,8 +1757,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers") {
   block seed_global;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
-  std::vector<Field15Bit> o_i_bar, v_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s, s_square;
+  std::vector<ZpMersenneLongElement> o_i_bar, v_i_bar;
 
   p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
 
@@ -1771,45 +1771,45 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers") {
   free1Darray(secret);
 }
 
-TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
+TEST_CASE("sac_verifier_logic<ZpMersenneLongElement>_protocol_big_numbers_reject") {
   auto M = 200, N = 16, n = 128, m = 1024;
 
   osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
-  Field15Bit **a;
-  Field15Bit *t, *secret;
+  ZpMersenneLongElement **a;
+  ZpMersenneLongElement *t, *secret;
 
-  a = allocate2D<Field15Bit>(n, m);
-  t = allocate1D<Field15Bit>(n);
-  secret = allocate1D<Field15Bit>(m);
+  a = allocate2D<ZpMersenneLongElement>(n, m);
+  t = allocate1D<ZpMersenneLongElement>(n);
+  secret = allocate1D<ZpMersenneLongElement>(m);
 
   // Random matrix A
   for (auto nn = 0; nn < n; ++nn) {
     for (auto mm = 0; mm < m; ++mm) {
-      a[nn][mm] = Field15Bit(prng.get<block>().halves[0]);
+      a[nn][mm] = ZpMersenneLongElement(prng.get<block>().halves[0]);
     }
   }
 
   // Random vector secret
   for (auto mm = 0; mm < m; ++mm) {
-    secret[mm] = Field15Bit(prng.get<block>().bytes[0] % 2);
+    secret[mm] = ZpMersenneLongElement(prng.get<block>().bytes[0] % 2);
   }
 
   // Calculate t
   for (auto nn = 0; nn < n; ++nn) {
-    t[nn] = Field15Bit(0);
+    t[nn] = ZpMersenneLongElement(0);
 
     for (auto mm = 0; mm < m; ++mm) {
       t[nn] += a[nn][mm] * secret[mm];
     }
   }
 
-  secret[0] += Field15Bit(1); // Proof should be rejected now
+  secret[0] += ZpMersenneLongElement(1); // Proof should be rejected now
 
   Parameters param(M, 0, N, n, m);
 
-  SacProverLogic<Field15Bit> p(param, a, t, secret);
-  SacVerifierLogic<Field15Bit> v(param, a, t);
+  SacProverLogic<ZpMersenneLongElement> p(param, a, t, secret);
+  SacVerifierLogic<ZpMersenneLongElement> v(param, a, t);
 
   block h_gamma;
 
@@ -1830,8 +1830,8 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_protocol_big_numbers_reject") {
   block seed_global;
   std::vector<std::vector<block>> seed_tree;
   std::vector<block> gamma_i_bar;
-  std::vector<std::vector<Field15Bit>> alpha_i_bar, b_square, s, s_square;
-  std::vector<Field15Bit> o_i_bar, v_i_bar;
+  std::vector<std::vector<ZpMersenneLongElement>> alpha_i_bar, b_square, s, s_square;
+  std::vector<ZpMersenneLongElement> o_i_bar, v_i_bar;
 
   p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
 

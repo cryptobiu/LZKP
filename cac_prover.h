@@ -8,8 +8,6 @@
 #include "seedtree.h"
 #include "parameters.h"
 
-#include "utils.h"
-
 
 namespace lzkp {
 

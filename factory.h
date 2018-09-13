@@ -33,9 +33,9 @@ public:
         else if (q == 31) {
           return new CacProverParty<ZpMersenneIntElement>();
         }
-//        else if (q == 61) {
-//          return new CacProverParty<ZpMersenneLongElement>();
-//        }
+        else if (q == 61) {
+          return new CacProverParty<ZpMersenneLongElement>();
+        }
       }
       else { // Create verifier
         if (q == 15) {
@@ -44,9 +44,9 @@ public:
         else if (q == 31) {
           return new CacVerifierParty<ZpMersenneIntElement>();
         }
-//        else if (q == 61) {
-//          return new CacVerifierParty<ZpMersenneLongElement>();
-//        }
+        else if (q == 61) {
+          return new CacVerifierParty<ZpMersenneLongElement>();
+        }
       }
     }
     else if (protocol_type == 1) { // Sacrificing
@@ -57,9 +57,9 @@ public:
         else if (q == 31) {
           return new SacProverParty<ZpMersenneIntElement>();
         }
-//        else if (q == 61) {
-//          return new SacProverParty<ZpMersenneLongElement>();
-//        }
+        else if (q == 61) {
+          return new SacProverParty<ZpMersenneLongElement>();
+        }
       }
       else { // Create verifier
         if (q == 15) {
@@ -68,9 +68,9 @@ public:
         else if (q == 31) {
           return new SacVerifierParty<ZpMersenneIntElement>();
         }
-//        else if (q == 61) {
-//          return new SacVerifierParty<ZpMersenneLongElement>();
-//        }
+        else if (q == 61) {
+          return new SacVerifierParty<ZpMersenneLongElement>();
+        }
       }
     }
 

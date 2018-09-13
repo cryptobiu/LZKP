@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class SacProverLogic {
 public:
-  SacProverLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded = false);
+  SacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, bool multi_threaded = false);
   ~SacProverLogic();
 
   void r1(block &h_gamma);
@@ -31,15 +31,14 @@ public:
 private:
 public:
   // Public known values
-  const std::vector<std::vector<FieldType>> &a_;
-  const std::vector<FieldType> &t_;
+  FieldType **&a_;
+  FieldType *&t_;
 
   // CacProver's secret
-  const std::vector<FieldType> secret_;
+  FieldType *&secret_;
 
   const Parameters &par_;
   const int M;
-  const int tau;
   const int N;
   const int n;
   const int m;
@@ -67,8 +66,8 @@ public:
 };
 
 template <class FieldType>
-SacProverLogic<FieldType>::SacProverLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret, bool multi_threaded)
-    : a_(a), t_(t), secret_(secret), par_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
+SacProverLogic<FieldType>::SacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, bool multi_threaded)
+    : a_(a), t_(t), secret_(secret), par_(s), M(s.M), N(s.N), n(s.n), m(s.m) {
   if (multi_threaded)
     nthreads_ = std::thread::hardware_concurrency();
   else
@@ -171,82 +170,6 @@ void SacProverLogic<FieldType>::r3(const block &seed_ell, block &h_pi, block &h_
   h_psi = h_psi_;
   h_theta = h_theta_;
 }
-//  // 2.h
-//  seed.resize(tau);
-//  omegaN.resize(M - tau);
-//
-//  osuCrypto::SHA1 sha_h_pi(sizeof(block)); // For step 3
-//  for (auto e = 0, o_id = 0, s_id = 0; e < M; ++e) {
-//    if (E[e]) {
-//      seed[s_id++] = master_seed_[e]; // For out variable
-//      continue;
-//    }
-//
-//    sha_h_pi.Update(provers_[e]->pi_);
-//    omegaN[o_id++] = provers_[e]->omegaN_; // Set out variable
-//  }
-//  sha_h_pi.Final(h_pi_);
-//
-//  h_pi = h_pi_; // Set out variable
-
-//
-//template <class FieldType>
-//void SacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
-//  seed_ell_ = seed_ell;
-//
-//  prng_seed_ell_.SetSeed(seed_ell_.b);
-//
-//  for (auto e = 0; e < M; ++e) {
-//    if (E_[e]) {
-//      continue;
-//    }
-//
-//    osuCrypto::SHA1 sha_psi(sizeof(block));
-//
-//    // 1
-//    provers_[e]->coefficients_.resize(n + m);
-//
-//    for (auto i = 0; i < n; ++i) {
-//      provers_[e]->coefficients_[i] = FieldType(prng_seed_ell_.get<block>().halves[0]);
-//    }
-//    for (auto i = 0; i < m; ++i) {
-//      provers_[e]->coefficients_[n + i] = FieldType(prng_seed_ell_.get<block>().halves[0]);
-//    }
-//
-//    provers_[e]->w_ = prng_e_bar_.get<block>();
-//  }
-//
-//  // ** can be parallelized **
-//  std::vector<std::thread> threads(nthreads_);
-//
-//  for(auto t = 0u; t < nthreads_; t++) {
-//    threads[t] = std::thread(std::bind(
-//        [&](const int bi, const int ei, const int t) {
-//          for (auto e = bi; e < ei; ++e) {
-//            if (!E_[e]) {
-//              provers_[e]->r5();
-//            }
-//          }
-//        }, t * M / nthreads_, (t + 1) == nthreads_ ? M : (t + 1) * M / nthreads_, t));
-//  }
-//  std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
-//
-//  osuCrypto::SHA1 sha_h_psi(sizeof(block));
-//
-//  for (auto e = 0; e < M; ++e) {
-//    if (!E_[e]) {
-//      sha_h_psi.Update(provers_[e]->psi_);
-//
-//      //std::cout << "WE " << e << " " << w_[e_it].halves[0] << " " << w_[e_it].halves[1] << std::endl;
-//      //std::cout << "PSI " << e << " " << psi_[e_it].halves[0] << psi_[e_it].halves[1] << std::endl;
-//    }
-//  }
-//
-//  sha_h_psi.Final(h_psi_);
-//
-//  h_psi = h_psi_;
-//}
-//
 
 template <class FieldType>
 void SacProverLogic<FieldType>::r5(const std::vector<int> &i_bar, block &seed_global, std::vector<std::vector<block>> &seed_tree,

@@ -23,6 +23,9 @@ public:
   }
   ~SacVerifierParty() {
     debug("Destructing SacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
+
+    free2Darray<FieldType>(a_);
+    free1Darray<FieldType>(t_);
   }
 
   virtual int init(int argc, const char* const argv[]);
@@ -35,8 +38,8 @@ protected:
   virtual int negotiateParameters();
 
   // Public known values
-  std::vector<std::vector<FieldType>> a_;
-  std::vector<FieldType> t_;
+  FieldType **a_;
+  FieldType *t_;
 
   Parameters par_;
 
@@ -99,8 +102,7 @@ template<class FieldType>
 int SacVerifierParty<FieldType>::negotiateParameters() {
   debug("Negotiating protocol parameters..." << std::endl);
 
-  iovec iov[1];
-  ssize_t nwritten, nread;
+  iovec iov[2];
 
   int protocol_type = SacVerifierParty::PROTOCOL_TYPE;
 
@@ -108,27 +110,23 @@ int SacVerifierParty<FieldType>::negotiateParameters() {
 
   iov[0].iov_base = &protocol_type;
   iov[0].iov_len = sizeof(protocol_type);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  this->writevWrapper(iov, 1, iov[0].iov_len);
 
   debug("done" << std::endl);
   debug("\tTransmitting field characteristic ... ");
-
 
   uint64_t q = FieldType::p;
 
   iov[0].iov_base = &q;
   iov[0].iov_len = sizeof(q);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  this->writevWrapper(iov, 1, iov[0].iov_len);
 
   debug("done" << std::endl);
   debug("\tReceiving protocol parameters... ");
 
   iov[0].iov_base = &this->par_;
   iov[0].iov_len = sizeof(this->par_);
-  nread = readv(this->sock_, iov, 1);
-  assert (nread == (int)iov[0].iov_len);
+  this->readvWrapper(iov, 1, iov[0].iov_len);
 
   debug("done" << std::endl);
   debug("\t\tM: " << this->par_.M << std::endl);
@@ -137,21 +135,14 @@ int SacVerifierParty<FieldType>::negotiateParameters() {
   debug("\t\tm: " << this->par_.m << std::endl);
   debug("\tReceiving protocol public data... ");
 
-  iovec *iov2 = new iovec[par_.n + 1];
+  a_ = allocate2D<FieldType>(par_.n, par_.m);
+  t_ = allocate1D<FieldType>(par_.n);
 
-  a_.resize(par_.n);
-  for (auto i = 0; i < par_.n; ++i) {
-    a_[i].resize(par_.m);
-    iov2[i].iov_base = a_[i].data();
-    iov2[i].iov_len = a_[i].size() * sizeof(a_[i][0]);
-  }
-  t_.resize(par_.n);
-  iov2[par_.n].iov_base = t_.data();
-  iov2[par_.n].iov_len = t_.size() * sizeof(t_[0]);
-  nread = readv(this->sock_, iov2, par_.n + 1);
-  assert (nread == (int)iov2[0].iov_len * par_.n + (int)iov2[par_.n].iov_len);
-
-  delete[] iov2;
+  iov[0].iov_base = a_[0];
+  iov[0].iov_len = par_.n * par_.m * sizeof(FieldType);
+  iov[1].iov_base = t_;
+  iov[1].iov_len = par_.n * sizeof(FieldType);
+  this->readvWrapper(iov, 2, iov[0].iov_len + iov[1].iov_len);
 
   debug("done" << std::endl);
   debug("Negotiating protocol parameters... done" << std::endl);
@@ -163,23 +154,28 @@ template<class FieldType>
 bool SacVerifierParty<FieldType>::runOnline() {
   SacVerifierLogic<FieldType> v(par_, a_, t_, multi_threaded_);
 
-  iovec *iov = new iovec[par_.M * 5 + 4]; // 1 + par_.M + 1 + par_.M + 2 + par_.M * 3
-  ssize_t nwritten, nread;
+  iovec iov[9];
+
+  debug("Online phase:" << std::endl);
 
   // ** Round 1 output **
   block h_gamma;
   iov[0].iov_base = &h_gamma;
   iov[0].iov_len = sizeof(h_gamma);
-  nread = readv(this->sock_, iov, 1);
-  assert (nread == (int)iov[0].iov_len);
+  debug("\tReceiving output of round #1... ");
+  this->readvWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
 
   // ** Round 2 **
   block seed_ell;
+  debug("\tExecuting round #2... ");
   v.r2(h_gamma, seed_ell); // Run round 2
+  debug("done" << std::endl);
   iov[0].iov_base = &seed_ell;
   iov[0].iov_len = sizeof(seed_ell);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  debug("\tSending output of round #2... ");
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
 
   // ** Round 3 output **
   block h_pi, h_psi, h_theta;
@@ -189,16 +185,20 @@ bool SacVerifierParty<FieldType>::runOnline() {
   iov[1].iov_len = sizeof(h_psi);
   iov[2].iov_base = &h_theta;
   iov[2].iov_len = sizeof(h_theta);
-  nread = readv(this->sock_, iov, 3);
-  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len + iov[2].iov_len));
+  debug("\tReceiving output of round #3... ");
+  this->readvWrapper(iov, 3, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len);
+  debug("done" << std::endl);
 
   // ** Round 4 **
   std::vector<int> i_bar;
+  debug("\tExecuting round #4... ");
   v.r4(h_pi, h_psi, h_theta, i_bar); // Run round 4
+  debug("done" << std::endl);
   iov[0].iov_base = i_bar.data();
   iov[0].iov_len = i_bar.size() * sizeof(i_bar[0]);
-  nwritten = writev(this->sock_, iov, 1);
-  assert (nwritten == (int)iov[0].iov_len);
+  debug("\tSending output of round #4... ");
+  this->writevWrapper(iov, 1, iov[0].iov_len);
+  debug("done" << std::endl);
 
   // ** Round 5 output **
   block seed_global;
@@ -206,55 +206,90 @@ bool SacVerifierParty<FieldType>::runOnline() {
   std::vector<block> gamma_i_bar(par_.M);
   std::vector<std::vector<FieldType>> alpha_i_bar(par_.M), b_square(par_.M), s(par_.M), s_square(par_.M);
   std::vector<FieldType> o_i_bar(par_.M), v_i_bar(par_.M);
-  auto iov_id = 0;
-  iov[iov_id].iov_base = &seed_global;
-  iov[iov_id++].iov_len = sizeof(seed_global);
-  for (auto i = 0; i < par_.M; ++i) {
-    seed_tree[i].resize(log(par_.N)/log(2));
-    iov[iov_id].iov_base = seed_tree[i].data();
-    iov[iov_id++].iov_len = seed_tree[i].size() * sizeof(seed_tree[i][0]);
-  }
-  iov[iov_id].iov_base = gamma_i_bar.data();
-  iov[iov_id++].iov_len = gamma_i_bar.size() * sizeof(gamma_i_bar[0]);
-  for (auto i = 0; i < par_.M; ++i) {
-    alpha_i_bar[i].resize(par_.m);
-    iov[iov_id].iov_base = alpha_i_bar[i].data();
-    iov[iov_id++].iov_len = alpha_i_bar[i].size() * sizeof(alpha_i_bar[i][0]);
-  }
-  iov[iov_id].iov_base = o_i_bar.data();
-  iov[iov_id++].iov_len = o_i_bar.size() * sizeof(o_i_bar[0]);
-  iov[iov_id].iov_base = v_i_bar.data();
-  iov[iov_id++].iov_len = v_i_bar.size() * sizeof(v_i_bar[0]);
+
   int i_id = 0;
   for (auto e = 0; e < par_.M; ++e) {
     if (v.verifiers_[e]->i_bar_ != par_.N - 1) {
-      b_square[e].resize(par_.m);
-      iov[iov_id].iov_base = b_square[e].data();
-      iov[iov_id++].iov_len = b_square[e].size() * sizeof(b_square[e][0]);
-      s[e].resize(par_.m);
-      iov[iov_id].iov_base = s[e].data();
-      iov[iov_id++].iov_len = s[e].size() * sizeof(s[e][0]);
-      s_square[e].resize(par_.m);
-      iov[iov_id].iov_base = s_square[e].data();
-      iov[iov_id++].iov_len = s_square[e].size() * sizeof(s_square[e][0]);
-
-      i_id += 3;
+      i_id++;
     }
   }
-  nread = readv(this->sock_, iov, 1 + par_.M + 1 + par_.M + 2 + i_id);
-  assert (nread == (int)(iov[0].iov_len + iov[1].iov_len * par_.M + iov[par_.M + 1].iov_len +
-                            iov[par_.M + 2].iov_len * par_.M + iov[2 * par_.M + 2].iov_len + iov[2 * par_.M + 3].iov_len +
-                            iov[2 * par_.M + 4].iov_len * i_id));
 
+  block **seed_tree_f = allocate2D<block>(par_.M, (int)(log(par_.N) / log(2)));
+  FieldType **alpha_i_bar_f = allocate2D<FieldType>(par_.M, par_.m);
+  FieldType **b_square_f = allocate2D<FieldType>(i_id, par_.m);
+  FieldType **s_f = allocate2D<FieldType>(i_id, par_.m);
+  FieldType **s_square_f = allocate2D<FieldType>(i_id, par_.m);
+
+  iov[0].iov_base = &seed_global;
+  iov[0].iov_len = sizeof(seed_global);
+  iov[1].iov_base = seed_tree_f[0];
+  iov[1].iov_len = par_.M * (int)(log(par_.N) / log(2)) * sizeof(block);
+  iov[2].iov_base = gamma_i_bar.data();
+  iov[2].iov_len = gamma_i_bar.size() * sizeof(gamma_i_bar[0]);
+  iov[3].iov_base = alpha_i_bar_f[0];
+  iov[3].iov_len = par_.M * par_.m * sizeof(FieldType);
+  iov[4].iov_base = o_i_bar.data();
+  iov[4].iov_len = o_i_bar.size() * sizeof(o_i_bar[0]);
+  iov[5].iov_base = v_i_bar.data();
+  iov[5].iov_len = v_i_bar.size() * sizeof(v_i_bar[0]);
+  iov[6].iov_base = b_square_f[0];
+  iov[6].iov_len = i_id * par_.m * sizeof(FieldType);
+  iov[7].iov_base = s_f[0];
+  iov[7].iov_len = i_id * par_.m * sizeof(FieldType);
+  iov[8].iov_base = s_square_f[0];
+  iov[8].iov_len = i_id * par_.m * sizeof(FieldType);
+  debug("\tReceiving output of round #5... ");
+  this->readvWrapper(iov, 9, iov[0].iov_len + iov[1].iov_len + iov[2].iov_len + iov[3].iov_len +
+                             iov[4].iov_len + iov[5].iov_len + iov[6].iov_len + iov[7].iov_len +
+                             iov[8].iov_len);
+  debug("done" << std::endl);
+
+  for (auto i = 0; i < par_.M; ++i) {
+    seed_tree[i].resize((int)(log(par_.N) / log(2)));
+    alpha_i_bar[i].resize(par_.m);
+
+    memcpy(seed_tree[i].data(), seed_tree_f[i], (int)(log(par_.N) / log(2)) * sizeof(block));
+    memcpy(alpha_i_bar[i].data(), alpha_i_bar_f[i], par_.m * sizeof(FieldType));
+  }
+
+  i_id = 0;
+  for (auto e = 0, e_id = 0; e < par_.M; ++e) {
+    if (v.verifiers_[e]->i_bar_ != par_.N - 1) {
+      b_square[e].resize(par_.m);
+      s[e].resize(par_.m);
+      s_square[e].resize(par_.m);
+
+      memcpy(b_square[e].data(), b_square_f[i_id], par_.m * sizeof(FieldType));
+      memcpy(s[e].data(), s_f[i_id], par_.m * sizeof(FieldType));
+      memcpy(s_square[e].data(), s_square_f[i_id], par_.m * sizeof(FieldType));
+
+      i_id++;
+    }
+
+    e_id++;
+  }
 
   bool flag = v.r6(seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 6
 
+  debug(std::endl);
   if (flag)
-    std::cout << "Proof accepted" << std::endl;
+    std::cout << "\tProof accepted" << std::endl;
   else
-    std::cout << "Proof rejected" << std::endl;
+    std::cout << "\tProof rejected" << std::endl;
 
-  delete[] iov;
+//  iov[0].iov_base = &flag;
+//  iov[0].iov_len = sizeof(flag);
+//  debug("\tSending protocol output... ");
+//  this->writevWrapper(iov, 1, iov[0].iov_len);
+//  debug("done" << std::endl);
+
+  debug("Online phase... done" << std::endl);
+
+  free2Darray<block>(seed_tree_f);
+  free2Darray<FieldType>(alpha_i_bar_f);
+  free2Darray<FieldType>(b_square_f);
+  free2Darray<FieldType>(s_f);
+  free2Darray<FieldType>(s_square_f);
 
   return true;
 }

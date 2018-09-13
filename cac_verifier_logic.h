@@ -248,21 +248,18 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
 
   block h_gamma_computed;
   sha_h_gamma.Final(h_gamma_computed);
-
   if (!eq(h_gamma_.b, h_gamma_computed.b))
     return false;
 
   // 3
   block pi;
   sha_h_pi.Final(pi);
-
   if (!eq(pi.b, h_pi_.b))
     return false;
 
   // 4
   block psi;
   sha_h_psi.Final(psi);
-
   if (!eq(psi.b, h_psi_.b))
     return false;
 

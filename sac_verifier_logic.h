@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class SacVerifierLogic {
 public:
-  SacVerifierLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded = false);
+  SacVerifierLogic(const Parameters &s, FieldType **&a, FieldType *&t, bool multi_threaded = false);
   ~SacVerifierLogic();
 
   void r2(const block &h_gamma, block &seed_ell);
@@ -30,8 +30,8 @@ public:
 private:
 public:
   // Public known values
-  const std::vector<std::vector<FieldType>> &a_;
-  const std::vector<FieldType> &t_;
+  FieldType **&a_;
+  FieldType *&t_;
 
   const Parameters &par_;
   const int M;
@@ -57,7 +57,7 @@ public:
 
 
 template <class FieldType>
-SacVerifierLogic<FieldType>::SacVerifierLogic(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, bool multi_threaded)
+SacVerifierLogic<FieldType>::SacVerifierLogic(const Parameters &s, FieldType **&a, FieldType *&t, bool multi_threaded)
     : a_(a), t_(t), par_(s), M(s.M), N(s.N), n(s.n), m(s.m) {
   if (multi_threaded)
     nthreads_ = std::thread::hardware_concurrency();
@@ -172,7 +172,6 @@ bool SacVerifierLogic<FieldType>::r6(const block &seed_global, const std::vector
 
   block h_gamma_computed;
   sha_h_gamma.Final(h_gamma_computed);
-
   if (!eq(h_gamma_.b, h_gamma_computed.b))
     return false;
 

@@ -290,7 +290,7 @@ bool CacVerifierParty<FieldType>::runOnline() {
 
   bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 8
 
-  debug(std::endl;)
+  debug(std::endl);
   if (flag)
     std::cout << "\tProof accepted" << std::endl;
   else

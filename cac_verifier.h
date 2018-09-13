@@ -10,8 +10,6 @@
 #include "seedtree.h"
 #include "parameters.h"
 
-//#include <NTL/ZZ_p.h>
-
 
 namespace lzkp {
 

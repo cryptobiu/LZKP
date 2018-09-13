@@ -9,14 +9,13 @@
 #include "parameters.h"
 
 
-
 namespace lzkp {
 
 
 template <class FieldType>
 class SacProver {
 public:
-  SacProver(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret);
+  SacProver(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret);
   ~SacProver();
 
   void r1(const block &master_seed);
@@ -28,11 +27,11 @@ public:
 private:
 public:
   // Public known values
-  const std::vector<std::vector<FieldType>> &a_;
-  const std::vector<FieldType> &t_;
+  FieldType **&a_;
+  FieldType *&t_;
 
   // CacProver's secret
-  const std::vector<FieldType> secret_;
+  FieldType *&secret_;
 
   const int N;
   const int n;
@@ -65,19 +64,10 @@ public:
   block theta_;
 
   int i_bar_;
-
-//  block gN_; // g_{e,N}
-//  block omegaN_;
-
-//
-//  std::vector<FieldType> coefficients_;
-
-//  block w_;
-//
 };
 
 template <class FieldType>
-SacProver<FieldType>::SacProver(const Parameters &s, const std::vector<std::vector<FieldType>> &a, const std::vector<FieldType> &t, const std::vector<FieldType> &secret)
+SacProver<FieldType>::SacProver(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret)
     : a_(a), t_(t), secret_(secret), N(s.N), n(s.n), m(s.m) {
 }
 
