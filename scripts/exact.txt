@@ -1,0 +1,429 @@
+M    N    q    Optimal tau for 2^(-40)  M - tau (40)        Optimal tau for 2^(-80)  M - tau (80)        
+5    2    15   None                                         None                                         
+5    2    31   None                                         None                                         
+5    2    59   None                                         None                                         
+5    2    61   None                                         None                                         
+5    4    15   None                                         None                                         
+5    4    31   None                                         None                                         
+5    4    59   None                                         None                                         
+5    4    61   None                                         None                                         
+5    8    15   None                                         None                                         
+5    8    31   None                                         None                                         
+5    8    59   None                                         None                                         
+5    8    61   None                                         None                                         
+5    16   15   None                                         None                                         
+5    16   31   None                                         None                                         
+5    16   59   None                                         None                                         
+5    16   61   None                                         None                                         
+5    32   15   None                                         None                                         
+5    32   31   None                                         None                                         
+5    32   59   None                                         None                                         
+5    32   61   None                                         None                                         
+5    64   15   None                                         None                                         
+5    64   31   None                                         None                                         
+5    64   59   None                                         None                                         
+5    64   61   None                                         None                                         
+15   2    15   None                                         None                                         
+15   2    31   None                                         None                                         
+15   2    59   None                                         None                                         
+15   2    61   None                                         None                                         
+15   4    15   None                                         None                                         
+15   4    31   None                                         None                                         
+15   4    59   None                                         None                                         
+15   4    61   None                                         None                                         
+15   8    15   None                                         None                                         
+15   8    31   None                                         None                                         
+15   8    59   None                                         None                                         
+15   8    61   None                                         None                                         
+15   16   15   None                                         None                                         
+15   16   31   None                                         None                                         
+15   16   59   None                                         None                                         
+15   16   61   None                                         None                                         
+15   32   15   None                                         None                                         
+15   32   31   None                                         None                                         
+15   32   59   None                                         None                                         
+15   32   61   None                                         None                                         
+15   64   15   None                                         None                                         
+15   64   31   None                                         None                                         
+15   64   59   None                                         None                                         
+15   64   61   None                                         None                                         
+25   2    15   None                                         None                                         
+25   2    31   None                                         None                                         
+25   2    59   None                                         None                                         
+25   2    61   None                                         None                                         
+25   4    15   None                                         None                                         
+25   4    31   None                                         None                                         
+25   4    59   None                                         None                                         
+25   4    61   None                                         None                                         
+25   8    15   None                                         None                                         
+25   8    31   None                                         None                                         
+25   8    59   None                                         None                                         
+25   8    61   None                                         None                                         
+25   16   15   None                                         None                                         
+25   16   31   None                                         None                                         
+25   16   59   None                                         None                                         
+25   16   61   None                                         None                                         
+25   32   15   None                                         None                                         
+25   32   31   None                                         None                                         
+25   32   59   None                                         None                                         
+25   32   61   None                                         None                                         
+25   64   15   None                                         None                                         
+25   64   31   None                                         None                                         
+25   64   59   None                                         None                                         
+25   64   61   None                                         None                                         
+35   2    15   None                                         None                                         
+35   2    31   None                                         None                                         
+35   2    59   None                                         None                                         
+35   2    61   None                                         None                                         
+35   4    15   None                                         None                                         
+35   4    31   None                                         None                                         
+35   4    59   None                                         None                                         
+35   4    61   None                                         None                                         
+35   8    15   None                                         None                                         
+35   8    31   None                                         None                                         
+35   8    59   None                                         None                                         
+35   8    61   None                                         None                                         
+35   16   15   None                                         None                                         
+35   16   31   None                                         None                                         
+35   16   59   None                                         None                                         
+35   16   61   None                                         None                                         
+35   32   15   None                                         None                                         
+35   32   31   None                                         None                                         
+35   32   59   None                                         None                                         
+35   32   61   None                                         None                                         
+35   64   15   None                                         None                                         
+35   64   31   None                                         None                                         
+35   64   59   None                                         None                                         
+35   64   61   None                                         None                                         
+45   2    15   None                                         None                                         
+45   2    31   None                                         None                                         
+45   2    59   None                                         None                                         
+45   2    61   None                                         None                                         
+45   4    15   None                                         None                                         
+45   4    31   None                                         None                                         
+45   4    59   None                                         None                                         
+45   4    61   None                                         None                                         
+45   8    15   None                                         None                                         
+45   8    31   None                                         None                                         
+45   8    59   None                                         None                                         
+45   8    61   None                                         None                                         
+45   16   15   26                       19                  None                                         
+45   16   31   None                                         None                                         
+45   16   59   None                                         None                                         
+45   16   61   None                                         None                                         
+45   32   15   26                       19                  None                                         
+45   32   31   28                       17                  None                                         
+45   32   59   None                                         None                                         
+45   32   61   None                                         None                                         
+45   64   15   26                       19                  None                                         
+45   64   31   28                       17                  None                                         
+45   64   59   28                       17                  None                                         
+45   64   61   28                       17                  None                                         
+55   2    15   None                                         None                                         
+55   2    31   None                                         None                                         
+55   2    59   None                                         None                                         
+55   2    61   None                                         None                                         
+55   4    15   None                                         None                                         
+55   4    31   None                                         None                                         
+55   4    59   None                                         None                                         
+55   4    61   None                                         None                                         
+55   8    15   None                                         None                                         
+55   8    31   None                                         None                                         
+55   8    59   None                                         None                                         
+55   8    61   None                                         None                                         
+55   16   15   40                       15                  None                                         
+55   16   31   None                                         None                                         
+55   16   59   None                                         None                                         
+55   16   61   None                                         None                                         
+55   32   15   40                       15                  None                                         
+55   32   31   41                       14                  None                                         
+55   32   59   None                                         None                                         
+55   32   61   None                                         None                                         
+55   64   15   40                       15                  None                                         
+55   64   31   41                       14                  None                                         
+55   64   59   42                       13                  None                                         
+55   64   61   42                       13                  None                                         
+65   2    15   None                                         None                                         
+65   2    31   None                                         None                                         
+65   2    59   None                                         None                                         
+65   2    61   None                                         None                                         
+65   4    15   None                                         None                                         
+65   4    31   None                                         None                                         
+65   4    59   None                                         None                                         
+65   4    61   None                                         None                                         
+65   8    15   None                                         None                                         
+65   8    31   None                                         None                                         
+65   8    59   None                                         None                                         
+65   8    61   None                                         None                                         
+65   16   15   52                       13                  None                                         
+65   16   31   None                                         None                                         
+65   16   59   None                                         None                                         
+65   16   61   None                                         None                                         
+65   32   15   52                       13                  None                                         
+65   32   31   53                       12                  None                                         
+65   32   59   None                                         None                                         
+65   32   61   None                                         None                                         
+65   64   15   52                       13                  None                                         
+65   64   31   53                       12                  None                                         
+65   64   59   53                       12                  None                                         
+65   64   61   53                       12                  None                                         
+75   2    15   None                                         None                                         
+75   2    31   None                                         None                                         
+75   2    59   None                                         None                                         
+75   2    61   None                                         None                                         
+75   4    15   None                                         None                                         
+75   4    31   None                                         None                                         
+75   4    59   None                                         None                                         
+75   4    61   None                                         None                                         
+75   8    15   32                       43                  None                                         
+75   8    31   None                                         None                                         
+75   8    59   None                                         None                                         
+75   8    61   None                                         None                                         
+75   16   15   63                       12                  None                                         
+75   16   31   31                       44                  None                                         
+75   16   59   None                                         None                                         
+75   16   61   None                                         None                                         
+75   32   15   63                       12                  None                                         
+75   32   31   64                       11                  None                                         
+75   32   59   35                       40                  None                                         
+75   32   61   33                       42                  None                                         
+75   64   15   63                       12                  None                                         
+75   64   31   64                       11                  None                                         
+75   64   59   64                       11                  None                                         
+75   64   61   64                       11                  None                                         
+85   2    15   None                                         None                                         
+85   2    31   None                                         None                                         
+85   2    59   None                                         None                                         
+85   2    61   None                                         None                                         
+85   4    15   None                                         None                                         
+85   4    31   None                                         None                                         
+85   4    59   None                                         None                                         
+85   4    61   None                                         None                                         
+85   8    15   43                       42                  None                                         
+85   8    31   None                                         None                                         
+85   8    59   None                                         None                                         
+85   8    61   None                                         None                                         
+85   16   15   73                       12                  None                                         
+85   16   31   42                       43                  None                                         
+85   16   59   None                                         None                                         
+85   16   61   None                                         None                                         
+85   32   15   73                       12                  None                                         
+85   32   31   74                       11                  47                       38                  
+85   32   59   46                       39                  None                                         
+85   32   61   44                       41                  None                                         
+85   64   15   73                       12                  None                                         
+85   64   31   74                       11                  47                       38                  
+85   64   59   75                       10                  49                       36                  
+85   64   61   75                       10                  49                       36                  
+95   2    15   None                                         None                                         
+95   2    31   None                                         None                                         
+95   2    59   None                                         None                                         
+95   2    61   None                                         None                                         
+95   4    15   None                                         None                                         
+95   4    31   None                                         None                                         
+95   4    59   None                                         None                                         
+95   4    61   None                                         None                                         
+95   8    15   52                       43                  None                                         
+95   8    31   None                                         None                                         
+95   8    59   None                                         None                                         
+95   8    61   None                                         None                                         
+95   16   15   84                       11                  63                       32                  
+95   16   31   52                       43                  None                                         
+95   16   59   None                                         None                                         
+95   16   61   None                                         None                                         
+95   32   15   84                       11                  63                       32                  
+95   32   31   85                       10                  65                       30                  
+95   32   59   55                       40                  None                                         
+95   32   61   53                       42                  None                                         
+95   64   15   84                       11                  63                       32                  
+95   64   31   85                       10                  65                       30                  
+95   64   59   85                       10                  66                       29                  
+95   64   61   85                       10                  66                       29                  
+105  2    15   None                                         None                                         
+105  2    31   None                                         None                                         
+105  2    59   None                                         None                                         
+105  2    61   None                                         None                                         
+105  4    15   None                                         None                                         
+105  4    31   None                                         None                                         
+105  4    59   None                                         None                                         
+105  4    61   None                                         None                                         
+105  8    15   61                       44                  None                                         
+105  8    31   None                                         None                                         
+105  8    59   None                                         None                                         
+105  8    61   None                                         None                                         
+105  16   15   94                       11                  76                       29                  
+105  16   31   61                       44                  None                                         
+105  16   59   None                                         None                                         
+105  16   61   None                                         None                                         
+105  32   15   94                       11                  76                       29                  
+105  32   31   95                       10                  78                       27                  
+105  32   59   64                       41                  None                                         
+105  32   61   62                       43                  None                                         
+105  64   15   94                       11                  76                       29                  
+105  64   31   95                       10                  78                       27                  
+105  64   59   96                       9                   79                       26                  
+105  64   61   96                       9                   79                       26                  
+115  2    15   None                                         None                                         
+115  2    31   None                                         None                                         
+115  2    59   None                                         None                                         
+115  2    61   None                                         None                                         
+115  4    15   None                                         None                                         
+115  4    31   None                                         None                                         
+115  4    59   None                                         None                                         
+115  4    61   None                                         None                                         
+115  8    15   69                       46                  None                                         
+115  8    31   None                                         None                                         
+115  8    59   None                                         None                                         
+115  8    61   None                                         None                                         
+115  16   15   104                      11                  88                       27                  
+115  16   31   69                       46                  None                                         
+115  16   59   None                                         None                                         
+115  16   61   None                                         None                                         
+115  32   15   104                      11                  88                       27                  
+115  32   31   105                      10                  90                       25                  
+115  32   59   73                       42                  None                                         
+115  32   61   71                       44                  None                                         
+115  64   15   104                      11                  88                       27                  
+115  64   31   105                      10                  90                       25                  
+115  64   59   106                      9                   91                       24                  
+115  64   61   106                      9                   91                       24                  
+125  2    15   None                                         None                                         
+125  2    31   None                                         None                                         
+125  2    59   None                                         None                                         
+125  2    61   None                                         None                                         
+125  4    15   None                                         None                                         
+125  4    31   None                                         None                                         
+125  4    59   None                                         None                                         
+125  4    61   None                                         None                                         
+125  8    15   77                       48                  None                                         
+125  8    31   None                                         None                                         
+125  8    59   None                                         None                                         
+125  8    61   None                                         None                                         
+125  16   15   114                      11                  99                       26                  
+125  16   31   77                       48                  None                                         
+125  16   59   None                                         None                                         
+125  16   61   None                                         None                                         
+125  32   15   114                      11                  99                       26                  
+125  32   31   116                      9                   101                      24                  
+125  32   59   81                       44                  None                                         
+125  32   61   79                       46                  None                                         
+125  64   15   114                      11                  99                       26                  
+125  64   31   116                      9                   101                      24                  
+125  64   59   116                      9                   102                      23                  
+125  64   61   116                      9                   102                      23                  
+135  2    15   None                                         None                                         
+135  2    31   None                                         None                                         
+135  2    59   None                                         None                                         
+135  2    61   None                                         None                                         
+135  4    15   33                       102                 None                                         
+135  4    31   None                                         None                                         
+135  4    59   None                                         None                                         
+135  4    61   None                                         None                                         
+135  8    15   85                       50                  None                                         
+135  8    31   33                       102                 None                                         
+135  8    59   None                                         None                                         
+135  8    61   None                                         None                                         
+135  16   15   124                      11                  110                      25                  
+135  16   31   85                       50                  None                                         
+135  16   59   38                       97                  None                                         
+135  16   61   35                       100                 None                                         
+135  32   15   124                      11                  110                      25                  
+135  32   31   126                      9                   113                      22                  
+135  32   59   90                       45                  52                       83                  
+135  32   61   87                       48                  None                                         
+135  64   15   124                      11                  110                      25                  
+135  64   31   126                      9                   113                      22                  
+135  64   59   126                      9                   113                      22                  
+135  64   61   126                      9                   113                      22                  
+145  2    15   None                                         None                                         
+145  2    31   None                                         None                                         
+145  2    59   None                                         None                                         
+145  2    61   None                                         None                                         
+145  4    15   41                       104                 None                                         
+145  4    31   None                                         None                                         
+145  4    59   None                                         None                                         
+145  4    61   None                                         None                                         
+145  8    15   93                       52                  59                       86                  
+145  8    31   41                       104                 None                                         
+145  8    59   None                                         None                                         
+145  8    61   None                                         None                                         
+145  16   15   134                      11                  121                      24                  
+145  16   31   93                       52                  59                       86                  
+145  16   59   46                       99                  None                                         
+145  16   61   43                       102                 None                                         
+145  32   15   134                      11                  121                      24                  
+145  32   31   136                      9                   123                      22                  
+145  32   59   98                       47                  68                       77                  
+145  32   61   95                       50                  63                       82                  
+145  64   15   134                      11                  121                      24                  
+145  64   31   136                      9                   123                      22                  
+145  64   59   137                      8                   124                      21                  
+145  64   61   137                      8                   124                      21                  
+155  2    15   None                                         None                                         
+155  2    31   None                                         None                                         
+155  2    59   None                                         None                                         
+155  2    61   None                                         None                                         
+155  4    15   48                       107                 None                                         
+155  4    31   None                                         None                                         
+155  4    59   None                                         None                                         
+155  4    61   None                                         None                                         
+155  8    15   101                      54                  72                       83                  
+155  8    31   48                       107                 None                                         
+155  8    59   None                                         None                                         
+155  8    61   None                                         None                                         
+155  16   15   144                      11                  132                      23                  
+155  16   31   101                      54                  72                       83                  
+155  16   59   52                       103                 None                                         
+155  16   61   50                       105                 None                                         
+155  32   15   144                      11                  132                      23                  
+155  32   31   146                      9                   134                      21                  
+155  32   59   106                      49                  79                       76                  
+155  32   61   104                      51                  75                       80                  
+155  64   15   144                      11                  132                      23                  
+155  64   31   146                      9                   134                      21                  
+155  64   59   147                      8                   135                      20                  
+155  64   61   147                      8                   135                      20                  
+165  2    15   None                                         None                                         
+165  2    31   None                                         None                                         
+165  2    59   None                                         None                                         
+165  2    61   None                                         None                                         
+165  4    15   54                       111                 None                                         
+165  4    31   None                                         None                                         
+165  4    59   None                                         None                                         
+165  4    61   None                                         None                                         
+165  8    15   109                      56                  83                       82                  
+165  8    31   54                       111                 None                                         
+165  8    59   None                                         None                                         
+165  8    61   None                                         None                                         
+165  16   15   154                      11                  142                      23                  
+165  16   31   109                      56                  82                       83                  
+165  16   59   59                       106                 None                                         
+165  16   61   56                       109                 None                                         
+165  32   15   154                      11                  142                      23                  
+165  32   31   156                      9                   145                      20                  
+165  32   59   114                      51                  89                       76                  
+165  32   61   112                      53                  86                       79                  
+165  64   15   154                      11                  142                      23                  
+165  64   31   156                      9                   145                      20                  
+165  64   59   157                      8                   146                      19                  
+165  64   61   157                      8                   146                      19                  
+175  2    15   None                                         None                                         
+175  2    31   None                                         None                                         
+175  2    59   None                                         None                                         
+175  2    61   None                                         None                                         
+175  4    15   60                       115                 None                                         
+175  4    31   None                                         None                                         
+175  4    59   None                                         None                                         
+175  4    61   None                                         None                                         
+175  8    15   117                      58                  92                       83                  
+175  8    31   60                       115                 None                                         
+175  8    59   None                                         None                                         
+175  8    61   None                                         None                                         
+175  16   15   164                      11                  152                      23                  
+175  16   31   117                      58                  92                       83                  
+175  16   59   65                       110                 None                                         
+175  16   61   62                       113                 None                                         
+175  32   15   164                      11                  152                      23                  
+175  32   31   166                      9                   155                      20                  
+175  32   59   122                      53                  99                       76                  
+175  32   61   120                      55                  95                       80                  
