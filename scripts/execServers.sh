@@ -8,12 +8,13 @@ git log -1 | head -1 > measurements.txt
 date +"%Y/%m/%d %H:%M:%S.%N" >> measurements.txt
 
 
-q=()
-n=()
-m=()
+# Parameters are going in parallel, first entry of each parameter are corresponding
+q=()	# e.g q=("31")
+n=()	# e.g n=("256")
+m=()	# e.g m=("1024")
 
-N=()
-M=()
+N=()	# e.g. N=("2")
+M=()	# Split with : for multiple values e.g. M=("40:80")
 tau=()
 echo "protocol 1" >> measurements.txt
 for((p=0;p<${#q[@]};p++)); do
@@ -42,12 +43,12 @@ for((p=0;p<${#q[@]};p++)); do
 done
 
 
-q=("15" "15" "31" "61")
-n=("256" "256" "512" "1024")
-m=("1024" "4096" "2048" "4096")
+q=()
+n=()
+m=()
 
-N=("2" "4" "8" "16")
-M=("40:80" "20:40" "14:27" "10:20")
+N=()
+M=()
 echo "protocol 2" >> measurements.txt
 for((p=0;p<${#q[@]};p++)); do
     MM=(${M[$i]//:/ })

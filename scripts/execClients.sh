@@ -8,6 +8,7 @@ NUM_TRIALS=10
 git log -1 | head -1 > results.txt
 date +"%Y/%m/%d %H:%M:%S.%N" >> results.txt
 
+# Best to copy parameters section from execServers config file
 q=()
 n=()
 m=()
@@ -39,12 +40,12 @@ for((p=0;p<${#q[@]};p++)); do
 done
 
 
-q=("15" "15" "31" "61")
-n=("256" "256" "512" "1024")
-m=("1024" "4096" "2048" "4096")
+q=()
+n=()
+m=()
 
-N=("2" "4" "8" "16")
-M=("40:80" "20:40" "14:27" "10:20")
+N=()
+M=()
 for((p=0;p<${#q[@]};p++)); do
     MM=(${M[$i]//:/ })
 
