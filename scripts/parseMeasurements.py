@@ -74,7 +74,7 @@ for i_protocol, protocol in enumerate(['1', '2']):
 		MM = M[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
 
 		for _ in range(num_trials):
-			assert(results[r_id] == 'Proof accepted')
+			assert(results[r_id].split(',')[0] == '1')
 			r_id += 1
 
 		try:
@@ -83,7 +83,7 @@ for i_protocol, protocol in enumerate(['1', '2']):
 			TT = ''
 
 		for MMM, TTT in zip(MM.split(':'), TT.split(':')):
-			mmm = map(int, measurements[m_id].split())
+			mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
 			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<70}{:<10.4f}{:<10.4f}'.format(qq, nn, mm, NN, MMM, TTT, '', measurements[m_id], mean(mmm), stddev(mmm))
 			# print qq, nn, mm, NN, MMM, measurements[m_id]
 			m_id += 1

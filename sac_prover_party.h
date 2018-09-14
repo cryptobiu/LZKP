@@ -16,9 +16,9 @@ namespace lzkp {
 
 
 template <class FieldType>
-class SacProverParty : public ProverParty<FieldType> {
+class SacProverParty : public ProverParty {
 public:
-  SacProverParty() : ProverParty<FieldType>() {
+  SacProverParty() : ProverParty() {
     debug("Constructing SacProverParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
   }
   ~SacProverParty() {
@@ -234,7 +234,9 @@ bool SacProverParty<FieldType>::runOnline() {
   // ** Round 1 **
   block h_gamma;
   debug("\tExecuting round #1... ");
+  startComputationClock();
   p.r1(h_gamma); // Run round 1
+  stopComputationClock();
   debug("done" << std::endl);
   iov[0].iov_base = &h_gamma;
   iov[0].iov_len = sizeof(h_gamma);
@@ -253,7 +255,9 @@ bool SacProverParty<FieldType>::runOnline() {
   // ** Round 3 **
   block h_pi, h_psi, h_theta;
   debug("\tExecuting round #3... ");
+  startComputationClock();
   p.r3(seed_ell, h_pi, h_psi, h_theta); // Run round 3
+  stopComputationClock();
   debug("done" << std::endl);
   iov[0].iov_base = &h_pi;
   iov[0].iov_len = sizeof(h_pi);
@@ -280,7 +284,9 @@ bool SacProverParty<FieldType>::runOnline() {
   std::vector<std::vector<FieldType>> alpha_i_bar, b_square, s, s_square;
   std::vector<FieldType> o_i_bar, v_i_bar;
   debug("\tExecuting round #5... ");
+  startComputationClock();
   p.r5(i_bar, seed_global, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, v_i_bar, b_square, s, s_square); // Run round 5
+  stopComputationClock();
   debug("done" << std::endl);
 
   int i_id = 0;

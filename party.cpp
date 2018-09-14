@@ -92,3 +92,14 @@ int Party::readvWrapper(iovec *iov, int iovcnt, ssize_t nexpected) {
 
   return 0;
 }
+
+void Party::startComputationClock() {
+  computation_clock_ = std::chrono::high_resolution_clock::now();
+}
+
+void Party::stopComputationClock() {
+  auto cur_time = std::chrono::high_resolution_clock::now();
+  auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - computation_clock_);
+
+  tot_computation_time_ += dur.count();
+}

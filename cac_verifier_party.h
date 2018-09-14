@@ -16,9 +16,9 @@ namespace lzkp {
 
 
 template <class FieldType>
-class CacVerifierParty : public VerifierParty<FieldType> {
+class CacVerifierParty : public VerifierParty {
 public:
-  CacVerifierParty() : VerifierParty<FieldType>(), a_(nullptr), t_(nullptr) {
+  CacVerifierParty() : VerifierParty(), a_(nullptr), t_(nullptr) {
     debug("Constructing CacVerifierParty<" << boost::typeindex::type_id<FieldType>().pretty_name() << ">" << std::endl);
   }
 
@@ -170,7 +170,9 @@ bool CacVerifierParty<FieldType>::runOnline() {
   // ** Round 2 **
   std::vector<uint8_t> E;
   debug("\tExecuting round #2... ");
+  startComputationClock();
   v.r2(h_gamma, E); // Run round 2
+  stopComputationClock();
   debug("done" << std::endl);
   iov[0].iov_base = E.data();
   iov[0].iov_len = E.size() * sizeof(E[0]);
@@ -194,7 +196,9 @@ bool CacVerifierParty<FieldType>::runOnline() {
 //   ** Round 4 **
   block seed_ell;
   debug("\tExecuting round #4... ");
+  startComputationClock();
   v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+  stopComputationClock();
   debug("done" << std::endl);
   iov[0].iov_base = &seed_ell;
   iov[0].iov_len = sizeof(seed_ell);
@@ -213,7 +217,9 @@ bool CacVerifierParty<FieldType>::runOnline() {
   // ** Round 6 **
   std::vector<int> i_bar;
   debug("\tExecuting round #6... ");
+  startComputationClock();
   v.r6(h_psi, i_bar); // Run round 6
+  stopComputationClock();
   debug("done" << std::endl);
   iov[0].iov_base = i_bar.data();
   iov[0].iov_len = i_bar.size() * sizeof(i_bar[0]);
@@ -288,16 +294,18 @@ bool CacVerifierParty<FieldType>::runOnline() {
     e_id++;
   }
 
-  bool flag = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 8
+  startComputationClock();
+  this->is_accepted_ = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 8
+  stopComputationClock();
 
   debug(std::endl);
-  if (flag)
-    std::cout << "\tProof accepted" << std::endl;
+  if (this->is_accepted_)
+          debug("\tProof accepted" << std::endl);
   else
-    std::cout << "\tProof rejected" << std::endl;
+          debug("\tProof rejected" << std::endl);
 
-  iov[0].iov_base = &flag;
-  iov[0].iov_len = sizeof(flag);
+  iov[0].iov_base = &this->is_accepted_;
+  iov[0].iov_len = sizeof(this->is_accepted_);
   debug("\tSending protocol output... ");
   this->writevWrapper(iov, 1, iov[0].iov_len);
   debug("done" << std::endl);

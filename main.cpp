@@ -160,10 +160,11 @@ int main(int argc, char *argv[]) {
     party->runOnline();
     auto stop = std::chrono::high_resolution_clock::now();
     auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    std::cout << dur.count() - party->RTT_ << std::endl;
+    std::cout << dur.count() - party->RTT_ << "," << party->tot_computation_time_ << std::endl;
   }
   else {
     party->runOnline();
+    std::cout << dynamic_cast<VerifierParty*>(party)->isAccepted() << "," << party->tot_computation_time_ << std::endl;
   }
 
   delete party;

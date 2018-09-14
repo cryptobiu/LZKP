@@ -34,7 +34,7 @@ namespace lzkp {
 
 class Party {
 public:
-  Party() : sock_(0), RTT_(0) { }
+  Party() : sock_(0), RTT_(0), tot_computation_time_(0) { }
   virtual ~Party() { };
 
   virtual int init(int argc, const char* const argv[]) = 0;
@@ -48,11 +48,15 @@ protected:
   int readWrapper(void *buf, size_t count);
   int writevWrapper(iovec *iov, int iovcnt, ssize_t nexpected);
   int readvWrapper(iovec *iov, int iovcnt, ssize_t nexpected);
+  void startComputationClock();
+  void stopComputationClock();
 
   int sock_;
+  std::chrono::time_point<std::chrono::high_resolution_clock> computation_clock_;
 
 public:
   int RTT_;
+  int tot_computation_time_;
 };
 
 
