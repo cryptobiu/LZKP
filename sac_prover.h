@@ -3,7 +3,7 @@
 
 
 #include <stack>
-#include <cryptoTools/Crypto/sha1.h>
+#include <cryptoTools/Crypto/Blake2.h>
 
 #include "seedtree.h"
 #include "parameters.h"
@@ -140,7 +140,7 @@ void SacProver<FieldType>::r1(const block &master_seed) {
 
   // 1.f
   gamma_.resize(N);
-  osuCrypto::SHA1 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_gamma(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     block blk = seed_tree_.getSeed(i);
@@ -158,7 +158,7 @@ void SacProver<FieldType>::r1(const block &master_seed) {
   }
 
   // 1.g
-  osuCrypto::SHA1 sha_h(sizeof(block));
+  osuCrypto::Blake2 sha_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     sha_h.Update(gamma_[i]);
   }
@@ -192,7 +192,7 @@ void SacProver<FieldType>::r3() {
     alpha_sum_[mm] = FieldType(0); // For step 3.b
   }
 
-  osuCrypto::SHA1 sha_pi(sizeof(block)); // For step 3.c
+  osuCrypto::Blake2 sha_pi(sizeof(block)); // For step 3.c
 
   for (auto i = 0; i < N; ++i) {
     for (auto k = 0; k < m; ++k) {
@@ -208,7 +208,7 @@ void SacProver<FieldType>::r3() {
   // 3.d + 3.e
   o_.resize(N);
 
-  osuCrypto::SHA1 sha_psi(sizeof(block));
+  osuCrypto::Blake2 sha_psi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
@@ -243,7 +243,7 @@ void SacProver<FieldType>::r3() {
     de_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
   }
 
-  osuCrypto::SHA1 sha_theta(sizeof(block));
+  osuCrypto::Blake2 sha_theta(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     v_[i] = FieldType(0);

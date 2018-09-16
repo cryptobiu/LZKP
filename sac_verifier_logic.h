@@ -153,10 +153,10 @@ bool SacVerifierLogic<FieldType>::r6(const block &seed_global, const std::vector
   }
 
   // 2
-  osuCrypto::SHA1 sha_h_gamma(sizeof(block));
-  osuCrypto::SHA1 sha_h_pi(sizeof(block));
-  osuCrypto::SHA1 sha_h_psi(sizeof(block));
-  osuCrypto::SHA1 sha_h_theta(sizeof(block));
+  osuCrypto::Blake2 sha_h_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_h_pi(sizeof(block));
+  osuCrypto::Blake2 sha_h_psi(sizeof(block));
+  osuCrypto::Blake2 sha_h_theta(sizeof(block));
 
   for (auto e = 0; e < M; ++e) {
     sha_h_gamma.Update(verifiers_[e]->h_); // For step 2

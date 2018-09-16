@@ -106,7 +106,7 @@ void SacProverLogic<FieldType>::r1(block &h_gamma) {
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
-  osuCrypto::SHA1 sha_h_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_h_gamma(sizeof(block));
   for (auto e = 0; e < M; ++e) {
     sha_h_gamma.Update(provers_[e]->h_);
   }
@@ -147,9 +147,9 @@ void SacProverLogic<FieldType>::r3(const block &seed_ell, block &h_pi, block &h_
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
   // 4 + 5 + 6
-  osuCrypto::SHA1 sha_h_pi(sizeof(block)); // For step 4
-  osuCrypto::SHA1 sha_h_psi(sizeof(block)); // For step 5
-  osuCrypto::SHA1 sha_h_theta(sizeof(block)); // For step 6
+  osuCrypto::Blake2 sha_h_pi(sizeof(block)); // For step 4
+  osuCrypto::Blake2 sha_h_psi(sizeof(block)); // For step 5
+  osuCrypto::Blake2 sha_h_theta(sizeof(block)); // For step 6
 
   for (auto e = 0; e < M; ++e) {
     sha_h_pi.Update(provers_[e]->pi_);

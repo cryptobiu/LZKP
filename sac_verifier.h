@@ -4,7 +4,7 @@
 
 #include <stack>
 #include <queue>
-#include <cryptoTools/Crypto/sha1.h>
+#include <cryptoTools/Crypto/Blake2.h>
 #include <cryptoTools/Crypto/PRNG.h>
 
 #include "seedtree.h"
@@ -186,7 +186,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
   // 1.c
   gamma_.resize(N);
 
-  osuCrypto::SHA1 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_gamma(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     if (i == i_bar_)
       continue;
@@ -206,7 +206,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
   }
 
   // 1.d
-  osuCrypto::SHA1 sha_h(sizeof(block));
+  osuCrypto::Blake2 sha_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     if (i != i_bar_)
       sha_h.Update(gamma_[i]);
@@ -226,7 +226,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     alpha_sum_computed[mm] = FieldType(0);
   }
 
-  osuCrypto::SHA1 sha_pi(sizeof(block));
+  osuCrypto::Blake2 sha_pi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     for (auto k = 0; k < m; ++k) {
@@ -259,7 +259,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
   // 1.h + 1.i
   o_.resize(N);
 
-  osuCrypto::SHA1 sha_psi(sizeof(block));
+  osuCrypto::Blake2 sha_psi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
@@ -321,7 +321,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     de_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
   }
 
-  osuCrypto::SHA1 sha_theta(sizeof(block)); // For step 1.l
+  osuCrypto::Blake2 sha_theta(sizeof(block)); // For step 1.l
 
   for (auto i = 0; i < N; ++i) {
     v_[i] = FieldType(0);

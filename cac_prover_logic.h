@@ -103,7 +103,7 @@ void CacProverLogic<FieldType>::r1(block &h_gamma) {
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
-  osuCrypto::SHA1 sha_h_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_h_gamma(sizeof(block));
   for (auto e = 0; e < M; ++e) {
     sha_h_gamma.Update(provers_[e]->h_);
   }
@@ -147,7 +147,7 @@ void CacProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<bl
   seed.resize(tau);
   omegaN.resize(M - tau);
 
-  osuCrypto::SHA1 sha_h_pi(sizeof(block)); // For step 3
+  osuCrypto::Blake2 sha_h_pi(sizeof(block)); // For step 3
   for (auto e = 0, o_id = 0, s_id = 0; e < M; ++e) {
     if (E[e]) {
       seed[s_id++] = master_seed_[e]; // For out variable
@@ -173,7 +173,7 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
       continue;
     }
 
-    osuCrypto::SHA1 sha_psi(sizeof(block));
+    osuCrypto::Blake2 sha_psi(sizeof(block));
 
     // 1
     provers_[e]->coefficients_.resize(n + m);
@@ -203,7 +203,7 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
-  osuCrypto::SHA1 sha_h_psi(sizeof(block));
+  osuCrypto::Blake2 sha_h_psi(sizeof(block));
 
   for (auto e = 0; e < M; ++e) {
     if (!E_[e]) {

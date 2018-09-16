@@ -4,7 +4,7 @@
 
 #include <stack>
 #include <queue>
-#include <cryptoTools/Crypto/sha1.h>
+#include <cryptoTools/Crypto/Blake2.h>
 #include <cryptoTools/Crypto/PRNG.h>
 
 #include "seedtree.h"
@@ -112,7 +112,7 @@ void CacVerifier<FieldType>::r4() {
   }
 
   // *1* - 1.e
-  osuCrypto::SHA1 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_gamma(sizeof(block));
   for (auto i = 0; i < N - 1; ++i) {
     block blk = seed_tree_.getSeed(i);
     sha_gamma.Reset();
@@ -130,7 +130,7 @@ void CacVerifier<FieldType>::r4() {
   sha_gamma.Final(gamma_[N - 1]);
 
   // *1* - 1.f
-  osuCrypto::SHA1 sha_h(sizeof(block));
+  osuCrypto::Blake2 sha_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     sha_h.Update(gamma_[i]);
   }
@@ -222,7 +222,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   }
 
   // 1.c
-  osuCrypto::SHA1 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_gamma(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     if (i == i_bar_)
       continue;
@@ -241,7 +241,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   }
 
   // 1.d
-  osuCrypto::SHA1 sha_h(sizeof(block));
+  osuCrypto::Blake2 sha_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     if (i != i_bar_)
       sha_h.Update(gamma_[i]);
@@ -255,7 +255,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
     block gN_e, blk;
 
     gN_e = prng[N - 1].get<block>();
-    osuCrypto::SHA1 sha_omega(sizeof(block));
+    osuCrypto::Blake2 sha_omega(sizeof(block));
     for (auto i = 0; i < m; ++i) {
       sha_omega.Update(s[i].elem);
     }
@@ -310,7 +310,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   }
 
   // 1.h
-  osuCrypto::SHA1 sha_pi(sizeof(block));
+  osuCrypto::Blake2 sha_pi(sizeof(block));
 
   for (auto mm = 0; mm < m; ++mm) {
     for (auto nn = 0; nn < N; ++nn) {
@@ -326,7 +326,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   sha_pi.Final(pi_);
 
   // 1.j
-  osuCrypto::SHA1 sha_psi(sizeof(block));
+  osuCrypto::Blake2 sha_psi(sizeof(block));
 
   o_.resize(N);
   for (auto i = 0; i < N; ++i) {

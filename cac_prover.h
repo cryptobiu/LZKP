@@ -3,7 +3,7 @@
 
 
 #include <stack>
-#include <cryptoTools/Crypto/sha1.h>
+#include <cryptoTools/Crypto/Blake2.h>
 
 #include "seedtree.h"
 #include "parameters.h"
@@ -120,7 +120,7 @@ void CacProver<FieldType>::r1(const block &master_seed) {
 
   // 1.e
   gamma_.resize(N);
-  osuCrypto::SHA1 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 sha_gamma(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     block blk = seed_tree_.getSeed(i);
@@ -136,7 +136,7 @@ void CacProver<FieldType>::r1(const block &master_seed) {
   }
 
   // 1.f
-  osuCrypto::SHA1 sha_h(sizeof(block));
+  osuCrypto::Blake2 sha_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     sha_h.Update(gamma_[i]);
   }
@@ -183,7 +183,7 @@ void CacProver<FieldType>::r3() {
   }
 
   // 2.f
-  osuCrypto::SHA1 sha_omegaN(sizeof(block));
+  osuCrypto::Blake2 sha_omegaN(sizeof(block));
   for (auto i = 0; i < m; ++i) {
       sha_omegaN.Update(s_[i][N - 1].elem);
   }
@@ -191,7 +191,7 @@ void CacProver<FieldType>::r3() {
   sha_omegaN.Final(omegaN_);
 
   // 2.g
-  osuCrypto::SHA1 sha_pi(sizeof(block));
+  osuCrypto::Blake2 sha_pi(sizeof(block));
 
   for (auto mm = 0; mm < m; ++mm) {
     for (auto nn = 0; nn < N; ++nn) {
@@ -207,7 +207,7 @@ void CacProver<FieldType>::r5() {
   o_.resize(N);
 
   // 2.a
-  osuCrypto::SHA1 sha_psi(sizeof(block));
+  osuCrypto::Blake2 sha_psi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
