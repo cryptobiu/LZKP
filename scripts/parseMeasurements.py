@@ -34,23 +34,24 @@ if len(sys.argv) != 4:
 	sys.exit(1)
 
 config = open(sys.argv[1], 'r').readlines()
-q = [c.replace('\n', '') for c in config if c.startswith('q=(')]
-n = [c.replace('\n', '') for c in config if c.startswith('n=(')]
-m = [c.replace('\n', '') for c in config if c.startswith('m=(')]
-N = [c.replace('\n', '') for c in config if c.startswith('N=(')]
-M = [c.replace('\n', '') for c in config if c.startswith('M=(')]
-tau = [c.replace('\n', '') for c in config if c.startswith('tau=(')]
-num_trials = int([c.replace('\n', '') for c in config if c.startswith('NUM_TRIALS=')][0].split('=')[1])
+config = [c.split('#')[0] for c in config]
+q = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('q=(')]
+n = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('n=(')]
+m = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('m=(')]
+N = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('N=(')]
+M = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('M=(')]
+tau = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('tau=(')]
+num_trials = int([c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('NUM_TRIALS=')][0].split('=')[1])
 
 measurements = open(sys.argv[2], 'r').readlines()
 
-commit_measurements = measurements[0].replace('\n', '')
-measurements = [measurement.replace('\n', '') for measurement in measurements]
+commit_measurements = measurements[0].replace('\n', '').replace('\t', '').strip()
+measurements = [measurement.replace('\n', '').replace('\t', '').strip() for measurement in measurements]
 
 results = open(sys.argv[3], 'r').readlines()
 
-commit_results = results[0].replace('\n', '')
-results = [result.replace('\n', '') for result in results]
+commit_results = results[0].replace('\n', '').replace('\t', '').strip()
+results = [result.replace('\n', '').replace('\t', '').strip() for result in results]
 
 assert (commit_measurements == commit_results)
 print '{}'.format(commit_measurements)
@@ -59,7 +60,7 @@ print 'Execution time: {}'.format(measurements[1])
 m_id = 2
 r_id = 2
 
-print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<70}{:<10}{:<10}'.format('q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'times','AVG', 'STD')
+print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<55}{:<10}{:<10}{:<55}{:<10}{:<10}'.format('q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD')
 for i_protocol, protocol in enumerate(['1', '2']):
 	print measurements[m_id]
 	assert measurements[m_id] == 'protocol {}'.format(protocol)
@@ -74,7 +75,7 @@ for i_protocol, protocol in enumerate(['1', '2']):
 		MM = M[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
 
 		for _ in range(num_trials):
-			assert(results[r_id].split(',')[0] == '1')
+			assert(results[r_id].split(',')[-1] == '1')
 			r_id += 1
 
 		try:
@@ -84,9 +85,14 @@ for i_protocol, protocol in enumerate(['1', '2']):
 
 		for MMM, TTT in zip(MM.split(':'), TT.split(':')):
 			mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
-			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<70}{:<10.4f}{:<10.4f}'.format(qq, nn, mm, NN, MMM, TTT, '', measurements[m_id], mean(mmm), stddev(mmm))
+			ccc = map(int, [cccc.split(',')[1] for cccc in measurements[m_id].split()])
+			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<55}{:<10.4f}{:<10.4f}{:<55}{:<10.4f}{:<10.4f}'.format(qq, nn, mm, NN, MMM, TTT, '',
+			 	  ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc))
 			# print qq, nn, mm, NN, MMM, measurements[m_id]
 			m_id += 1
-			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<70}{:<10.4f}{:<10.4f}'.format(qq, nn, mm, NN, MMM, TTT, 'X', measurements[m_id], mean(mmm), stddev(mmm))
+			mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
+			ccc = map(int, [cccc.split(',')[1] for cccc in measurements[m_id].split()])
+			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<55}{:<10.4f}{:<10.4f}{:<55}{:<10.4f}{:<10.4f}'.format(qq, nn, mm, NN, MMM, TTT, 'X',
+			      ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc))
 			# print qq, nn, mm, NN, MMM, measurements[m_id]
 			m_id += 1
