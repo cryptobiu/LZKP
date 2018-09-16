@@ -120,27 +120,27 @@ void CacProver<FieldType>::r1(const block &master_seed) {
 
   // 1.e
   gamma_.resize(N);
-  osuCrypto::Blake2 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 blake_gamma(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     block blk = seed_tree_.getSeed(i);
-    sha_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
-    sha_gamma.Update(blk); // Hash seed_e,i
+    blake_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
+    blake_gamma.Update(blk); // Hash seed_e,i
     if (i == N - 1) {
       for (auto k = 0; k < m; ++k) { // TODO: optimize
-        sha_gamma.Update(b_square_[k][N - 1].elem); // TODO: check POS
+        blake_gamma.Update(b_square_[k][N - 1].elem); // TODO: check POS
       }
     }
-    sha_gamma.Update(r_[i]); // Hash r_e,i
-    sha_gamma.Final(gamma_[i]);
+    blake_gamma.Update(r_[i]); // Hash r_e,i
+    blake_gamma.Final(gamma_[i]);
   }
 
   // 1.f
-  osuCrypto::Blake2 sha_h(sizeof(block));
+  osuCrypto::Blake2 blake_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
-    sha_h.Update(gamma_[i]);
+    blake_h.Update(gamma_[i]);
   }
-  sha_h.Final(h_); // mb need to zero it first
+  blake_h.Final(h_); // mb need to zero it first
 }
 
 template <class FieldType>
@@ -183,23 +183,23 @@ void CacProver<FieldType>::r3() {
   }
 
   // 2.f
-  osuCrypto::Blake2 sha_omegaN(sizeof(block));
+  osuCrypto::Blake2 blake_omegaN(sizeof(block));
   for (auto i = 0; i < m; ++i) {
-      sha_omegaN.Update(s_[i][N - 1].elem);
+      blake_omegaN.Update(s_[i][N - 1].elem);
   }
-  sha_omegaN.Update(gN_);
-  sha_omegaN.Final(omegaN_);
+  blake_omegaN.Update(gN_);
+  blake_omegaN.Final(omegaN_);
 
   // 2.g
-  osuCrypto::Blake2 sha_pi(sizeof(block));
+  osuCrypto::Blake2 blake_pi(sizeof(block));
 
   for (auto mm = 0; mm < m; ++mm) {
     for (auto nn = 0; nn < N; ++nn) {
-      sha_pi.Update(alpha_[mm][nn].elem);
+      blake_pi.Update(alpha_[mm][nn].elem);
     }
   }
-  sha_pi.Update(g_);
-  sha_pi.Final(pi_);
+  blake_pi.Update(g_);
+  blake_pi.Final(pi_);
 }
 
 template <class FieldType>
@@ -207,7 +207,7 @@ void CacProver<FieldType>::r5() {
   o_.resize(N);
 
   // 2.a
-  osuCrypto::Blake2 sha_psi(sizeof(block));
+  osuCrypto::Blake2 blake_psi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
@@ -228,11 +228,11 @@ void CacProver<FieldType>::r5() {
     }
 
     // 2.b
-    sha_psi.Update(o_[i].elem); // For step 2.b
+    blake_psi.Update(o_[i].elem); // For step 2.b
   }
 
-  sha_psi.Update(w_);
-  sha_psi.Final(psi_);
+  blake_psi.Update(w_);
+  blake_psi.Final(psi_);
 }
 
 template <class FieldType>

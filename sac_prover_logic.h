@@ -106,11 +106,11 @@ void SacProverLogic<FieldType>::r1(block &h_gamma) {
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
-  osuCrypto::Blake2 sha_h_gamma(sizeof(block));
+  osuCrypto::Blake2 blake_h_gamma(sizeof(block));
   for (auto e = 0; e < M; ++e) {
-    sha_h_gamma.Update(provers_[e]->h_);
+    blake_h_gamma.Update(provers_[e]->h_);
   }
-  sha_h_gamma.Final(h_gamma_.bytes);
+  blake_h_gamma.Final(h_gamma_.bytes);
 
   h_gamma = h_gamma_; // Set out variable
 }
@@ -147,19 +147,19 @@ void SacProverLogic<FieldType>::r3(const block &seed_ell, block &h_pi, block &h_
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
   // 4 + 5 + 6
-  osuCrypto::Blake2 sha_h_pi(sizeof(block)); // For step 4
-  osuCrypto::Blake2 sha_h_psi(sizeof(block)); // For step 5
-  osuCrypto::Blake2 sha_h_theta(sizeof(block)); // For step 6
+  osuCrypto::Blake2 blake_h_pi(sizeof(block)); // For step 4
+  osuCrypto::Blake2 blake_h_psi(sizeof(block)); // For step 5
+  osuCrypto::Blake2 blake_h_theta(sizeof(block)); // For step 6
 
   for (auto e = 0; e < M; ++e) {
-    sha_h_pi.Update(provers_[e]->pi_);
-    sha_h_psi.Update(provers_[e]->psi_);
-    sha_h_theta.Update(provers_[e]->theta_);
+    blake_h_pi.Update(provers_[e]->pi_);
+    blake_h_psi.Update(provers_[e]->psi_);
+    blake_h_theta.Update(provers_[e]->theta_);
   }
 
-  sha_h_pi.Final(h_pi_); // 4
-  sha_h_psi.Final(h_psi_); // 5
-  sha_h_theta.Final(h_theta_); // 6
+  blake_h_pi.Final(h_pi_); // 4
+  blake_h_psi.Final(h_psi_); // 5
+  blake_h_theta.Final(h_theta_); // 6
 
   h_pi = h_pi_;
   h_psi = h_psi_;

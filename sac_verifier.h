@@ -186,34 +186,34 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
   // 1.c
   gamma_.resize(N);
 
-  osuCrypto::Blake2 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 blake_gamma(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     if (i == i_bar_)
       continue;
 
     block blk = partial_seeds_[i];
-    sha_gamma.Reset();
-    sha_gamma.Update(blk);
+    blake_gamma.Reset();
+    blake_gamma.Update(blk);
     if (i == N - 1) {
       for (auto k = 0; k < m; ++k) {
-        sha_gamma.Update(s[k].elem); // TODO: check POS
-        sha_gamma.Update(s_square[k].elem);
-        sha_gamma.Update(b_square[k].elem);
+        blake_gamma.Update(s[k].elem); // TODO: check POS
+        blake_gamma.Update(s_square[k].elem);
+        blake_gamma.Update(b_square[k].elem);
       }
     }
-    sha_gamma.Update(r_[i]);
-    sha_gamma.Final(gamma_[i]);
+    blake_gamma.Update(r_[i]);
+    blake_gamma.Final(gamma_[i]);
   }
 
   // 1.d
-  osuCrypto::Blake2 sha_h(sizeof(block));
+  osuCrypto::Blake2 blake_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
     if (i != i_bar_)
-      sha_h.Update(gamma_[i]);
+      blake_h.Update(gamma_[i]);
     else
-      sha_h.Update(gamma_i_bar);
+      blake_h.Update(gamma_i_bar);
   }
-  sha_h.Final(h_);
+  blake_h.Final(h_);
 
   // 1.e + 1.f + 1.g
   std::vector<std::vector<FieldType>> alpha_computed;
@@ -226,7 +226,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     alpha_sum_computed[mm] = FieldType(0);
   }
 
-  osuCrypto::Blake2 sha_pi(sizeof(block));
+  osuCrypto::Blake2 blake_pi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     for (auto k = 0; k < m; ++k) {
@@ -236,30 +236,30 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
 
           alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
 
-          sha_pi.Update(alpha_computed[k][i].elem);
+          blake_pi.Update(alpha_computed[k][i].elem);
         }
         else {
           alpha_computed[k][i] = s[k] - ep_[k] * b_[k][i];
 
           alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
 
-          sha_pi.Update(alpha_computed[k][i].elem);
+          blake_pi.Update(alpha_computed[k][i].elem);
         }
       }
       else {
         alpha_sum_computed[k] += alpha_i_bar[k];
 
-        sha_pi.Update(alpha_i_bar[k].elem);
+        blake_pi.Update(alpha_i_bar[k].elem);
       }
     }
   }
-  sha_pi.Update(g_);
-  sha_pi.Final(pi_);
+  blake_pi.Update(g_);
+  blake_pi.Final(pi_);
 
   // 1.h + 1.i
   o_.resize(N);
 
-  osuCrypto::Blake2 sha_psi(sizeof(block));
+  osuCrypto::Blake2 blake_psi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
@@ -267,7 +267,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     if (i == i_bar_) {
       o_[i] = o_i_bar;
 
-      sha_psi.Update(o_[i].elem); // For step 2.b
+      blake_psi.Update(o_[i].elem); // For step 2.b
 
       continue;
     }
@@ -292,11 +292,11 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
         o_[i] += ga_[k] * (s_square[k] - s[k]);
     }
 
-    sha_psi.Update(o_[i].elem); // For step 2.b
+    blake_psi.Update(o_[i].elem); // For step 2.b
   }
 
-  sha_psi.Update(w_);
-  sha_psi.Final(psi_);
+  blake_psi.Update(w_);
+  blake_psi.Final(psi_);
 
   // 1.j
   sigma_o = FieldType(0);
@@ -321,7 +321,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     de_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
   }
 
-  osuCrypto::Blake2 sha_theta(sizeof(block)); // For step 1.l
+  osuCrypto::Blake2 blake_theta(sizeof(block)); // For step 1.l
 
   for (auto i = 0; i < N; ++i) {
     v_[i] = FieldType(0);
@@ -329,7 +329,7 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     if (i == i_bar_) {
       v_[i] = v_i_bar;
 
-      sha_theta.Update(v_[i].elem); // For step 2.b
+      blake_theta.Update(v_[i].elem); // For step 2.b
 
       continue;
     }
@@ -341,11 +341,11 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
         v_[i] += de_[k] * (s_square[k] - alpha_sum_computed[k] * (s[k] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square[k]));
     }
 
-    sha_theta.Update(v_[i].elem); // For step 1.l
+    blake_theta.Update(v_[i].elem); // For step 1.l
   }
 
-  sha_theta.Update(u_);
-  sha_theta.Final(theta_);
+  blake_theta.Update(u_);
+  blake_theta.Final(theta_);
 
   // 1.m
   sigma_v = FieldType(0);

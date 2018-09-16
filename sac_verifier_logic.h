@@ -153,38 +153,38 @@ bool SacVerifierLogic<FieldType>::r6(const block &seed_global, const std::vector
   }
 
   // 2
-  osuCrypto::Blake2 sha_h_gamma(sizeof(block));
-  osuCrypto::Blake2 sha_h_pi(sizeof(block));
-  osuCrypto::Blake2 sha_h_psi(sizeof(block));
-  osuCrypto::Blake2 sha_h_theta(sizeof(block));
+  osuCrypto::Blake2 blake_h_gamma(sizeof(block));
+  osuCrypto::Blake2 blake_h_pi(sizeof(block));
+  osuCrypto::Blake2 blake_h_psi(sizeof(block));
+  osuCrypto::Blake2 blake_h_theta(sizeof(block));
 
   for (auto e = 0; e < M; ++e) {
-    sha_h_gamma.Update(verifiers_[e]->h_); // For step 2
-    sha_h_pi.Update(verifiers_[e]->pi_); // For step 3
-    sha_h_psi.Update(verifiers_[e]->psi_); // For step 4
-    sha_h_theta.Update(verifiers_[e]->theta_); // For step 5
+    blake_h_gamma.Update(verifiers_[e]->h_); // For step 2
+    blake_h_pi.Update(verifiers_[e]->pi_); // For step 3
+    blake_h_psi.Update(verifiers_[e]->psi_); // For step 4
+    blake_h_theta.Update(verifiers_[e]->theta_); // For step 5
   }
 
   block h_gamma_computed;
-  sha_h_gamma.Final(h_gamma_computed);
+  blake_h_gamma.Final(h_gamma_computed);
   if (!eq(h_gamma_.b, h_gamma_computed.b))
     return false;
 
   // 3
   block pi;
-  sha_h_pi.Final(pi);
+  blake_h_pi.Final(pi);
   if (!eq(pi.b, h_pi_.b))
     return false;
 
   // 4
   block psi;
-  sha_h_psi.Final(psi);
+  blake_h_psi.Final(psi);
   if (!eq(psi.b, h_psi_.b))
     return false;
 
   // 5
   block theta;
-  sha_h_theta.Final(theta);
+  blake_h_theta.Final(theta);
   if (!eq(theta.b, h_theta_.b))
     return false;
 

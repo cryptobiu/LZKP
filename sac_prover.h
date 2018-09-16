@@ -140,29 +140,29 @@ void SacProver<FieldType>::r1(const block &master_seed) {
 
   // 1.f
   gamma_.resize(N);
-  osuCrypto::Blake2 sha_gamma(sizeof(block));
+  osuCrypto::Blake2 blake_gamma(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     block blk = seed_tree_.getSeed(i);
-    sha_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
-    sha_gamma.Update(blk); // Hash seed_e,i
+    blake_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
+    blake_gamma.Update(blk); // Hash seed_e,i
     if (i == N - 1) {
       for (auto k = 0; k < m; ++k) { // TODO: optimize
-        sha_gamma.Update(s_[k][N - 1].elem); // TODO: check POS
-        sha_gamma.Update(s_square_[k][N - 1].elem);
-        sha_gamma.Update(b_square_[k][N - 1].elem);
+        blake_gamma.Update(s_[k][N - 1].elem); // TODO: check POS
+        blake_gamma.Update(s_square_[k][N - 1].elem);
+        blake_gamma.Update(b_square_[k][N - 1].elem);
       }
     }
-    sha_gamma.Update(r_[i]); // Hash r_e,i
-    sha_gamma.Final(gamma_[i]);
+    blake_gamma.Update(r_[i]); // Hash r_e,i
+    blake_gamma.Final(gamma_[i]);
   }
 
   // 1.g
-  osuCrypto::Blake2 sha_h(sizeof(block));
+  osuCrypto::Blake2 blake_h(sizeof(block));
   for (auto i = 0; i < N; ++i) {
-    sha_h.Update(gamma_[i]);
+    blake_h.Update(gamma_[i]);
   }
-  sha_h.Final(h_); // mb need to zero it first
+  blake_h.Final(h_); // mb need to zero it first
 }
 
 template <class FieldType>
@@ -192,23 +192,23 @@ void SacProver<FieldType>::r3() {
     alpha_sum_[mm] = FieldType(0); // For step 3.b
   }
 
-  osuCrypto::Blake2 sha_pi(sizeof(block)); // For step 3.c
+  osuCrypto::Blake2 blake_pi(sizeof(block)); // For step 3.c
 
   for (auto i = 0; i < N; ++i) {
     for (auto k = 0; k < m; ++k) {
       alpha_[k][i] = s_[k][i] - ep_[k] * b_[k][i];
       alpha_sum_[k] += alpha_[k][i]; // 3.b
 
-      sha_pi.Update(alpha_[k][i].elem);
+      blake_pi.Update(alpha_[k][i].elem);
     }
   }
-  sha_pi.Update(g_);
-  sha_pi.Final(pi_);
+  blake_pi.Update(g_);
+  blake_pi.Final(pi_);
 
   // 3.d + 3.e
   o_.resize(N);
 
-  osuCrypto::Blake2 sha_psi(sizeof(block));
+  osuCrypto::Blake2 blake_psi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
@@ -227,11 +227,11 @@ void SacProver<FieldType>::r3() {
       o_[i] += ga_[k] * (s_square_[k][i] - s_[k][i]);
     }
 
-    sha_psi.Update(o_[i].elem); // For step 2.b
+    blake_psi.Update(o_[i].elem); // For step 2.b
   }
 
-  sha_psi.Update(w_);
-  sha_psi.Final(psi_);
+  blake_psi.Update(w_);
+  blake_psi.Final(psi_);
 
   // 3.f + 3.g
   v_.resize(N);
@@ -243,7 +243,7 @@ void SacProver<FieldType>::r3() {
     de_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
   }
 
-  osuCrypto::Blake2 sha_theta(sizeof(block));
+  osuCrypto::Blake2 blake_theta(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     v_[i] = FieldType(0);
@@ -252,11 +252,11 @@ void SacProver<FieldType>::r3() {
       v_[i] += de_[k] * (s_square_[k][i] - alpha_sum_[k] * (s_[k][i] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square_[k][i]));
     }
 
-    sha_theta.Update(v_[i].elem); // For step 2.b
+    blake_theta.Update(v_[i].elem); // For step 2.b
   }
 
-  sha_theta.Update(u_);
-  sha_theta.Final(theta_);
+  blake_theta.Update(u_);
+  blake_theta.Final(theta_);
 }
 
 template <class FieldType>

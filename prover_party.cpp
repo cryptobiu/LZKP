@@ -71,7 +71,7 @@ int ProverParty::initCommunication() {
     auto start = std::chrono::high_resolution_clock::now();
     auto n = this->sync();
     auto stop = std::chrono::high_resolution_clock::now();
-    auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    auto dur = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     RTT_ = dur.count() / 2;
     assert(n == 2);
     debug("done (" << RTT_ << " ms)" << std::endl);
