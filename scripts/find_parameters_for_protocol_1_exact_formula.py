@@ -17,8 +17,8 @@ def nCr(n, r):
     return numer // denom
 
 print '{:<5}{:<5}{:<5}{:<25}{:<20}{:<25}{:<20}'.format('M', 'N', 'q', 'Optimal tau for 2^(-40)', 'M - tau (40)', 'Optimal tau for 2^(-80)', 'M - tau (80)')
-for M in range(5, 200 + 1, 10):
-	for N in [2, 4, 8, 16, 32, 64]:
+for N in [2, 4, 8, 16, 32, 64]:
+	for M in range(5, 200 + 1, 10):
 		for q in [15, 31, 59, 61]:
 			tau_80 = 0	# Finds best tau for 2^(-80) security
 			tau_40 = 0  # Finds best tau for 2^(-40) security
