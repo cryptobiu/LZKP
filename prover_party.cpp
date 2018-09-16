@@ -74,7 +74,7 @@ int ProverParty::initCommunication() {
     auto dur = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     RTT_ = dur.count() / 2;
     assert(n == 2);
-    debug("done (" << RTT_ << " ms)" << std::endl);
+    debug("done (" << RTT_ << " micro seconds)" << std::endl);
 
     debug("Initializing communication channel... done" << std::endl);
 
