@@ -69,10 +69,7 @@ int ProverParty::initCommunication() {
     debug("done" << std::endl);
     debug("\tmeasuring RTT... ");
     auto start = std::chrono::high_resolution_clock::now();
-    char dummy;
-    int n = 0;
-    n += write(sock_, &dummy, 1);
-    n += read(sock_, &dummy, 1);
+    auto n = this->sync();
     auto stop = std::chrono::high_resolution_clock::now();
     auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     RTT_ = dur.count() / 2;
@@ -82,4 +79,14 @@ int ProverParty::initCommunication() {
     debug("Initializing communication channel... done" << std::endl);
 
     return 0;
+}
+
+int ProverParty::sync() {
+  char dummy;
+  int n = 0;
+
+  n += write(sock_, &dummy, 1);
+  n += read(sock_, &dummy, 1);
+
+  return n;
 }

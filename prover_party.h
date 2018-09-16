@@ -27,6 +27,7 @@ public:
 
 protected:
   int initCommunication();
+  virtual int sync();
   virtual int generateData() = 0;
 
 protected:

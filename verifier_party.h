@@ -27,7 +27,8 @@ public:
   bool isAccepted() const { return is_accepted_; }
 
 protected:
-    int initCommunication();
+  int initCommunication();
+  virtual int sync();
 
 protected:
   std::string ip_;

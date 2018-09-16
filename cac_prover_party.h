@@ -71,6 +71,8 @@ int CacProverParty<FieldType>::init(int argc, const char* const argv[]) {
   if (par != 0)
     std::cerr << "Parameters negotiation failed (error " << par << ")" << std::endl;
 
+  this->sync();
+
   return 0;
 }
 

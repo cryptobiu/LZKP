@@ -43,6 +43,7 @@ public:
 protected:
   virtual int parseArguments(int argc, const char *const *argv) = 0;
   virtual int initCommunication() = 0;
+  virtual int sync() = 0;
   virtual int negotiateParameters() = 0;
   int writeWrapper(void *buf, size_t count);
   int readWrapper(void *buf, size_t count);

@@ -48,10 +48,7 @@ int VerifierParty::initCommunication() {
     }
     debug("done" << std::endl);
     debug("\tmeasuring RTT... ");
-    char dummy;
-    int n = 0;
-    n += read(sock_, &dummy, 1);
-    n += write(sock_, &dummy, 1);
+    auto n = this->sync();
     assert(n == 2);
     debug("done" << std::endl);
 
@@ -59,4 +56,14 @@ int VerifierParty::initCommunication() {
     debug("Initializing communication channel... done" << std::endl);
 
     return 0;
+}
+
+int VerifierParty::sync() {
+  char dummy;
+  int n = 0;
+
+  n += read(sock_, &dummy, 1);
+  n += write(sock_, &dummy, 1);
+
+  return n;
 }
