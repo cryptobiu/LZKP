@@ -53,7 +53,7 @@ protected:
   int m;
   bool is_accepted = false;
 
-  bool multi_threaded_ = false;
+  int x_;
 };
 
 template<class FieldType>
@@ -85,7 +85,7 @@ int SacProverParty<FieldType>::parseArguments(int argc, const char* const argv[]
 
   po::options_description performence("Performence options");
   performence.add_options()
-    ("multi_threaded,x", po::bool_switch(&multi_threaded_), "should execute in multi-threading?")
+      ("multi_threaded,x", po::value<int>(&x_)->default_value(1), "number of threads")
     ;
 
   po::options_description parameter("Parameter options");
@@ -113,8 +113,8 @@ int SacProverParty<FieldType>::parseArguments(int argc, const char* const argv[]
   debug("\tm: " << m << std::endl);
   debug("\tis_accepted: " << is_accepted << std::endl);
 
-  if (multi_threaded_)
-    debug("\tMulti-threading enabled" << std::endl);
+  if (x_ != 1)
+    debug("\tMulti-threading enabled (# " << x_ << " threads)" << std::endl);
   else
     debug("\tMultit-hreading disabled" << std::endl);
 
@@ -229,7 +229,7 @@ int SacProverParty<FieldType>::generateData() {
 
 template<class FieldType>
 bool SacProverParty<FieldType>::runOnline() {
-  SacProverLogic<FieldType> p(par_, a_, t_, secret_, multi_threaded_);
+  SacProverLogic<FieldType> p(par_, a_, t_, secret_, x_);
 
   iovec iov[9];
 

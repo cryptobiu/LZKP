@@ -30,8 +30,8 @@ for((p=0;p<${#q[@]};p++)); do
     	done
 
     	for((nt=0;nt<${NUM_TRIALS};nt++)); do
-    		echo "../LZKP -p0 -q${q[$p]} --ip ${IP} --port ${PORT} -x"
-    		S=$(echo "../LZKP -p0 -q${q[$p]} --ip ${IP} --port ${PORT} -x") # Single threaded
+    		echo "../LZKP -p0 -q${q[$p]} --ip ${IP} --port ${PORT} -x8"
+    		S=$(echo "../LZKP -p0 -q${q[$p]} --ip ${IP} --port ${PORT} -x8") # Single threaded
     		echo ${S} | tee -a results.txt
     		wait
     		sleep 1
@@ -55,15 +55,15 @@ for((p=0;p<${#q[@]};p++)); do
     		S=$(echo "./LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT}") # Single threaded
     		echo ${S} | tee -a results.txt
     		wait
-    		sleep 2
+    		sleep 1
     	done
 
     	for((nt=0;nt<${NUM_TRIALS};nt++)); do
-    		echo "./LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT} -x"
-    		S=$(echo "./LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT} -x") # Multi threaded
+    		echo "./LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT} -x8"
+    		S=$(echo "./LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT} -x8") # Multi threaded
     		echo ${S} | tee -a results.txt
     		wait
-    		sleep 2
+    		sleep 1
     	done
     done
 done

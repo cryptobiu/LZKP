@@ -33,8 +33,8 @@ for((p=0;p<${#q[@]};p++)); do
 
     	R=""
     	for((nt=0;nt<${NUM_TRIALS};nt++)); do
-    		echo "../LZKP -p0 -i -q${q[$p]} -M${MM[$j]} -t${TT[$j]} -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x"
-    		S=$(echo "../LZKP -p0 -i -q${q[$p]} -M${MM[$j]} -t${TT[$j]} -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x") # Multi threaded
+    		echo "../LZKP -p0 -i -q${q[$p]} -M${MM[$j]} -t${TT[$j]} -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x8"
+    		S=$(echo "../LZKP -p0 -i -q${q[$p]} -M${MM[$j]} -t${TT[$j]} -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x8") # Multi threaded
     		R="${R}${S} "
     		wait
     	done
@@ -65,8 +65,8 @@ for((p=0;p<${#q[@]};p++)); do
 
     	R=""
     	for((nt=0;nt<${NUM_TRIALS};nt++)); do
-    		echo "../LZKP -p1 -i -q${q[$p]} -M${MM[$j]} -t1 -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x"
-    		S=$(echo "../LZKP -p1 -i -q${q[$p]} -M${MM[$j]} -t1 -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x") # Multi threaded
+    		echo "../LZKP -p1 -i -q${q[$p]} -M${MM[$j]} -t1 -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x8"
+    		S=$(echo "../LZKP -p1 -i -q${q[$p]} -M${MM[$j]} -t1 -N${N[$p]} -n${n[$p]} -m${m[$p]} -a --port ${PORT} -x8") # Multi threaded
     		R="${R}${S} "
     		wait
     	done

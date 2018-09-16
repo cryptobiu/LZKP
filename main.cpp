@@ -44,13 +44,11 @@ int main(int argc, char *argv[]) {
   int protocol_type;
   bool is_prover = false;
 
-  int q, M, tau, N, n, m;
+  int q, M, tau, N, n, m, x;
   bool is_accepted = false;
 
   string ip;
   int port;
-
-  bool multi_threaded = false;
 
   po::variables_map vm;
 
@@ -81,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     po::options_description performence("Performence options");
     performence.add_options()
-      ("multi_threaded,x", po::bool_switch(&multi_threaded), "should execute in multi-threading?")
+      ("multi_threaded,x", po::value<int>(&x)->default_value(1), ("number of threads (limited to " + to_string(std::thread::hardware_concurrency()) + ")").c_str())
       ;
 
     po::options_description cmdline_options;
@@ -127,6 +125,9 @@ int main(int argc, char *argv[]) {
 
     if (vm.count("m") && !(m > n))
       throw po::validation_error(po::validation_error::invalid_option_value, "m");
+
+    if (vm.count("multi_threaded") && !((x > 0) && (x <= (int)std::thread::hardware_concurrency())))
+      throw po::validation_error(po::validation_error::invalid_option_value, "x", to_string(x));
 
   }
   catch(exception &e) {

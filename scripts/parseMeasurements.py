@@ -73,7 +73,7 @@ for i_protocol, protocol in enumerate(['1', '2']):
 
 		NN = N[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
 		MM = M[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
-
+		print MM
 		for _ in range(num_trials):
 			assert(results[r_id].split(',')[-1] == '1')
 			r_id += 1
@@ -81,7 +81,7 @@ for i_protocol, protocol in enumerate(['1', '2']):
 		try:
 			TT = tau[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
 		except:
-			TT = ''
+			TT = ':'.join(['' for _ in range(len(MM.split(':')))])
 
 		for MMM, TTT in zip(MM.split(':'), TT.split(':')):
 			mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])

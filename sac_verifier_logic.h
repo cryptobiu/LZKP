@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class SacVerifierLogic {
 public:
-  SacVerifierLogic(const Parameters &s, FieldType **&a, FieldType *&t, bool multi_threaded = false);
+  SacVerifierLogic(const Parameters &s, FieldType **&a, FieldType *&t, int nthreads = 1);
   ~SacVerifierLogic();
 
   void r2(const block &h_gamma, block &seed_ell);
@@ -57,13 +57,8 @@ public:
 
 
 template <class FieldType>
-SacVerifierLogic<FieldType>::SacVerifierLogic(const Parameters &s, FieldType **&a, FieldType *&t, bool multi_threaded)
-    : a_(a), t_(t), par_(s), M(s.M), N(s.N), n(s.n), m(s.m) {
-  if (multi_threaded)
-    nthreads_ = std::thread::hardware_concurrency();
-  else
-    nthreads_ = 1;
-
+SacVerifierLogic<FieldType>::SacVerifierLogic(const Parameters &s, FieldType **&a, FieldType *&t, int nthreads)
+    : a_(a), t_(t), par_(s), M(s.M), N(s.N), n(s.n), m(s.m), nthreads_(nthreads) {
   verifiers_.resize(M);
 }
 

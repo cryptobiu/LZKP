@@ -18,7 +18,7 @@ namespace lzkp {
 template <class FieldType>
 class CacProverLogic {
 public:
-  CacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, bool multi_threaded = false);
+  CacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, int nthreads = 1);
   ~CacProverLogic();
 
   void r1(block &h_gamma);
@@ -63,13 +63,8 @@ public:
 };
 
 template <class FieldType>
-CacProverLogic<FieldType>::CacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, bool multi_threaded)
-    : a_(a), t_(t), secret_(secret), par_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m) {
-  if (multi_threaded)
-    nthreads_ = std::thread::hardware_concurrency();
-  else
-    nthreads_ = 1;
-
+CacProverLogic<FieldType>::CacProverLogic(const Parameters &s, FieldType **&a, FieldType *&t, FieldType *&secret, int nthreads)
+    : a_(a), t_(t), secret_(secret), par_(s), M(s.M), tau(s.tau), N(s.N), n(s.n), m(s.m), nthreads_(nthreads) {
   provers_.resize(M);
 }
 

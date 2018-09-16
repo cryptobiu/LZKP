@@ -43,7 +43,7 @@ protected:
 
   Parameters par_;
 
-  bool multi_threaded_ = false;
+  int x_;
 
 };
 
@@ -77,7 +77,7 @@ int SacVerifierParty<FieldType>::parseArguments(int argc, const char* const argv
 
   po::options_description performence("Performence options");
   performence.add_options()
-    ("multi_threaded,x", po::bool_switch(&multi_threaded_), "should execute in multi-threading?")
+      ("multi_threaded,x", po::value<int>(&x_)->default_value(1), "number of threads")
     ;
 
   po::options_description cmdline_options;
@@ -92,10 +92,10 @@ int SacVerifierParty<FieldType>::parseArguments(int argc, const char* const argv
   debug("\tIP: " << this->ip_ << std::endl);
   debug("\tPort: " << this->port_ << std::endl);
 
-  if (multi_threaded_)
-    debug("\tMulti-threading enabled" << std::endl);
+  if (x_ != 1)
+    debug("\tMulti-threading enabled (# " << x_ << " threads)" << std::endl);
   else
-    debug("\tMulti-threading disabled" << std::endl);
+    debug("\tMultit-hreading disabled" << std::endl);
 
   return 0;
 }
@@ -154,7 +154,7 @@ int SacVerifierParty<FieldType>::negotiateParameters() {
 
 template<class FieldType>
 bool SacVerifierParty<FieldType>::runOnline() {
-  SacVerifierLogic<FieldType> v(par_, a_, t_, multi_threaded_);
+  SacVerifierLogic<FieldType> v(par_, a_, t_, x_);
 
   iovec iov[9];
 
