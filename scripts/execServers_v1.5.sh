@@ -9,13 +9,13 @@ date +"%Y/%m/%d %H:%M:%S.%N" >> measurements.txt
 
 
 # Parameters are going in parallel, first entry of each parameter are corresponding
-q=()	# e.g q=("31")
-n=()	# e.g n=("256")
-m=()	# e.g m=("1024")
+q=("15" "15" "31" "61")
+n=("256" "256" "512" "1024")
+m=("1024" "4096" "2048" "4096")
 
-N=()	# e.g. N=("2")
-M=()	# Split with : for multiple values e.g. M=("40:80")
-tau=()
+N=("2" "4" "8" "16" "32" "64")
+M=("75:145" "55:105" "55:95" "45:95" "45:85" "45:85")
+tau=("34:63" "32:57" "38:57" "26:63" "28:47" "28:49")
 echo "protocol 1" >> measurements.txt
 for((p=0;p<${#q[@]};p++)); do
     for((i=0;i<${#N[@]};i++)); do
@@ -26,9 +26,9 @@ for((p=0;p<${#q[@]};p++)); do
         	R=""
         	for((nt=0;nt<${NUM_TRIALS};nt++)); do
         		echo "../LZKP -p0 -i -q${q[$p]} -M${MM[$j]} -t${TT[$j]} -N${N[$i]} -n${n[$p]} -m${m[$p]} -a --port ${PORT}"
-        		# S=$(echo "../LZKP -p0 -i -q${q[$p]} -M${MM[$j]} -t${TT[$j]} -N${N[$i]} -n${n[$p]} -m${m[$p]} -a --port ${PORT}") # Single threaded
-        		#R="${R}${S} "
-        		# wait
+        		S=$(../LZKP -p0 -i -q${q[$p]} -M${MM[$j]} -t${TT[$j]} -N${N[$i]} -n${n[$p]} -m${m[$p]} -a --port ${PORT}) # Single threaded
+        		R="${R}${S} "
+        		wait
         	done
         	echo ${R} >> measurements.txt
 
@@ -44,34 +44,34 @@ for((p=0;p<${#q[@]};p++)); do
     done
 done
 
-X=()
+X=("2" "4" "8" "16" "32")
 for((x=0;x<${#X[@]};x++)); do
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p0 -i -q61 -M45 -t28 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]}" # Multi threaded
-        #S=$(../LZKP -p0 -i -q61 -M45 -t28 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
-        #R="${R}${S} "
-        #wait
+        S=$(../LZKP -p0 -i -q61 -M45 -t28 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
+        R="${R}${S} "
+        wait
     done
     echo ${R} >> measurements.txt
 
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p0 -i -q61 -M85 -t49 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]}" # Multi threaded
-        #S=$(../LZKP -p0 -i -q61 -M85 -t49 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
-        #R="${R}${S} "
-        #wait
+        S=$(../LZKP -p0 -i -q61 -M85 -t49 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
+        R="${R}${S} "
+        wait
     done
     echo ${R} >> measurements.txt
 done
 
 
-q=()
-n=()
-m=()
+q=("15" "15" "31" "61")
+n=("256" "256" "512" "1024")
+m=("1024" "4096" "2048" "4096")
 
-N=()
-M=()
+N=("2" "4" "8" "16" "32" "64")
+M=("40:80" "20:40" "14:27" "10:20" "8:16" "7:14")
 echo "protocol 2" >> measurements.txt
 for((p=0;p<${#q[@]};p++)); do
     for((i=0;i<${#N[@]};i++)); do
@@ -81,8 +81,8 @@ for((p=0;p<${#q[@]};p++)); do
         	R=""
         	for((nt=0;nt<${NUM_TRIALS};nt++)); do
         		echo "../LZKP -p1 -i -q${q[$p]} -M${MM[$j]} -t1 -N${N[$i]} -n${n[$p]} -m${m[$p]} -a --port ${PORT}"
-        		# S=$(echo "../LZKP -p1 -i -q${q[$p]} -M${MM[$j]} -t1 -N${N[$i]} -n${n[$p]} -m${m[$p]} -a --port ${PORT}") # Single threaded
-        		#R="${R}${S} "
+        		S=$(../LZKP -p1 -i -q${q[$p]} -M${MM[$j]} -t1 -N${N[$i]} -n${n[$p]} -m${m[$p]} -a --port ${PORT}) # Single threaded
+        		R="${R}${S} "
         		wait
         	done
         	echo ${R} >> measurements.txt
@@ -99,23 +99,23 @@ for((p=0;p<${#q[@]};p++)); do
     done
 done
 
-X=()
+X=("2" "4" "8" "16" "32")
 for((x=0;x<${#X[@]};x++)); do
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p1 -i -q61 -M7 -t1 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]}" # Multi threaded
-        #S=$(../LZKP -p1 -i -q61 -M7 -t1 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
-        #R="${R}${S} "
-        #wait
+        S=$(../LZKP -p1 -i -q61 -M7 -t1 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
+        R="${R}${S} "
+        wait
     done
     echo ${R} >> measurements.txt
 
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p1 -i -q61 -M14 -t1 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]}" # Multi threaded
-        #S=$(../LZKP -p1 -i -q61 -M14 -t1 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
-        #R="${R}${S} "
-        #wait
+        S=$(../LZKP -p1 -i -q61 -M14 -t1 -N64 -n1024 -m4096 -a --port ${PORT} -x${X[$x]})
+        R="${R}${S} "
+        wait
     done
     echo ${R} >> measurements.txt
 done

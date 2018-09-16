@@ -9,13 +9,13 @@ git log -1 | head -1 > results.txt
 date +"%Y/%m/%d %H:%M:%S.%N" >> results.txt
 
 # Best to copy parameters section from execServers config file
-q=()
-n=()
-m=()
+q=("15" "15" "31" "61")
+n=("256" "256" "512" "1024")
+m=("1024" "4096" "2048" "4096")
 
-N=()
-M=()
-tau=()
+N=("2" "4" "8" "16" "32" "64")
+M=("75:145" "55:105" "55:95" "45:95" "45:85" "45:85")
+tau=("34:63" "32:57" "38:57" "26:63" "28:47" "28:49")
 for((p=0;p<${#q[@]};p++)); do
     for((i=0;i<${#N[@]};i++)); do
         MM=(${M[$i]//:/ })
@@ -24,10 +24,10 @@ for((p=0;p<${#q[@]};p++)); do
         for((j=0;j<${#MM[@]};j++)); do
         	for((nt=0;nt<${NUM_TRIALS};nt++)); do
         		echo "../LZKP -p0 -q${q[$p]} --ip ${IP} --port ${PORT}"
-        		# S=$(echo "../LZKP -p0 -q${q[$p]} --ip ${IP} --port ${PORT}") # Single threaded
-        		# echo ${S} | tee -a results.txt
-        		# wait
-        		# sleep 1
+        		S=$(../LZKP -p0 -q${q[$p]} --ip ${IP} --port ${PORT}) # Single threaded
+        		echo ${S} | tee -a results.txt
+        		wait
+        		sleep 1
         	done
 
         	# for((nt=0;nt<${NUM_TRIALS};nt++)); do
@@ -41,34 +41,34 @@ for((p=0;p<${#q[@]};p++)); do
     done
 done
 
-X=()
+X=("2" "4" "8" "16" "32")
 for((x=0;x<${#X[@]};x++)); do
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p0 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}"
-        #S=$(../LZKP -p0 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
-        #echo ${S} | tee -a results.txt
-        #wait
-        #sleep 1
+        S=$(../LZKP -p0 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
+        echo ${S} | tee -a results.txt
+        wait
+        sleep 1
     done
 
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p0 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}"
-        #S=$(../LZKP -p0 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
-        #echo ${S} | tee -a results.txt
-        #wait
-        #sleep 1
+        S=$(../LZKP -p0 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
+        echo ${S} | tee -a results.txt
+        wait
+        sleep 1
     done
 done
 
 
-q=()
-n=()
-m=()
+q=("15" "15" "31" "61")
+n=("256" "256" "512" "1024")
+m=("1024" "4096" "2048" "4096")
 
-N=()
-M=()
+N=("2" "4" "8" "16" "32" "64")
+M=("40:80" "20:40" "14:27" "10:20" "8:16" "7:14")
 for((p=0;p<${#q[@]};p++)); do
     for((i=0;i<${#N[@]};i++)); do
         MM=(${M[$i]//:/ })
@@ -76,7 +76,7 @@ for((p=0;p<${#q[@]};p++)); do
         for((j=0;j<${#MM[@]};j++)); do
         	for((nt=0;nt<${NUM_TRIALS};nt++)); do
         		echo "../LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT}"
-        		S=$(echo "../LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT}") # Single threaded
+        		S=$(../LZKP -p1 -q${q[$p]} --ip ${IP} --port ${PORT}) # Single threaded
         		echo ${S} | tee -a results.txt
         		wait
         		sleep 1
@@ -93,24 +93,24 @@ for((p=0;p<${#q[@]};p++)); do
     done
 done
 
-X=()
+X=("2" "4" "8" "16" "32")
 for((x=0;x<${#X[@]};x++)); do
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p1 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}"
-        #S=$(../LZKP -p1 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
-        #echo ${S} | tee -a results.txt
-        #wait
-        #sleep 1
+        S=$(../LZKP -p1 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
+        echo ${S} | tee -a results.txt
+        wait
+        sleep 1
     done
 
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
         echo "../LZKP -p1 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}"
-        #S=$(../LZKP -p1 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
-        #echo ${S} | tee -a results.txt
-        #wait
-        #sleep 1
+        S=$(../LZKP -p1 -q61 --ip ${IP} --port ${PORT} -x${X[$x]}) # Multi threaded
+        echo ${S} | tee -a results.txt
+        wait
+        sleep 1
     done
 done
 

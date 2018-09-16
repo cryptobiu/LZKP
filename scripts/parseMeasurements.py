@@ -41,6 +41,7 @@ m = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswi
 N = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('N=(')]
 M = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('M=(')]
 tau = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('tau=(')]
+X = [c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('X=(')]
 num_trials = int([c.replace('\n', '').replace('\t', '').strip() for c in config if c.startswith('NUM_TRIALS=')][0].split('=')[1])
 
 measurements = open(sys.argv[2], 'r').readlines()
@@ -60,7 +61,7 @@ print 'Execution time: {}'.format(measurements[1])
 m_id = 2
 r_id = 2
 
-print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<55}{:<10}{:<10}{:<55}{:<10}{:<10}'.format('q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD')
+print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12}{:<12}{:<75}{:<12}{:<12}'.format('q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD')
 for i_protocol, protocol in enumerate(['1', '2']):
 	print measurements[m_id]
 	assert measurements[m_id] == 'protocol {}'.format(protocol)
@@ -71,28 +72,52 @@ for i_protocol, protocol in enumerate(['1', '2']):
 		nn = n[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
 		mm = m[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
 
-		NN = N[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
-		MM = M[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
-		print MM
-		for _ in range(num_trials):
-			assert(results[r_id].split(',')[-1] == '1')
-			r_id += 1
+		for j in range(len(N[i_protocol].split('=')[1][1:-1].replace('"', '').split())):
+			NN = N[i_protocol].split('=')[1][1:-1].replace('"', '').split()[j]
+			MM = M[i_protocol].split('=')[1][1:-1].replace('"', '').split()[j]
 
-		try:
-			TT = tau[i_protocol].split('=')[1][1:-1].replace('"', '').split()[i]
-		except:
-			TT = ':'.join(['' for _ in range(len(MM.split(':')))])
+			for _ in range(num_trials):
+				assert(results[r_id].split(',')[-1] == '1')
+				r_id += 1
 
+			try:
+				TT = tau[i_protocol].split('=')[1][1:-1].replace('"', '').split()[j]
+			except:
+				TT = ':'.join(['' for _ in range(len(MM.split(':')))])
+
+			for MMM, TTT in zip(MM.split(':'), TT.split(':')):
+				mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
+				ccc = map(int, [cccc.split(',')[1] for cccc in measurements[m_id].split()])
+				print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, '',
+				 	  ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc))
+
+				m_id += 1
+
+	qq = q[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+	nn = n[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+	mm = m[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+	NN = N[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+	MM = M[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+
+	try:
+		TT = tau[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+	except:
+		TT = ':'.join(['' for _ in range(len(MM.split(':')))])
+
+	XX = X[i_protocol].split('=')[1][1:-1].replace('"', '').split()
+
+	for XXX in XX:
 		for MMM, TTT in zip(MM.split(':'), TT.split(':')):
+			for _ in range(num_trials):
+				assert(results[r_id].split(',')[-1] == '1')
+				r_id += 1
+
 			mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
 			ccc = map(int, [cccc.split(',')[1] for cccc in measurements[m_id].split()])
-			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<55}{:<10.4f}{:<10.4f}{:<55}{:<10.4f}{:<10.4f}'.format(qq, nn, mm, NN, MMM, TTT, '',
+
+			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, XXX,
 			 	  ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc))
-			# print qq, nn, mm, NN, MMM, measurements[m_id]
+
 			m_id += 1
-			mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
-			ccc = map(int, [cccc.split(',')[1] for cccc in measurements[m_id].split()])
-			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<55}{:<10.4f}{:<10.4f}{:<55}{:<10.4f}{:<10.4f}'.format(qq, nn, mm, NN, MMM, TTT, 'X',
-			      ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc))
-			# print qq, nn, mm, NN, MMM, measurements[m_id]
-			m_id += 1
+
+			#print qq, nn, mm, NN, MMM, TTT, XX
