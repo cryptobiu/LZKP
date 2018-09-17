@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 
 struct Field15Bit {
@@ -19,6 +20,9 @@ public:
   Field15Bit() { elem = 0; }
   Field15Bit(uint64_t elem) {
     this->elem = elem % p;
+  }
+  Field15Bit(const Field15Bit &rhs) {
+    this->elem = rhs.elem;
   }
 
   Field15Bit& operator=(const Field15Bit &other) { elem = other.elem; return *this; }
@@ -130,6 +134,26 @@ public:
     elem = ((uint32_t)elem * (uint32_t)f2.elem) % p;
 
     return *this;
+  }
+
+  static Field15Bit dotProdct(Field15Bit **&mat_a, const std::vector<std::vector<Field15Bit>> &mat_b, int row, int col, int length) {
+    uint64_t v = 0;
+
+    for (int k = 0; k < length; ++k) { // OK up to length = 2^34
+      v += (uint32_t)mat_a[row][k].elem * (uint32_t)mat_b[k][col].elem;
+    }
+
+    return Field15Bit(v);
+  }
+
+  static Field15Bit dotProdct(Field15Bit **&mat_a, const std::vector<Field15Bit> &vec_b, int row, int col, int length) {
+    uint64_t v = 0;
+
+    for (int k = 0; k < length; ++k) { // OK up to length = 2^34
+      v += (uint32_t)mat_a[row][k].elem * (uint32_t)vec_b[k].elem;
+    }
+
+    return Field15Bit(v);
   }
 };
 

@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <vector>
 #include <cstdint>
 #include <x86intrin.h>
 #include <gmp.h>
@@ -24,6 +25,9 @@ public:
   Field59Bit() { elem = 0; }
   Field59Bit(uint64_t elem) {
     this->elem = elem % p;
+  }
+  Field59Bit(const Field59Bit &rhs) {
+    this->elem = rhs.elem;
   }
 
   Field59Bit& operator=(const Field59Bit &other) { elem = other.elem; return *this; }
@@ -112,6 +116,64 @@ public:
     elem = ((uint128_t)elem * (uint128_t)f2.elem) % p;
 
     return *this;
+  }
+
+  static Field59Bit dotProdct(Field59Bit **&mat_a, const std::vector<std::vector<Field59Bit>> &mat_b, int row, int col, int length) {
+    uint128_t v = 0, t;
+
+    int quotiant = length / 1024;
+    int remainder = length - (quotiant * 1024);
+
+    int qq = 0;
+    for (int q = 0; q < quotiant; ++q) { // OK up to very large "length"
+      t = 0;
+      for (int k = 0; k < 1024; ++k) {
+        t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)mat_b[qq + k][col].elem;
+      }
+      v += t % p;
+      qq += 1024;
+    }
+
+    t = 0;
+    for (int k = 0; k < remainder; ++k) {
+      t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)mat_b[qq + k][col].elem;
+    }
+    v += t % p;
+
+    Field59Bit ret;
+
+    ret.elem = v % p;
+
+    return ret;
+  }
+
+  static Field59Bit dotProdct(Field59Bit **&mat_a, const std::vector<Field59Bit> &vec_b, int row, int col, int length) {
+    uint128_t v = 0, t;
+
+    int quotiant = length / 1024;
+    int remainder = length - (quotiant * 1024);
+
+    int qq = 0;
+    for (int q = 0; q < quotiant; ++q) { // OK up to very large "length"
+      t = 0;
+      for (int k = 0; k < 1024; ++k) {
+        t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)vec_b[qq + k].elem;
+      }
+      v += t % p;
+      qq += 1024;
+    }
+
+    t = 0;
+    for (int k = 0; k < remainder; ++k) {
+      t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)vec_b[qq + k].elem;
+    }
+    v += t % p;
+
+    Field59Bit ret;
+
+    ret.elem = v % p;
+
+    return ret;
   }
 };
 

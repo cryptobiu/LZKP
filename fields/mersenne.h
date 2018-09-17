@@ -14,7 +14,7 @@
 
 
 typedef uint8_t byte;
-
+typedef unsigned __int128 uint128_t;
 
 struct ZpMersenneIntElement {
 
@@ -38,6 +38,9 @@ public:
       return;
     }
     this->elem -= p;
+  }
+  ZpMersenneIntElement(const ZpMersenneIntElement &rhs) {
+    this->elem = rhs.elem;
   }
 
   ZpMersenneIntElement& operator=(const ZpMersenneIntElement &other) { elem = other.elem; return *this; }
@@ -170,6 +173,26 @@ public:
 
     return *this;
   }
+
+  static ZpMersenneIntElement dotProdct(ZpMersenneIntElement **&mat_a, const std::vector<std::vector<ZpMersenneIntElement>> &mat_b, int row, int col, int length) {
+    uint128_t v = 0;
+
+    for (int k = 0; k < length; ++k) { // OK up to length = 2^68
+      v += (uint64_t)mat_a[row][k].elem * (uint64_t)mat_b[k][col].elem;
+    }
+
+    return ZpMersenneIntElement(v % p);
+  }
+
+  static ZpMersenneIntElement dotProdct(ZpMersenneIntElement **&mat_a, const std::vector<ZpMersenneIntElement> &vec_b, int row, int col, int length) {
+    uint128_t v = 0;
+
+    for (int k = 0; k < length; ++k) { // OK up to length = 2^68
+      v += (uint64_t)mat_a[row][k].elem * (uint64_t)vec_b[k].elem;
+    }
+
+    return ZpMersenneIntElement(v % p);
+  }
 };
 
 inline std::ostream& operator<<(std::ostream& s, const ZpMersenneIntElement &a) { return s << a.elem; }
@@ -196,6 +219,9 @@ public:
       if (this->elem >= p)
         this->elem -= p;
     }
+  }
+  ZpMersenneLongElement(const ZpMersenneIntElement &rhs) {
+    this->elem = rhs.elem;
   }
 
   inline ZpMersenneLongElement& operator=(const ZpMersenneLongElement &other) {elem = other.elem; return *this; }
@@ -321,6 +347,64 @@ public:
     elem = res;
 
     return *this;
+  }
+
+  static ZpMersenneLongElement dotProdct(ZpMersenneLongElement **&mat_a, const std::vector<std::vector<ZpMersenneLongElement>> &mat_b, int row, int col, int length) {
+    uint128_t v = 0, t;
+
+    int quotiant = length / 64;
+    int remainder = length - (quotiant * 64);
+
+    int qq = 0;
+    for (int q = 0; q < quotiant; ++q) { // OK up to very large "length"
+      t = 0;
+      for (int k = 0; k < 64; ++k) {
+        t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)mat_b[qq + k][col].elem;
+      }
+      v += t % p;
+      qq += 64;
+    }
+
+    t = 0;
+    for (int k = 0; k < remainder; ++k) {
+      t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)mat_b[qq + k][col].elem;
+    }
+    v += t % p;
+
+    ZpMersenneLongElement ret;
+
+    ret.elem = v % p;
+
+    return ret;
+  }
+
+  static ZpMersenneLongElement dotProdct(ZpMersenneLongElement **&mat_a, const std::vector<ZpMersenneLongElement> &vec_b, int row, int col, int length) {
+    uint128_t v = 0, t;
+
+    int quotiant = length / 64;
+    int remainder = length - (quotiant * 64);
+
+    int qq = 0;
+    for (int q = 0; q < quotiant; ++q) { // OK up to very large "length"
+      t = 0;
+      for (int k = 0; k < 64; ++k) {
+        t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)vec_b[qq + k].elem;
+      }
+      v += t % p;
+      qq += 64;
+    }
+
+    t = 0;
+    for (int k = 0; k < remainder; ++k) {
+      t += (uint128_t)mat_a[row][qq + k].elem * (uint128_t)vec_b[qq + k].elem;
+    }
+    v += t % p;
+
+    ZpMersenneLongElement ret;
+
+    ret.elem = v % p;
+
+    return ret;
   }
 };
 
