@@ -264,16 +264,14 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     }
 
     for (auto l = 0; l < n; ++l) {
-      FieldType tmp(0);
+      FieldType prod;
 
-      for (auto k = 0; k < m; ++k) {
-        if (i != N - 1)
-          tmp += a_[l][k] * s_[k][i];
-        else
-          tmp += a_[l][k] * s[k];
-      }
+      if (i != N - 1)
+        prod = FieldType::dotProdct(a_, s_, l, i, m);
+      else
+        prod = FieldType::dotProdct(a_, s, l, i, m);
 
-      o_[i] += be_[l] * ((t_[l] / FieldType(N)) - tmp);
+      o_[i] += be_[l] * ((t_[l] / FieldType(N)) - prod);
     }
 
     for (auto k = 0; k < m; ++k) {

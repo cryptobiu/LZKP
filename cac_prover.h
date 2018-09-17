@@ -212,13 +212,9 @@ void CacProver<FieldType>::r5() {
     o_[i] = FieldType(0);
 
     for (auto l = 0; l < n; ++l) {
-      FieldType tmp(0);
+      FieldType prod = FieldType::dotProdct(a_, s_, l, i, m);
 
-      for (auto k = 0; k < m; ++k) {
-        tmp += a_[l][k] * s_[k][i];
-      }
-
-      o_[i] += coefficients_[l] * ((t_[l] / FieldType(N)) - tmp);
+      o_[i] += coefficients_[l] * ((t_[l] / FieldType(N)) - prod);
     }
 
     for (auto k = 0; k < m; ++k) {
