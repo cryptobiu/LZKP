@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
   auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
   if (is_prover) {
-    std::cout << dur.count() - party->RTT_ << "," << party->tot_computation_time_ << "," << party->RTT_ << std::endl;
+    std::cout << dur.count() - (party->RTT_ / 1000) << "," << party->tot_computation_time_ << "," << party->RTT_ << std::endl;
   }
   else {
     std::cout << dur.count() << "," << party->tot_computation_time_ << ","
