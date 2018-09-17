@@ -226,34 +226,44 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
       return false;
   }
 
-  // 2
+  // 2 + 3 + 4
   osuCrypto::Blake2 blake_h_gamma(sizeof(block));
   osuCrypto::Blake2 blake_h_pi(sizeof(block));
   osuCrypto::Blake2 blake_h_psi(sizeof(block));
 
-  for (auto e = 0; e < M; ++e) {
-    blake_h_gamma.Update(verifiers_[e]->h_); // For step 2
+  std::vector<block> h_to_hash(M);
+  std::vector<block> pi_to_hash(M - tau);
+  std::vector<block> psi_to_hash(M - tau);
+
+  for (auto e = 0, e_id = 0; e < M; ++e) {
+    h_to_hash[e] = verifiers_[e]->h_;
 
     if (E_[e])
       continue;
 
-    blake_h_pi.Update(verifiers_[e]->pi_); // For step 3
-    blake_h_psi.Update(verifiers_[e]->psi_); // For step 4
+    pi_to_hash[e_id] = verifiers_[e]->pi_; // For step 3
+    psi_to_hash[e_id] = verifiers_[e]->psi_; // For step 4
+
+    e_id++;
   }
 
+  // 2
   block h_gamma_computed;
+  blake_h_gamma.Update(h_to_hash.data(), M);
   blake_h_gamma.Final(h_gamma_computed);
   if (!eq(h_gamma_.b, h_gamma_computed.b))
     return false;
 
   // 3
   block pi;
+  blake_h_pi.Update(pi_to_hash.data(), M - tau);
   blake_h_pi.Final(pi);
   if (!eq(pi.b, h_pi_.b))
     return false;
 
   // 4
   block psi;
+  blake_h_psi.Update(psi_to_hash.data(), M - tau);
   blake_h_psi.Final(psi);
   if (!eq(psi.b, h_psi_.b))
     return false;

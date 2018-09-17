@@ -104,9 +104,11 @@ void CacProverLogic<FieldType>::r1(block &h_gamma) {
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
   osuCrypto::Blake2 blake_h_gamma(sizeof(block));
+  std::vector<block> h_to_hash(M);
   for (auto e = 0; e < M; ++e) {
-    blake_h_gamma.Update(provers_[e]->h_);
+    h_to_hash[e] = provers_[e]->h_;
   }
+  blake_h_gamma.Update(h_to_hash.data(), M);
   blake_h_gamma.Final(h_gamma_.bytes);
 
   h_gamma = h_gamma_; // Set out variable
@@ -148,15 +150,17 @@ void CacProverLogic<FieldType>::r3(const std::vector<uint8_t> &E, std::vector<bl
   omegaN.resize(M - tau);
 
   osuCrypto::Blake2 blake_h_pi(sizeof(block)); // For step 3
+  std::vector<block> pi_to_hash(M - tau);
   for (auto e = 0, o_id = 0, s_id = 0; e < M; ++e) {
     if (E[e]) {
       seed[s_id++] = master_seed_[e]; // For out variable
       continue;
     }
 
-    blake_h_pi.Update(provers_[e]->pi_);
+    pi_to_hash[o_id] = provers_[e]->pi_;
     omegaN[o_id++] = provers_[e]->omegaN_; // Set out variable
   }
+  blake_h_pi.Update(pi_to_hash.data(), M - tau);
   blake_h_pi.Final(h_pi_);
 
   h_pi = h_pi_; // Set out variable
@@ -205,12 +209,13 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
 
   osuCrypto::Blake2 blake_h_psi(sizeof(block));
 
-  for (auto e = 0; e < M; ++e) {
+  std::vector<block> psi_to_hash(M - tau);
+  for (auto e = 0, e_id = 0; e < M; ++e) {
     if (!E_[e]) {
-      blake_h_psi.Update(provers_[e]->psi_);
+      psi_to_hash[e_id++] = provers_[e]->psi_;
     }
   }
-
+  blake_h_psi.Update(psi_to_hash.data(), M - tau);
   blake_h_psi.Final(h_psi_);
 
   h_psi = h_psi_;

@@ -55,14 +55,6 @@ public:
   block seed_global_;
   osuCrypto::PRNG prng_seed_global_;
   block h_pi_, h_psi_, h_theta_;
-//  std::vector<uint8_t> E_;
-//  block seed_e_bar_;
-//  osuCrypto::PRNG prng_e_bar_;
-//  std::vector<block> g_;
-//  block h_pi_;
-//
-//
-//  block h_psi_;
 };
 
 template <class FieldType>
@@ -107,9 +99,11 @@ void SacProverLogic<FieldType>::r1(block &h_gamma) {
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
   osuCrypto::Blake2 blake_h_gamma(sizeof(block));
+  std::vector<block> h_to_hash(M);
   for (auto e = 0; e < M; ++e) {
-    blake_h_gamma.Update(provers_[e]->h_);
+    h_to_hash[e] = provers_[e]->h_;
   }
+  blake_h_gamma.Update(h_to_hash.data(), M);
   blake_h_gamma.Final(h_gamma_.bytes);
 
   h_gamma = h_gamma_; // Set out variable
@@ -151,11 +145,19 @@ void SacProverLogic<FieldType>::r3(const block &seed_ell, block &h_pi, block &h_
   osuCrypto::Blake2 blake_h_psi(sizeof(block)); // For step 5
   osuCrypto::Blake2 blake_h_theta(sizeof(block)); // For step 6
 
+  std::vector<block> pi_to_hash(M);
+  std::vector<block> psi_to_hash(M);
+  std::vector<block> theta_to_hash(M);
+
   for (auto e = 0; e < M; ++e) {
-    blake_h_pi.Update(provers_[e]->pi_);
-    blake_h_psi.Update(provers_[e]->psi_);
-    blake_h_theta.Update(provers_[e]->theta_);
+    pi_to_hash[e] = provers_[e]->pi_;
+    psi_to_hash[e] = provers_[e]->psi_;
+    theta_to_hash[e] = provers_[e]->theta_;
   }
+
+  blake_h_pi.Update(pi_to_hash.data(), M); // For step 4
+  blake_h_psi.Update(psi_to_hash.data(), M); // For step 5
+  blake_h_theta.Update(theta_to_hash.data(), M); // Fot step 6
 
   blake_h_pi.Final(h_pi_); // 4
   blake_h_psi.Final(h_psi_); // 5

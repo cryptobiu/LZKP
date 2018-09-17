@@ -195,11 +195,9 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     blake_gamma.Reset();
     blake_gamma.Update(blk);
     if (i == N - 1) {
-      for (auto k = 0; k < m; ++k) {
-        blake_gamma.Update(s[k].elem); // TODO: check POS
-        blake_gamma.Update(s_square[k].elem);
-        blake_gamma.Update(b_square[k].elem);
-      }
+      blake_gamma.Update((decltype(s[0].elem)*)s.data(), m);
+      blake_gamma.Update((decltype(s_square[0].elem)*)s_square.data(), m);
+      blake_gamma.Update((decltype(b_square[0].elem)*)b_square.data(), m);
     }
     blake_gamma.Update(r_[i]);
     blake_gamma.Final(gamma_[i]);
@@ -207,12 +205,11 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
 
   // 1.d
   osuCrypto::Blake2 blake_h(sizeof(block));
-  for (auto i = 0; i < N; ++i) {
-    if (i != i_bar_)
-      blake_h.Update(gamma_[i]);
-    else
-      blake_h.Update(gamma_i_bar);
-  }
+  if (i_bar_ != 0)
+    blake_h.Update(gamma_.data(), i_bar_);
+  blake_h.Update(gamma_i_bar);
+  if (i_bar_ != N - 1)
+    blake_h.Update(gamma_.data() + i_bar_ + 1, N - i_bar_ - 1);
   blake_h.Final(h_);
 
   // 1.e + 1.f + 1.g
@@ -228,31 +225,27 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
 
   osuCrypto::Blake2 blake_pi(sizeof(block));
 
-  for (auto i = 0; i < N; ++i) {
+  std::vector<FieldType> alpha_to_hash(N * m);
+  for (auto i = 0, id = 0; i < N; ++i) {
     for (auto k = 0; k < m; ++k) {
       if (i != i_bar_) {
         if (i != N - 1) {
           alpha_computed[k][i] = s_[k][i] - ep_[k] * b_[k][i];
-
-          alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
-
-          blake_pi.Update(alpha_computed[k][i].elem);
         }
         else {
           alpha_computed[k][i] = s[k] - ep_[k] * b_[k][i];
-
-          alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
-
-          blake_pi.Update(alpha_computed[k][i].elem);
         }
+        alpha_sum_computed[k] += alpha_computed[k][i]; // 1.i
+        alpha_to_hash[id++] = alpha_computed[k][i];
       }
       else {
         alpha_sum_computed[k] += alpha_i_bar[k];
 
-        blake_pi.Update(alpha_i_bar[k].elem);
+        alpha_to_hash[id++] = alpha_i_bar[k];
       }
     }
   }
+  blake_pi.Update((decltype(alpha_to_hash[0].elem)*)alpha_to_hash.data(), N * m);
   blake_pi.Update(g_);
   blake_pi.Final(pi_);
 
@@ -266,8 +259,6 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
 
     if (i == i_bar_) {
       o_[i] = o_i_bar;
-
-      blake_psi.Update(o_[i].elem); // For step 2.b
 
       continue;
     }
@@ -291,10 +282,8 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
       else
         o_[i] += ga_[k] * (s_square[k] - s[k]);
     }
-
-    blake_psi.Update(o_[i].elem); // For step 2.b
   }
-
+  blake_psi.Update((decltype(o_[0].elem)*)o_.data(), N);
   blake_psi.Update(w_);
   blake_psi.Final(psi_);
 
@@ -329,8 +318,6 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
     if (i == i_bar_) {
       v_[i] = v_i_bar;
 
-      blake_theta.Update(v_[i].elem); // For step 2.b
-
       continue;
     }
 
@@ -340,10 +327,8 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
       else
         v_[i] += de_[k] * (s_square[k] - alpha_sum_computed[k] * (s[k] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square[k]));
     }
-
-    blake_theta.Update(v_[i].elem); // For step 1.l
   }
-
+  blake_theta.Update((decltype(v_[0].elem)*)v_.data(), N);
   blake_theta.Update(u_);
   blake_theta.Final(theta_);
 

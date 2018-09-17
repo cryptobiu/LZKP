@@ -113,27 +113,25 @@ void CacVerifier<FieldType>::r4() {
 
   // *1* - 1.e
   osuCrypto::Blake2 blake_gamma(sizeof(block));
-  for (auto i = 0; i < N - 1; ++i) {
+
+  for (auto i = 0; i < N; ++i) {
     block blk = seed_tree_.getSeed(i);
-    blake_gamma.Reset();
-    blake_gamma.Update(blk);
-    blake_gamma.Update(r_[i]);
+    blake_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
+    blake_gamma.Update(blk); // Hash seed_e,i
+    if (i == N - 1) {
+      std::vector<FieldType> b_square_to_hash(m);
+      for (auto k = 0; k < m; ++k) { // TODO: optimize
+        b_square_to_hash[k] = b_square_[k][N - 1];
+      }
+      blake_gamma.Update((decltype(b_square_to_hash[0].elem)*)b_square_to_hash.data(), m); // TODO: make POS
+    }
+    blake_gamma.Update(r_[i]); // Hash r_e,i
     blake_gamma.Final(gamma_[i]);
   }
-  block blk = seed_tree_.getSeed(N - 1);
-  blake_gamma.Reset();
-  blake_gamma.Update(blk);
-  for (auto i = 0; i < m; ++i) {
-    blake_gamma.Update(b_square_[i][N - 1].elem);
-  }
-  blake_gamma.Update(r_[N - 1]);
-  blake_gamma.Final(gamma_[N - 1]);
 
   // *1* - 1.f
   osuCrypto::Blake2 blake_h(sizeof(block));
-  for (auto i = 0; i < N; ++i) {
-    blake_h.Update(gamma_[i]);
-  }
+  blake_h.Update(gamma_.data(), N);
   blake_h.Final(h_); // mb need to zero it first
 }
 
@@ -231,9 +229,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
     blake_gamma.Reset();
     blake_gamma.Update(blk);
     if (i == N - 1) {
-      for (auto k = 0; k < m; ++k) {
-        blake_gamma.Update(b_square[k].elem);
-      }
+      blake_gamma.Update((decltype(b_square[0].elem)*)b_square.data(), m);
     }
     blake_gamma.Update(r_[i]);
     blake_gamma.Final(gamma_[i]);
@@ -242,12 +238,11 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
 
   // 1.d
   osuCrypto::Blake2 blake_h(sizeof(block));
-  for (auto i = 0; i < N; ++i) {
-    if (i != i_bar_)
-      blake_h.Update(gamma_[i]);
-    else
-      blake_h.Update(gamma_i_bar);
-  }
+  if (i_bar_ != 0)
+    blake_h.Update(gamma_.data(), i_bar_);
+  blake_h.Update(gamma_i_bar);
+  if (i_bar_ != N - 1)
+    blake_h.Update(gamma_.data() + i_bar_ + 1, N - i_bar_ - 1);
   blake_h.Final(h_);
 
   // 1.e
@@ -256,9 +251,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
 
     gN_e = prng[N - 1].get<block>();
     osuCrypto::Blake2 blake_omega(sizeof(block));
-    for (auto i = 0; i < m; ++i) {
-      blake_omega.Update(s[i].elem);
-    }
+    blake_omega.Update((decltype(s[0].elem)*)s.data(), m);
     blake_omega.Update(gN_e);
     blake_omega.Final(blk);
 
@@ -313,14 +306,11 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   osuCrypto::Blake2 blake_pi(sizeof(block));
 
   for (auto mm = 0; mm < m; ++mm) {
-    for (auto nn = 0; nn < N; ++nn) {
-      if (nn != i_bar_) {
-        blake_pi.Update(alpha_computed[mm][nn].elem);
-      }
-      else {
-        blake_pi.Update(alpha_i_bar[mm].elem);
-      }
-    }
+    if (i_bar_ != 0)
+      blake_pi.Update((decltype(alpha_computed[mm][0].elem)*)alpha_computed[mm].data(), i_bar_);
+    blake_pi.Update(alpha_i_bar[mm].elem);
+    if (i_bar_ != N - 1)
+      blake_pi.Update((decltype(alpha_computed[mm][0].elem)*)alpha_computed[mm].data() + i_bar_ + 1, N - i_bar_ - 1);
   }
   blake_pi.Update(g_);
   blake_pi.Final(pi_);
@@ -369,10 +359,9 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   sigma_o = FieldType(0);
 
   for (auto i = 0; i < N; ++i) {
-    blake_psi.Update(o_[i].elem);
-
     sigma_o += o_[i]; // for step 1.k
   }
+  blake_psi.Update((decltype(o_[0].elem)*)o_.data(), N);
   blake_psi.Update(w_);
   blake_psi.Final(psi_);
 

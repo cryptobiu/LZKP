@@ -146,12 +146,15 @@ void SacProver<FieldType>::r1(const block &master_seed) {
     block blk = seed_tree_.getSeed(i);
     blake_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
     blake_gamma.Update(blk); // Hash seed_e,i
+
     if (i == N - 1) {
+      std::vector<FieldType> elements_to_hash(m * 3);
       for (auto k = 0; k < m; ++k) { // TODO: optimize
-        blake_gamma.Update(s_[k][N - 1].elem); // TODO: check POS
-        blake_gamma.Update(s_square_[k][N - 1].elem);
-        blake_gamma.Update(b_square_[k][N - 1].elem);
+        elements_to_hash[k] = s_[k][N - 1];
+        elements_to_hash[m + k] = s_square_[k][N - 1];
+        elements_to_hash[2 * m + k] = b_square_[k][N - 1];
       }
+      blake_gamma.Update((decltype(elements_to_hash[0].elem)*)elements_to_hash.data(), m * 3);
     }
     blake_gamma.Update(r_[i]); // Hash r_e,i
     blake_gamma.Final(gamma_[i]);
@@ -159,9 +162,7 @@ void SacProver<FieldType>::r1(const block &master_seed) {
 
   // 1.g
   osuCrypto::Blake2 blake_h(sizeof(block));
-  for (auto i = 0; i < N; ++i) {
-    blake_h.Update(gamma_[i]);
-  }
+  blake_h.Update(gamma_.data(), N);
   blake_h.Final(h_); // mb need to zero it first
 }
 
@@ -194,14 +195,16 @@ void SacProver<FieldType>::r3() {
 
   osuCrypto::Blake2 blake_pi(sizeof(block)); // For step 3.c
 
-  for (auto i = 0; i < N; ++i) {
+  std::vector<FieldType> alpha_to_hash(N * m);
+  for (auto i = 0, id = 0; i < N; ++i) {
     for (auto k = 0; k < m; ++k) {
       alpha_[k][i] = s_[k][i] - ep_[k] * b_[k][i];
       alpha_sum_[k] += alpha_[k][i]; // 3.b
 
-      blake_pi.Update(alpha_[k][i].elem);
+      alpha_to_hash[id++] = alpha_[k][i];
     }
   }
+  blake_pi.Update((decltype(alpha_to_hash[0].elem)*)alpha_to_hash.data(), N * m);
   blake_pi.Update(g_);
   blake_pi.Final(pi_);
 
@@ -226,10 +229,8 @@ void SacProver<FieldType>::r3() {
     for (auto k = 0; k < m; ++k) {
       o_[i] += ga_[k] * (s_square_[k][i] - s_[k][i]);
     }
-
-    blake_psi.Update(o_[i].elem); // For step 2.b
   }
-
+  blake_psi.Update((decltype(o_[0].elem)*)o_.data(), N); // For step 3.e
   blake_psi.Update(w_);
   blake_psi.Final(psi_);
 
@@ -251,10 +252,8 @@ void SacProver<FieldType>::r3() {
     for (auto k = 0; k < m; ++k) {
       v_[i] += de_[k] * (s_square_[k][i] - alpha_sum_[k] * (s_[k][i] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square_[k][i]));
     }
-
-    blake_theta.Update(v_[i].elem); // For step 2.b
   }
-
+  blake_theta.Update((decltype(v_[0].elem)*)v_.data(), N); // For step 3.g
   blake_theta.Update(u_);
   blake_theta.Final(theta_);
 }

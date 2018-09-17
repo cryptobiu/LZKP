@@ -127,9 +127,11 @@ void CacProver<FieldType>::r1(const block &master_seed) {
     blake_gamma.Reset(); // Calculate com(state_e,i , r_e,i) == com(seed_e,i , r_e,i)
     blake_gamma.Update(blk); // Hash seed_e,i
     if (i == N - 1) {
+      std::vector<FieldType> b_square_to_hash(m);
       for (auto k = 0; k < m; ++k) { // TODO: optimize
-        blake_gamma.Update(b_square_[k][N - 1].elem); // TODO: check POS
+        b_square_to_hash[k] = b_square_[k][N - 1];
       }
+      blake_gamma.Update((decltype(b_square_to_hash[0].elem)*)b_square_to_hash.data(), m); // TODO: make POS
     }
     blake_gamma.Update(r_[i]); // Hash r_e,i
     blake_gamma.Final(gamma_[i]);
@@ -137,9 +139,7 @@ void CacProver<FieldType>::r1(const block &master_seed) {
 
   // 1.f
   osuCrypto::Blake2 blake_h(sizeof(block));
-  for (auto i = 0; i < N; ++i) {
-    blake_h.Update(gamma_[i]);
-  }
+  blake_h.Update(gamma_.data(), N);
   blake_h.Final(h_); // mb need to zero it first
 }
 
@@ -184,9 +184,11 @@ void CacProver<FieldType>::r3() {
 
   // 2.f
   osuCrypto::Blake2 blake_omegaN(sizeof(block));
+  std::vector<FieldType> s_to_hash(m);
   for (auto i = 0; i < m; ++i) {
-      blake_omegaN.Update(s_[i][N - 1].elem);
+    s_to_hash[i] = s_[i][N - 1];
   }
+  blake_omegaN.Update((decltype(s_to_hash[0].elem)*)s_to_hash.data(), m); // TODO: make POS
   blake_omegaN.Update(gN_);
   blake_omegaN.Final(omegaN_);
 
@@ -194,9 +196,7 @@ void CacProver<FieldType>::r3() {
   osuCrypto::Blake2 blake_pi(sizeof(block));
 
   for (auto mm = 0; mm < m; ++mm) {
-    for (auto nn = 0; nn < N; ++nn) {
-      blake_pi.Update(alpha_[mm][nn].elem);
-    }
+    blake_pi.Update((decltype(alpha_[mm][0].elem)*)alpha_[mm].data(), N);
   }
   blake_pi.Update(g_);
   blake_pi.Final(pi_);
@@ -207,7 +207,6 @@ void CacProver<FieldType>::r5() {
   o_.resize(N);
 
   // 2.a
-  osuCrypto::Blake2 blake_psi(sizeof(block));
 
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
@@ -226,11 +225,12 @@ void CacProver<FieldType>::r5() {
       o_[i] += coefficients_[n + k] *
                (alpha_sum_[k] * (s_[k][i] + b_[k][i]) + b_square_[k][i] - s_[k][i]);
     }
-
-    // 2.b
-    blake_psi.Update(o_[i].elem); // For step 2.b
   }
 
+  // 2.b
+  osuCrypto::Blake2 blake_psi(sizeof(block));
+
+  blake_psi.Update((decltype(o_[0].elem)*)o_.data(), N);
   blake_psi.Update(w_);
   blake_psi.Final(psi_);
 }
