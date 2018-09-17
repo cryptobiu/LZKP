@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+from xlutils.copy import copy
+import xlrd
 import xlwt
+
 import sys
 
 
@@ -33,7 +36,12 @@ if len(sys.argv) != 4:
 	print 'usage: ./parseMeasurements.py <execServers-file> <measurments-file> <results-file>'
 	sys.exit(1)
 
-book = xlwt.Workbook()
+try:
+	rb = xlrd.open_workbook('stats.xls', formatting_info=True)
+	book = copy(rb)
+except:
+	book = xlwt.Workbook()
+
 sheet = book.add_sheet("v1.6", cell_overwrite_ok=True)
 
 config = open(sys.argv[1], 'r').readlines()
