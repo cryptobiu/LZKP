@@ -5,7 +5,7 @@ PORT=8000
 NUM_TRIALS=10
 
 git log -1 | head -1 > measurements.txt
-date +"%Y/%m/%d %H:%M:%S.%N" >> measurements.txt
+date +"%Y/%m/%d %H:%M:%S.%N" | tee -a measurements.txt
 
 
 # Parameters are going in parallel, first entry of each parameter are corresponding
@@ -16,7 +16,7 @@ m=("1024" "4096" "2048" "4096")
 N=("2" "4" "8" "16" "32" "64")
 M=("75:145" "55:105" "55:95" "45:95" "45:85" "45:85")
 tau=("34:63" "32:57" "38:57" "26:63" "28:47" "28:49")
-echo "protocol 1" >> measurements.txt
+echo "protocol 1" | tee -a measurements.txt
 for((p=0;p<${#q[@]};p++)); do
     for((i=0;i<${#N[@]};i++)); do
         MM=(${M[$i]//:/ })
@@ -30,7 +30,7 @@ for((p=0;p<${#q[@]};p++)); do
         		R="${R}${S} "
         		wait
         	done
-        	echo ${R} >> measurements.txt
+        	echo ${R} | tee -a measurements.txt
 
         	# R=""
         	# for((nt=0;nt<${NUM_TRIALS};nt++)); do
@@ -53,7 +53,7 @@ for((x=0;x<${#X[@]};x++)); do
         R="${R}${S} "
         wait
     done
-    echo ${R} >> measurements.txt
+    echo ${R} | tee -a measurements.txt
 
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
@@ -62,7 +62,7 @@ for((x=0;x<${#X[@]};x++)); do
         R="${R}${S} "
         wait
     done
-    echo ${R} >> measurements.txt
+    echo ${R} | tee -a measurements.txt
 done
 
 
@@ -72,7 +72,7 @@ m=("1024" "4096" "2048" "4096")
 
 N=("2" "4" "8" "16" "32" "64")
 M=("40:80" "20:40" "14:27" "10:20" "8:16" "7:14")
-echo "protocol 2" >> measurements.txt
+echo "protocol 2" | tee -a measurements.txt
 for((p=0;p<${#q[@]};p++)); do
     for((i=0;i<${#N[@]};i++)); do
         MM=(${M[$i]//:/ })
@@ -85,7 +85,7 @@ for((p=0;p<${#q[@]};p++)); do
         		R="${R}${S} "
         		wait
         	done
-        	echo ${R} >> measurements.txt
+        	echo ${R} | tee -a measurements.txt
 
         	# R=""
         	# for((nt=0;nt<${NUM_TRIALS};nt++)); do
@@ -94,7 +94,7 @@ for((p=0;p<${#q[@]};p++)); do
         		#R="${R}${S} "
         		# wait
         	# done
-        	# echo ${R} >> measurements.txt
+        	# echo ${R} | tee -a measurements.txt
         done
     done
 done
@@ -108,7 +108,7 @@ for((x=0;x<${#X[@]};x++)); do
         R="${R}${S} "
         wait
     done
-    echo ${R} >> measurements.txt
+    echo ${R} | tee -a measurements.txt
 
     R=""
     for((nt=0;nt<${NUM_TRIALS};nt++)); do
@@ -117,7 +117,7 @@ for((x=0;x<${#X[@]};x++)); do
         R="${R}${S} "
         wait
     done
-    echo ${R} >> measurements.txt
+    echo ${R} | tee -a measurements.txt
 done
 
-date +"%Y/%m/%d %H:%M:%S.%N" >> measurements.txt
+date +"%Y/%m/%d %H:%M:%S.%N" | tee -a measurements.txt
