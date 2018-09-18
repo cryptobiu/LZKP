@@ -243,7 +243,10 @@ bool CacProverParty<FieldType>::runOnline() {
   block h_gamma;
   debug("\tExecuting round #1... ");
   startComputationClock();
+  auto cut_and_choose_clock = std::chrono::high_resolution_clock::now();
   p.r1(h_gamma); // Run round 1
+  time_cut_and_choose_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::high_resolution_clock::now() - cut_and_choose_clock).count();
   stopComputationClock();
   debug("done" << std::endl);
   iov[0].iov_base = &h_gamma;
