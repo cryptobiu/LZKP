@@ -4,6 +4,7 @@
 
 #include <stack>
 #include <cryptoTools/Crypto/Blake2.h>
+#include <chrono>
 
 #include "seedtree.h"
 #include "parameters.h"
@@ -61,6 +62,8 @@ public:
   block psi_;
 
   int i_bar_;
+
+  int time_eq_1_;
 };
 
 template <class FieldType>
@@ -208,6 +211,8 @@ void CacProver<FieldType>::r5() {
 
   // 2.a
 
+  auto eq_1_clock = std::chrono::high_resolution_clock::now();
+
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
 
@@ -226,6 +231,9 @@ void CacProver<FieldType>::r5() {
                (alpha_sum_[k] * (s_[k][i] + b_[k][i]) + b_square_[k][i] - s_[k][i]);
     }
   }
+
+  time_eq_1_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::high_resolution_clock::now() - eq_1_clock).count();
 
   // 2.b
   osuCrypto::Blake2 blake_psi(sizeof(block));

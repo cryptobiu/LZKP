@@ -60,6 +60,8 @@ public:
   block seed_ell_;
   osuCrypto::PRNG prng_seed_ell_;
   block h_psi_;
+
+  int time_eq_1;
 };
 
 template <class FieldType>
@@ -209,10 +211,12 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
 
   osuCrypto::Blake2 blake_h_psi(sizeof(block));
 
+  time_eq_1 = 0;
   std::vector<block> psi_to_hash(M - tau);
   for (auto e = 0, e_id = 0; e < M; ++e) {
     if (!E_[e]) {
       psi_to_hash[e_id++] = provers_[e]->psi_;
+      time_eq_1 += provers_[e]->time_eq_1_;
     }
   }
   blake_h_psi.Update(psi_to_hash.data(), M - tau);
