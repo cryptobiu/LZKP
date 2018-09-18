@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
                 << party->time_eq_1 << "," << party->time_cut_and_choose_ << "," << party->RTT_ << std::endl;
     else
       std::cout << dur.count() - (party->RTT_ / 1000) << "," << party->tot_computation_time_ << ","
-              << party->time_eq_1 << "," << "," << party->RTT_ << std::endl;
+              << party->time_eq_1 << "," << party->RTT_ << std::endl;
   }
   else {
     std::cout << dur.count() << "," << party->tot_computation_time_ << ","
