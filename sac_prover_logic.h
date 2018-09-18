@@ -55,6 +55,8 @@ public:
   block seed_global_;
   osuCrypto::PRNG prng_seed_global_;
   block h_pi_, h_psi_, h_theta_;
+
+  int time_eq_1;
 };
 
 template <class FieldType>
@@ -149,10 +151,12 @@ void SacProverLogic<FieldType>::r3(const block &seed_ell, block &h_pi, block &h_
   std::vector<block> psi_to_hash(M);
   std::vector<block> theta_to_hash(M);
 
+  time_eq_1 = 0;
   for (auto e = 0; e < M; ++e) {
     pi_to_hash[e] = provers_[e]->pi_;
     psi_to_hash[e] = provers_[e]->psi_;
     theta_to_hash[e] = provers_[e]->theta_;
+    time_eq_1 += provers_[e]->time_eq_1_;
   }
 
   blake_h_pi.Update(pi_to_hash.data(), M); // For step 4

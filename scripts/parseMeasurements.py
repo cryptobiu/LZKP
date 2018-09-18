@@ -42,7 +42,7 @@ try:
 except:
 	book = xlwt.Workbook()
 
-sheet = book.add_sheet("v2.0", cell_overwrite_ok=True)
+sheet = book.add_sheet("v2.1", cell_overwrite_ok=True)
 
 config = open(sys.argv[1], 'r').readlines()
 config = [c.split('#')[0] for c in config]
@@ -74,8 +74,8 @@ r_id = 2
 
 row_id = 0
 col_id = 3
-for c, v in enumerate(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD']):
-	if v == 'total times' or v == 'computation times':
+for c, v in enumerate(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD', 'equation #1 times', 'AVG', 'STD']):
+	if v == 'total times' or v == 'computation times' or v == 'equation #1 times':
 		sheet.write_merge(row_id, row_id, col_id, col_id + num_trials - 1, v)
 		col_id += num_trials
 	else:
@@ -84,7 +84,7 @@ for c, v in enumerate(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AV
 row_id += 1
 
 
-print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12}{:<12}{:<75}{:<12}{:<12}'.format('q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD')
+print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12}{:<12}{:<75}{:<12}{:<12}{:<75}{:<12}{:<12}{:<75}{:<12}{:<12}'.format('q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD', 'equation #1 times', 'AVG', 'STD', 'cut-and-choose times', 'AVG', 'STD')
 for i_protocol, protocol in enumerate(['1', '2']):
 	print measurements[m_id]
 	sheet.write(row_id, 0, measurements[m_id])
@@ -114,21 +114,42 @@ for i_protocol, protocol in enumerate(['1', '2']):
 			for MMM, TTT in zip(MM.split(':'), TT.split(':')):
 				mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
 				ccc = map(int, [cccc.split(',')[1] for cccc in measurements[m_id].split()])
-				print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, '',
-				 	  ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc))
+				eq1 = map(int, [eq11.split(',')[2] for eq11 in measurements[m_id].split()])
+
+				if i_protocol == 0:
+					cac = map(int, [cacc.split(',')[3] for cacc in measurements[m_id].split()])
+
+				if i_protocol == 0:
+					print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, '',
+				 	  	','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1), ','.join(map(str, cac)), mean(cac), stddev(cac))
+				else:
+					print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, '',
+				 	  	','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1))
 
 				m_id += 1
 
 				col_id = 3
-				for c, (v1, v2) in enumerate(zip(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD'],
-										         [qq, nn, mm, NN, MMM, TTT, '', ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc)])):
-					if v1 == 'total times' or v1 == 'computation times':
-						for vv2 in v2.split(','):
-							sheet.write(row_id, col_id, vv2)
+
+				if i_protocol == 0:
+					for c, (v1, v2) in enumerate(zip(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD', 'equation #1 times', 'AVG', 'STD', 'cut-and-choose times', 'AVG', 'STD'],
+											         [qq, nn, mm, NN, MMM, TTT, '', ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1), ','.join(map(str, cac)), mean(cac), stddev(cac)])):
+						if v1 == 'total times' or v1 == 'computation times' or v == 'equation #1 times' or v == 'cut-and-choose times':
+							for vv2 in v2.split(','):
+								sheet.write(row_id, col_id, vv2)
+								col_id += 1
+						else:
+							sheet.write(row_id, col_id, v2)
 							col_id += 1
-					else:
-						sheet.write(row_id, col_id, v2)
-						col_id += 1
+				else:
+					for c, (v1, v2) in enumerate(zip(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD', 'equation #1 times', 'AVG', 'STD'],
+											         [qq, nn, mm, NN, MMM, TTT, '', ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1)])):
+						if v1 == 'total times' or v1 == 'computation times' or v == 'equation #1 times':
+							for vv2 in v2.split(','):
+								sheet.write(row_id, col_id, vv2)
+								col_id += 1
+						else:
+							sheet.write(row_id, col_id, v2)
+							col_id += 1
 
 				row_id += 1
 
@@ -153,22 +174,41 @@ for i_protocol, protocol in enumerate(['1', '2']):
 
 			mmm = map(int, [mmmm.split(',')[0] for mmmm in measurements[m_id].split()])
 			ccc = map(int, [cccc.split(',')[1] for cccc in measurements[m_id].split()])
+			eq1 = map(int, [eq11.split(',')[2] for eq11 in measurements[m_id].split()])
 
-			print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, XXX,
-			 	  ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc))
+			if i_protocol == 0:
+				cac = map(int, [cacc.split(',')[3] for cacc in measurements[m_id].split()])
+
+			if i_protocol == 0:
+				print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, XXX,
+			 	  	','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1), ','.join(map(str, cac)), mean(cac), stddev(cac))
+			else:
+				print '\t\t{:<5}{:<5}{:<7}{:<5}{:<5}{:<5}{:<5}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}{:<75}{:<12.4f}{:<12.4f}'.format(qq, nn, mm, NN, MMM, TTT, XXX,
+			 	  	','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1))
 
 			m_id += 1
 
 			col_id = 3
-			for c, (v1, v2) in enumerate(zip(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD'],
-										     [qq, nn, mm, NN, MMM, TTT, XXX, ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc)])):
-				if v1 == 'total times' or v1 == 'computation times':
-					for vv2 in v2.split(','):
-						sheet.write(row_id, col_id, vv2)
+			if i_protocol == 0:
+				for c, (v1, v2) in enumerate(zip(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD', 'equation #1 times', 'AVG', 'STD'],
+											     [qq, nn, mm, NN, MMM, TTT, XXX, ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1), ','.join(map(str, cac)), mean(cac), stddev(cac)])):
+					if v1 == 'total times' or v1 == 'computation times' or v == 'equation #1 times' or v == 'cut-and-choose times':
+						for vv2 in v2.split(','):
+							sheet.write(row_id, col_id, vv2)
+							col_id += 1
+					else:
+						sheet.write(row_id, col_id, v2)
 						col_id += 1
-				else:
-					sheet.write(row_id, col_id, v2)
-					col_id += 1
+			else:
+				for c, (v1, v2) in enumerate(zip(['q', 'n', 'm', 'N', 'M', 'tau', 'MT?', 'total times', 'AVG', 'STD', 'computation times', 'AVG', 'STD', 'equation #1 times', 'AVG', 'STD'],
+											     [qq, nn, mm, NN, MMM, TTT, XXX, ','.join(map(str, mmm)), mean(mmm), stddev(mmm), ','.join(map(str, ccc)), mean(ccc), stddev(ccc), ','.join(map(str, eq1)), mean(eq1), stddev(eq1)])):
+					if v1 == 'total times' or v1 == 'computation times' or v == 'equation #1 times':
+						for vv2 in v2.split(','):
+							sheet.write(row_id, col_id, vv2)
+							col_id += 1
+					else:
+						sheet.write(row_id, col_id, v2)
+						col_id += 1
 
 			row_id += 1
 

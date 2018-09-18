@@ -199,7 +199,10 @@ bool CacVerifierParty<FieldType>::runOnline() {
   block seed_ell;
   debug("\tExecuting round #4... ");
   startComputationClock();
+  auto cut_and_choose_clock = std::chrono::high_resolution_clock::now();
   v.r4(seed, omegaN, h_pi, seed_ell); // Run round 4
+  time_cut_and_choose_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::high_resolution_clock::now() - cut_and_choose_clock).count();
   stopComputationClock();
   debug("done" << std::endl);
   iov[0].iov_base = &seed_ell;
