@@ -1217,7 +1217,6 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r2") {
   for (auto e = 0; e < M; ++e) {
     REQUIRE(v.verifiers_[e]->ep_.size() == m);
     REQUIRE(v.verifiers_[e]->be_.size() == n);
-    REQUIRE(v.verifiers_[e]->ga_.size() == m);
   }
 
   free2Darray(a);
@@ -1281,11 +1280,9 @@ TEST_CASE("sac_prover_logic<Field15Bit>_r3") {
     REQUIRE(p.provers_[e]->ep_.size() == m);
     REQUIRE(p.provers_[e]->be_.size() == n);
     REQUIRE(p.provers_[e]->ga_.size() == m);
-    REQUIRE(p.provers_[e]->de_.size() == m);
 
     for (auto i = 0; i < m; ++i) {
       REQUIRE(p.provers_[e]->ep_[i] == v.verifiers_[e]->ep_[i]);
-      REQUIRE(p.provers_[e]->ga_[i] == v.verifiers_[e]->ga_[i]);
     }
 
     for (auto i = 0; i < n; ++i) {
@@ -1602,9 +1599,9 @@ TEST_CASE("sac_verifier_logic<Field15Bit>_r6") {
       REQUIRE(p.provers_[e]->v_[i] == v.verifiers_[e]->v_[i]);
     }
 
-    REQUIRE(p.provers_[e]->de_.size() == v.verifiers_[e]->de_.size());
+    REQUIRE(p.provers_[e]->ga_.size() == v.verifiers_[e]->ga_.size());
     for (auto k = 0; k < m; ++k) {
-      REQUIRE(p.provers_[e]->de_[k] == v.verifiers_[e]->de_[k]);
+      REQUIRE(p.provers_[e]->ga_[k] == v.verifiers_[e]->ga_[k]);
     }
 
     REQUIRE(eq(p.provers_[e]->g_.b, v.verifiers_[e]->g_.b));

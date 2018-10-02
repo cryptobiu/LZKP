@@ -39,7 +39,7 @@ public:
   // Local values
   block seed_ell_;
   osuCrypto::PRNG prng_seed_ell_;
-  std::vector<FieldType> ep_, be_, ga_;
+  std::vector<FieldType> ep_, be_;
 
   int i_bar_;
 
@@ -60,7 +60,7 @@ public:
   block psi_;
   block seed_global_;
   osuCrypto::PRNG prng_seed_global_;
-  std::vector<FieldType> de_;
+  std::vector<FieldType> ga_;
   std::vector<FieldType> v_;
   FieldType sigma_v;
   block u_;
@@ -80,13 +80,11 @@ template <class FieldType>
 void SacVerifier<FieldType>::r2() {
   ep_.resize(m);
   be_.resize(n);
-  ga_.resize(m);
 
   prng_seed_ell_.SetSeed(seed_ell_.b);
 
   for (auto i = 0; i < m; ++i) {
     ep_[i] = FieldType(prng_seed_ell_.get<block>().halves[0]);
-    ga_[i] = FieldType(prng_seed_ell_.get<block>().halves[0]);
   }
 
   for (auto i = 0; i < n; ++i) {
@@ -273,13 +271,6 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
 
       o_[i] += be_[l] * ((t_[l] / FieldType(N)) - prod);
     }
-
-    for (auto k = 0; k < m; ++k) {
-      if (i != N - 1)
-        o_[i] += ga_[k] * (s_square_[k][i] - s_[k][i]);
-      else
-        o_[i] += ga_[k] * (s_square[k] - s[k]);
-    }
   }
   blake_psi.Update((decltype(o_[0].elem)*)o_.data(), N);
   blake_psi.Update(w_);
@@ -301,11 +292,11 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
   // 1.k
   v_.resize(N);
 
-  de_.resize(m);
+  ga_.resize(m);
   prng_seed_global_.SetSeed(seed_global_.b);
 
   for (auto k = 0; k < m; ++k) {
-    de_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
+    ga_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
   }
 
   osuCrypto::Blake2 blake_theta(sizeof(block)); // For step 1.l
@@ -321,9 +312,9 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
 
     for (auto k = 0; k < m; ++k) {
       if (i != N - 1)
-        v_[i] += de_[k] * (s_square_[k][i] - alpha_sum_computed[k] * (s_[k][i] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square_[k][i]));
+        v_[i] += ga_[k] * (s_square_[k][i] - alpha_sum_computed[k] * (s_[k][i] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square_[k][i]));
       else
-        v_[i] += de_[k] * (s_square[k] - alpha_sum_computed[k] * (s[k] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square[k]));
+        v_[i] += ga_[k] * (s_square[k] - alpha_sum_computed[k] * (s[k] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square[k]));
     }
   }
   blake_theta.Update((decltype(v_[0].elem)*)v_.data(), N);

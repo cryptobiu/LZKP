@@ -49,7 +49,7 @@ public:
 
   block seed_ell_;
   osuCrypto::PRNG prng_seed_ell_;
-  std::vector<FieldType> ep_, be_, ga_;
+  std::vector<FieldType> ep_, be_;
   block g_;
   std::vector<std::vector<FieldType>> alpha_;
   std::vector<FieldType> alpha_sum_;
@@ -59,7 +59,7 @@ public:
   block psi_;
   block seed_global_;
   osuCrypto::PRNG prng_seed_global_;
-  std::vector<FieldType> de_;
+  std::vector<FieldType> ga_;
   std::vector<FieldType> v_;
   block u_;
   block theta_;
@@ -174,13 +174,11 @@ void SacProver<FieldType>::r3() {
   // 1
   ep_.resize(m);
   be_.resize(n);
-  ga_.resize(m);
 
   prng_seed_ell_.SetSeed(seed_ell_.b);
 
   for (auto i = 0; i < m; ++i) {
     ep_[i] = FieldType(prng_seed_ell_.get<block>().halves[0]);
-    ga_[i] = FieldType(prng_seed_ell_.get<block>().halves[0]);
   }
 
   for (auto i = 0; i < n; ++i) {
@@ -224,10 +222,6 @@ void SacProver<FieldType>::r3() {
 
       o_[i] += be_[l] * ((t_[l] / FieldType(N)) - prod);
     }
-
-    for (auto k = 0; k < m; ++k) {
-      o_[i] += ga_[k] * (s_square_[k][i] - s_[k][i]);
-    }
   }
 
   time_eq_1_ = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -242,11 +236,11 @@ void SacProver<FieldType>::r3() {
   // 3.f + 3.g
   v_.resize(N);
 
-  de_.resize(m);
+  ga_.resize(m);
   prng_seed_global_.SetSeed(seed_global_.b);
 
   for (auto k = 0; k < m; ++k) {
-    de_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
+    ga_[k] = FieldType(prng_seed_global_.get<block>().halves[0]);
   }
 
   osuCrypto::Blake2 blake_theta(sizeof(block));
@@ -255,7 +249,7 @@ void SacProver<FieldType>::r3() {
     v_[i] = FieldType(0);
 
     for (auto k = 0; k < m; ++k) {
-      v_[i] += de_[k] * (s_square_[k][i] - alpha_sum_[k] * (s_[k][i] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square_[k][i]));
+      v_[i] += ga_[k] * (s_square_[k][i] - alpha_sum_[k] * (s_[k][i] + ep_[k] * b_[k][i]) - ((ep_[k] * ep_[k]) * b_square_[k][i]));
     }
   }
   blake_theta.Update((decltype(v_[0].elem)*)v_.data(), N); // For step 3.g
