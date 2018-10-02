@@ -153,9 +153,9 @@ for i_protocol, protocol in enumerate(['1', '2']):
 
 				row_id += 1
 
-	qq = q[i_protocol].split('=')[1][1:-1].replace('"', '').split()[0]
-	nn = n[i_protocol].split('=')[1][1:-1].replace('"', '').split()[0]
-	mm = m[i_protocol].split('=')[1][1:-1].replace('"', '').split()[0]
+	qq = q[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+	nn = n[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
+	mm = m[i_protocol].split('=')[1][1:-1].replace('"', '').split()[-1]
 	NN = N[i_protocol].split('=')[1][1:-1].replace('"', '').split()[0]
 	MM = M[i_protocol].split('=')[1][1:-1].replace('"', '').split()[0]
 
