@@ -42,7 +42,7 @@ try:
 except:
 	book = xlwt.Workbook()
 
-sheet = book.add_sheet("v2.1", cell_overwrite_ok=True)
+sheet = book.add_sheet("v3.0", cell_overwrite_ok=True)
 
 config = open(sys.argv[1], 'r').readlines()
 config = [c.split('#')[0] for c in config]
