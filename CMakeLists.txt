@@ -4,7 +4,7 @@ project(LZKP)
 set(CMAKE_CXX_STANDARD 14)
 
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message("-- Compiliing in debug mode")
+    message("-- Compiling in debug mode")
     add_definitions(-DDEBUG)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
