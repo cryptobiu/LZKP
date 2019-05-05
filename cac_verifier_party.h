@@ -301,6 +301,8 @@ bool CacVerifierParty<FieldType>::runOnline() {
 
   startComputationClock();
   this->is_accepted_ = v.r8(seed_e_bar, seed_tree, gamma_i_bar, alpha_i_bar, o_i_bar, b_square, s); // Run round 8
+  time_eq_1 = v.time_eq_1;
+  tot_matrix_multiplication_time = v.tot_matrix_multiplication_time;
   stopComputationClock();
 
   debug(std::endl);
