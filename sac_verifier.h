@@ -248,10 +248,11 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
   blake_pi.Final(pi_);
 
   // 1.h + 1.i
-  o_.resize(N);
-
   osuCrypto::Blake2 blake_psi(sizeof(block));
 
+  auto eq_1_clock = std::chrono::high_resolution_clock::now();
+
+  o_.resize(N);
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
 
@@ -278,6 +279,10 @@ bool SacVerifier<FieldType>::r6(const std::vector<block> &seed_tree, const block
       o_[i] += be_[l] * ((t_[l] / FieldType(N)) - prod);
     }
   }
+
+  time_eq_1_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::high_resolution_clock::now() - eq_1_clock).count();
+
   blake_psi.Update((decltype(o_[0].elem)*)o_.data(), N);
   blake_psi.Update(w_);
   blake_psi.Final(psi_);

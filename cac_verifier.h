@@ -56,6 +56,9 @@ public:
   FieldType sigma_o;
   block w_;
   block psi_;
+
+  int time_eq_1_;
+  int tot_matrix_multiplication_time_;
 };
 
 template <class FieldType>
@@ -318,6 +321,8 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   // 1.j
   osuCrypto::Blake2 blake_psi(sizeof(block));
 
+  auto eq_1_clock = std::chrono::high_resolution_clock::now();
+
   o_.resize(N);
   for (auto i = 0; i < N; ++i) {
     o_[i] = FieldType(0);
@@ -358,6 +363,9 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
       }
     }
   }
+
+  time_eq_1_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::high_resolution_clock::now() - eq_1_clock).count();
 
   // 1.k
   sigma_o = FieldType(0);

@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
   }
   else {
     std::cout << dur.count() << "," << party->tot_computation_time_ << ","
-              << party->tot_matrix_multiplication_time_ << ","
+              << party->time_eq_1 << "," << party->tot_matrix_multiplication_time_ << ","
               << dynamic_cast<VerifierParty*>(party)->isAccepted() << std::endl;
   }
 

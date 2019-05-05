@@ -58,9 +58,9 @@ protected:
 public:
   int RTT_;
   int tot_computation_time_;
-  int tot_matrix_multiplication_time_;
   int time_cut_and_choose_;
   int time_eq_1;
+  int tot_matrix_multiplication_time;
 };
 
 

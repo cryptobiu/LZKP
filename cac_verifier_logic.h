@@ -56,6 +56,9 @@ public:
 
   block seed_e_bar_;
   osuCrypto::PRNG prng_e_bar_;
+
+  int time_eq_1;
+  int tot_matrix_multiplication_time;
 };
 
 
@@ -218,12 +221,17 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
   }
   std::for_each(threads.begin(), threads.end(), [](std::thread& x) { x.join(); });
 
+  time_eq_1 = 0;
+  tot_matrix_multiplication_time = 0;
   for (auto e = 0; e < M; ++e) {
     if (E_[e])
       continue;
 
     if (verifiers_[e]->reject_)
       return false;
+
+    time_eq_1 += verifiers_[e]->time_eq_1_;
+    tot_matrix_multiplication_time += verifiers_[e]->tot_matrix_multiplication_time_;
   }
 
   // 2 + 3 + 4

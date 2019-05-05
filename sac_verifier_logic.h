@@ -53,6 +53,9 @@ public:
 
   block seed_global_;
   osuCrypto::PRNG prng_seed_global_;
+
+  int time_eq_1;
+  int tot_matrix_multiplication_time;
 };
 
 
@@ -163,11 +166,16 @@ bool SacVerifierLogic<FieldType>::r6(const block &seed_global, const std::vector
   std::vector<block> psi_to_hash(M);
   std::vector<block> theta_to_hash(M);
 
+  time_eq_1 = 0;
+  tot_matrix_multiplication_time = 0;
   for (auto e = 0; e < M; ++e) {
     h_to_hash[e] = verifiers_[e]->h_; // For step 2
     pi_to_hash[e] = verifiers_[e]->pi_; // For step 3
     psi_to_hash[e] = verifiers_[e]->psi_; // For step 4
     theta_to_hash[e] = verifiers_[e]->theta_; // For step 5
+
+    time_eq_1 += verifiers_[e]->time_eq_1_;
+    tot_matrix_multiplication_time += verifiers_[e]->tot_matrix_multiplication_time_;
   }
 
   // 2

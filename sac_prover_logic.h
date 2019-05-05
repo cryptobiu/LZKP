@@ -57,6 +57,7 @@ public:
   block h_pi_, h_psi_, h_theta_;
 
   int time_eq_1;
+  int tot_matrix_multiplication_time;
 };
 
 template <class FieldType>
@@ -152,11 +153,14 @@ void SacProverLogic<FieldType>::r3(const block &seed_ell, block &h_pi, block &h_
   std::vector<block> theta_to_hash(M);
 
   time_eq_1 = 0;
+  tot_matrix_multiplication_time = 0;
   for (auto e = 0; e < M; ++e) {
     pi_to_hash[e] = provers_[e]->pi_;
     psi_to_hash[e] = provers_[e]->psi_;
     theta_to_hash[e] = provers_[e]->theta_;
+
     time_eq_1 += provers_[e]->time_eq_1_;
+    tot_matrix_multiplication_time += provers_[e]->tot_matrix_multiplication_time_;
   }
 
   blake_h_pi.Update(pi_to_hash.data(), M); // For step 4
