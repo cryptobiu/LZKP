@@ -34,7 +34,7 @@ namespace lzkp {
 
 class Party {
 public:
-  Party() : sock_(0), RTT_(0), tot_computation_time_(0), tot_matrix_multiplication_time_(0) { }
+  Party() : sock_(0), RTT_(0), tot_computation_time_(0) { }
   virtual ~Party() { };
 
   virtual int init(int argc, const char* const argv[]) = 0;
