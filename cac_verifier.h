@@ -331,10 +331,16 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
     for (auto l = 0; l < n; ++l) {
       FieldType prod;
 
+      auto matrix_multiplication_start_time = std::chrono::high_resolution_clock::now();
+
       if (i != N - 1)
         prod = FieldType::dotProdct(a_, s_computed, l, i, m);
       else
         prod = FieldType::dotProdct(a_, s, l, i, m);
+
+      auto matrix_multiplication_end_time = std::chrono::high_resolution_clock::now();
+      auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(matrix_multiplication_end_time - matrix_multiplication_start_time);
+      tot_matrix_multiplication_time_ += dur.count();
 
       o_[i] += coefficients_[l] * ((t_[l] / FieldType(N)) - prod);
     }

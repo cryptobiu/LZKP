@@ -164,13 +164,15 @@ int main(int argc, char *argv[]) {
   if (is_prover) {
     if (protocol_type == 0) // Cut-and-Choose
       std::cout << dur.count() - (party->RTT_ / 1000) << "," << party->tot_computation_time_ << ","
-                << party->time_eq_1 << "," << party->time_cut_and_choose_ << "," << party->RTT_ << std::endl;
+                << party->time_eq_1 << "," << party->tot_matrix_multiplication_time_ << ","
+                << party->time_cut_and_choose_ << "," << party->RTT_ << std::endl;
     else
       std::cout << dur.count() - (party->RTT_ / 1000) << "," << party->tot_computation_time_ << ","
-              << party->time_eq_1 << "," << party->RTT_ << std::endl;
+                << party->time_eq_1 << party->tot_matrix_multiplication_time_ << "," << "," << party->RTT_ << std::endl;
   }
   else {
     std::cout << dur.count() << "," << party->tot_computation_time_ << ","
+              << party->tot_matrix_multiplication_time_ << ","
               << dynamic_cast<VerifierParty*>(party)->isAccepted() << std::endl;
   }
 
