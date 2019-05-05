@@ -220,7 +220,7 @@ void CacProverLogic<FieldType>::r5(const block &seed_ell, block &h_psi) {
       psi_to_hash[e_id++] = provers_[e]->psi_;
 
       time_eq_1 += provers_[e]->time_eq_1_;
-      tot_matrix_multiplication_time += provers_[e]->tot_matrix_multiplication_time_;
+      tot_matrix_multiplication_time += provers_[e]->tot_matrix_multiplication_time_ / 1000000;
     }
   }
   blake_h_psi.Update(psi_to_hash.data(), M - tau);

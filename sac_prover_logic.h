@@ -160,7 +160,7 @@ void SacProverLogic<FieldType>::r3(const block &seed_ell, block &h_pi, block &h_
     theta_to_hash[e] = provers_[e]->theta_;
 
     time_eq_1 += provers_[e]->time_eq_1_;
-    tot_matrix_multiplication_time += provers_[e]->tot_matrix_multiplication_time_;
+    tot_matrix_multiplication_time += provers_[e]->tot_matrix_multiplication_time_ / 1000000;
   }
 
   blake_h_pi.Update(pi_to_hash.data(), M); // For step 4

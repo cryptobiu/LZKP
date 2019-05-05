@@ -261,7 +261,7 @@ bool SacProverParty<FieldType>::runOnline() {
   p.r3(seed_ell, h_pi, h_psi, h_theta); // Run round 3
   stopComputationClock();
   time_eq_1 = p.time_eq_1;
-  tot_matrix_multiplication_time = p.tot_matrix_multiplication_time / 1000000;
+  tot_matrix_multiplication_time = p.tot_matrix_multiplication_time;
   debug("done" << std::endl);
   iov[0].iov_base = &h_pi;
   iov[0].iov_len = sizeof(h_pi);

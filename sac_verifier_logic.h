@@ -175,7 +175,7 @@ bool SacVerifierLogic<FieldType>::r6(const block &seed_global, const std::vector
     theta_to_hash[e] = verifiers_[e]->theta_; // For step 5
 
     time_eq_1 += verifiers_[e]->time_eq_1_;
-    tot_matrix_multiplication_time += verifiers_[e]->tot_matrix_multiplication_time_;
+    tot_matrix_multiplication_time += verifiers_[e]->tot_matrix_multiplication_time_ / 1000000;
   }
 
   // 2

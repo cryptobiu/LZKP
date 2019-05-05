@@ -231,7 +231,7 @@ bool CacVerifierLogic<FieldType>::r8(const block &seed_e_bar, const std::vector<
       return false;
 
     time_eq_1 += verifiers_[e]->time_eq_1_;
-    tot_matrix_multiplication_time += verifiers_[e]->tot_matrix_multiplication_time_;
+    tot_matrix_multiplication_time += verifiers_[e]->tot_matrix_multiplication_time_ / 1000000;
   }
 
   // 2 + 3 + 4
