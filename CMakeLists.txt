@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -g -O3 -march=native -mbmi
 
 include_directories(.)
 
-link_directories(/usr/local/lib /usr/lib)
+link_directories(/usr/local/lib /usr/lib ~/cryptoTools/thirdparty/linux/miracl/miracl/source)
 
 find_package(Boost 1.62.0 REQUIRED
         #[version] [EXACT]      # Minimum or EXACT version e.g. 1.36.0
