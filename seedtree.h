@@ -5,6 +5,8 @@
 
 #include "block.h"
 #include <cryptoTools/Crypto/PRNG.h>
+#include <algorithm>
+#include <functional>
 
 
 namespace lzkp {
