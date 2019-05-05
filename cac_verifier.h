@@ -6,6 +6,8 @@
 #include <queue>
 #include <cryptoTools/Crypto/Blake2.h>
 #include <cryptoTools/Crypto/PRNG.h>
+#include <chrono>
+
 
 #include "seedtree.h"
 #include "parameters.h"
