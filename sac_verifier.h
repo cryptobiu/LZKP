@@ -65,6 +65,9 @@ public:
   FieldType sigma_v;
   block u_;
   block theta_;
+
+  int time_eq_1_;
+  int tot_matrix_multiplication_time_;
 };
 
 template <class FieldType>
