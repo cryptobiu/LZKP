@@ -324,6 +324,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
   osuCrypto::Blake2 blake_psi(sizeof(block));
 
   auto eq_1_clock = std::chrono::high_resolution_clock::now();
+  tot_matrix_multiplication_time_ = 0;
 
   o_.resize(N);
   for (auto i = 0; i < N; ++i) {
