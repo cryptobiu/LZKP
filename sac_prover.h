@@ -67,6 +67,7 @@ public:
   int i_bar_;
 
   int time_eq_1_;
+  int tot_matrix_multiplication_time_;
 };
 
 template <class FieldType>
