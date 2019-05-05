@@ -62,7 +62,7 @@ public:
   block h_psi_;
 
   int time_eq_1;
-  int tot_matrix_multiplication_time;
+  long tot_matrix_multiplication_time;
 };
 
 template <class FieldType>

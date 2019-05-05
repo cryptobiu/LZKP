@@ -296,7 +296,7 @@ bool CacProverParty<FieldType>::runOnline() {
   p.r5(seed_ell, h_psi); // Run round 5
   stopComputationClock();
   time_eq_1 = p.time_eq_1;
-  tot_matrix_multiplication_time = p.tot_matrix_multiplication_time;
+  tot_matrix_multiplication_time = p.tot_matrix_multiplication_time / 1000000;
   debug("done" << std::endl);
   iov[0].iov_base = &h_psi;
   iov[0].iov_len = sizeof(h_psi);

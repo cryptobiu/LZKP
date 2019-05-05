@@ -60,7 +60,7 @@ public:
   block psi_;
 
   int time_eq_1_;
-  int tot_matrix_multiplication_time_;
+  long tot_matrix_multiplication_time_;
 };
 
 template <class FieldType>
@@ -347,7 +347,7 @@ bool CacVerifier<FieldType>::r8(const std::vector<block> &seed_tree, const block
         prod = FieldType::dotProdct(a_, s, l, i, m);
 
       auto matrix_multiplication_end_time = std::chrono::high_resolution_clock::now();
-      auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(matrix_multiplication_end_time - matrix_multiplication_start_time);
+      auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(matrix_multiplication_end_time - matrix_multiplication_start_time);
       tot_matrix_multiplication_time_ += dur.count();
 
       o_[i] += coefficients_[l] * ((t_[l] / FieldType(N)) - prod);

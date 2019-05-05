@@ -58,7 +58,7 @@ public:
   osuCrypto::PRNG prng_e_bar_;
 
   int time_eq_1;
-  int tot_matrix_multiplication_time;
+  long tot_matrix_multiplication_time;
 };
 
 

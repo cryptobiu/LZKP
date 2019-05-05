@@ -57,7 +57,7 @@ public:
   block h_pi_, h_psi_, h_theta_;
 
   int time_eq_1;
-  int tot_matrix_multiplication_time;
+  long tot_matrix_multiplication_time;
 };
 
 template <class FieldType>
