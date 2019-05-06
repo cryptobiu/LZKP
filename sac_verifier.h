@@ -43,7 +43,7 @@ public:
   osuCrypto::PRNG prng_seed_ell_;
   std::vector<FieldType> ep_, be_;
 
-  int i_bar_;
+  volatile int i_bar_;
 
   SeedTree seed_tree_;
   std::vector<block> r_;
@@ -52,7 +52,7 @@ public:
   std::vector<block> gamma_;
   block h_;
 
-  bool reject_;
+  volatile bool reject_;
   std::vector<block> partial_seeds_;
   block g_;
   block pi_;
@@ -68,8 +68,8 @@ public:
   block u_;
   block theta_;
 
-  int time_eq_1_;
-  long tot_matrix_multiplication_time_;
+  volatile int time_eq_1_;
+  volatile long tot_matrix_multiplication_time_;
 };
 
 template <class FieldType>
