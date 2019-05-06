@@ -64,10 +64,10 @@ public:
   block u_;
   block theta_;
 
-  int i_bar_;
+  volatile int i_bar_;
 
-  int time_eq_1_;
-  long tot_matrix_multiplication_time_;
+  volatile int time_eq_1_;
+  volatile long tot_matrix_multiplication_time_;
 };
 
 template <class FieldType>
