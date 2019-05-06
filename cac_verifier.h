@@ -48,9 +48,9 @@ public:
   block h_;
   std::vector<FieldType> coefficients_;
 
-  int i_bar_;
+  volatile int i_bar_;
 
-  bool reject_;
+  volatile bool reject_;
   std::vector<block> partial_seeds_;
   block pi_;
   block g_;
@@ -59,8 +59,8 @@ public:
   block w_;
   block psi_;
 
-  int time_eq_1_;
-  long tot_matrix_multiplication_time_;
+  volatile int time_eq_1_;
+  volatile long tot_matrix_multiplication_time_;
 };
 
 template <class FieldType>
